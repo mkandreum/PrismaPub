@@ -64,71 +64,69 @@ export default function Hero() {
           className="absolute inset-x-0 top-0 z-0 flex flex-col items-center justify-start pt-16 md:pt-20 pointer-events-none overflow-hidden h-full"
         >
           <div className="relative w-full max-w-[600px] h-[600px] flex items-center justify-center">
-            {/* Rainbow Beams - originating from top point */}
-            <div className="absolute top-[16.5%] left-1/2 -translate-x-1/2 w-full h-[120vh] z-10">
+            {/* Rainbow Beams - Precisely aligned to Y: 48 within the relative 300 viewBox equivalent */}
+            <div className="absolute top-[16%] left-1/2 -translate-x-1/2 w-full h-[150vh] z-10">
               {[
-                { color: '#FF0000', angle: -24 },
-                { color: '#FF7F00', angle: -16 },
-                { color: '#FFFF00', angle: -8 },
+                { color: '#FF0000', angle: -28 },
+                { color: '#FF4500', angle: -19 },
+                { color: '#FFFF00', angle: -10 },
                 { color: '#00FF00', angle: 0 },
-                { color: '#0080FF', angle: 8 },
-                { color: '#4B0082', angle: 16 },
-                { color: '#9400D3', angle: 24 },
+                { color: '#00BFFF', angle: 10 },
+                { color: '#0000FF', angle: 19 },
+                { color: '#FF00FF', angle: 28 },
               ].map((beam, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 0.92, height: '100%' }}
+                  animate={{ opacity: 1, height: '100%' }}
                   transition={{ duration: 1.5, delay: i * 0.1, ease: "easeOut" }}
                   className="absolute top-0 left-1/2 origin-top"
                   style={{
                     transform: `translateX(-50%) rotate(${beam.angle}deg)`,
-                    width: '12px',
-                    background: `linear-gradient(to bottom, ${beam.color} 0%, ${beam.color}AA 25%, ${beam.color}66 50%, transparent 95%)`,
-                    boxShadow: `0 0 35px ${beam.color}88`,
-                    filter: 'blur(0.5px)',
+                    width: '14px',
+                    background: `linear-gradient(to bottom, ${beam.color} 0%, ${beam.color} 30%, ${beam.color}CC 60%, transparent 95%)`,
+                    boxShadow: `0 0 45px ${beam.color}AA`,
+                    filter: 'blur(0.4px)',
                   }}
                 >
                   <div 
-                    className="w-[3px] h-full mx-auto bg-white/50 blur-[1px]"
-                    style={{ animation: `pulse-beam 3s infinite alternate ${i * 0.2}s` }}
+                    className="w-[5px] h-full mx-auto bg-white/70 blur-[1px]"
+                    style={{ animation: `pulse-beam 2.5s infinite alternate ${i * 0.15}s` }}
                   />
                 </motion.div>
               ))}
             </div>
 
-            {/* The Star at the Apex - Perfectly centered with beams */}
-            <div className="absolute top-[16%] left-1/2 -translate-x-1/2 z-40">
+            {/* The Star at the Apex - Perfectly centered at Y: 16% */}
+            <div className="absolute top-[16%] left-1/2 -translate-x-1/2 z-40 -translate-y-[2px]">
               <div className="relative">
-                <div className="absolute inset-0 bg-white blur-2xl opacity-90 scale-[2] animate-pulse" />
-                <div className="relative w-3 h-3 bg-white rounded-full shadow-[0_0_25px_#fff,0_0_50px_#fff]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-[2px] bg-white blur-[1.5px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-16 w-[2px] bg-white blur-[1.5px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-[1.5px] bg-white rotate-45" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-[1.5px] bg-white -rotate-45" />
+                <div className="absolute inset-0 bg-white blur-2xl opacity-100 scale-[2.2] animate-pulse" />
+                <div className="relative w-4 h-4 bg-white rounded-full shadow-[0_0_35px_#fff,0_0_70px_#fff]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-[3px] bg-white blur-[2px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-20 w-[3px] bg-white blur-[2px]" />
               </div>
             </div>
 
-            {/* The Prism Outline (SVG) - Positioned so apex is at top-[16%] */}
+            {/* The Prism Outline (SVG) */}
             <svg viewBox="0 0 300 300" className="w-[85vw] h-[85vw] max-w-[450px] max-h-[450px] drop-shadow-[0_0_40px_rgba(255,255,255,0.4)] z-30">
               <defs>
                 <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
-                  <stop offset="50%" stopColor="rgba(168,85,247,0.8)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0.9)" />
+                  <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+                  <stop offset="50%" stopColor="rgba(192,132,252,1)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,1)" />
                 </linearGradient>
               </defs>
               <path
                 d="M150 48 L270 260 L30 260 Z"
-                fill="rgba(168,85,247,0.08)"
+                fill="rgba(168,85,247,0.12)"
                 stroke="url(#prism-stroke-enhanced)"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 className="animate-pulse"
                 style={{ animationDuration: '3s' }}
               />
-              <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-              <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-              <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+              <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
+              <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
+              <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
             </svg>
           </div>
         </motion.div>
