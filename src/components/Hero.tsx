@@ -37,9 +37,9 @@ export default function Hero() {
       {/* Animated gradient bg */}
       <div className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-[#050510]" />
-        <motion.div className="glow-orb left-[-10%] top-[-5%] h-[500px] w-[500px] bg-[#3a1a7a]/40 blur-[120px]" animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="glow-orb right-[-10%] top-[10%] h-[600px] w-[600px] bg-[#4c0577]/35 blur-[130px]" animate={{ x: [0, -40, 0], y: [0, 40, 0], scale: [1, 1.2, 1] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="glow-orb bottom-[-10%] left-[20%] h-[450px] w-[450px] bg-[#1e0b4a]/50 blur-[100px]" animate={{ x: [0, 30, 0], y: [0, 20, 0] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
+        <div className="glow-orb left-[-10%] top-[-5%] h-[500px] w-[500px] bg-[#3a1a7a]/40 blur-[120px] animate-[glow-drift-1_15s_ease-in-out_infinite]" />
+        <div className="glow-orb right-[-10%] top-[10%] h-[600px] w-[600px] bg-[#4c0577]/35 blur-[130px] animate-[glow-drift-2_12s_ease-in-out_infinite]" />
+        <div className="glow-orb bottom-[-10%] left-[20%] h-[450px] w-[450px] bg-[#1e0b4a]/50 blur-[100px] animate-[glow-drift-3_18s_ease-in-out_infinite]" />
       </div>
 
       {/* Floating particles */}
@@ -65,8 +65,25 @@ export default function Hero() {
             <defs>
               <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(255,255,255,1)" />
-                <stop offset="50%" stopColor="rgba(210,160,255,1)" />
+                <stop offset="30%" stopColor="rgba(220,180,255,1)" />
+                <stop offset="50%" stopColor="rgba(255,255,255,1)" />
+                <stop offset="70%" stopColor="rgba(200,160,255,1)" />
                 <stop offset="100%" stopColor="rgba(255,255,255,1)" />
+              </linearGradient>
+              <linearGradient id="prism-edge-left" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+                <stop offset="50%" stopColor="rgba(200,170,255,0.9)" />
+                <stop offset="100%" stopColor="rgba(180,140,255,0.8)" />
+              </linearGradient>
+              <linearGradient id="prism-edge-right" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+                <stop offset="50%" stopColor="rgba(220,190,255,0.9)" />
+                <stop offset="100%" stopColor="rgba(190,150,255,0.8)" />
+              </linearGradient>
+              <linearGradient id="prism-edge-bottom" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="rgba(180,140,255,0.8)" />
+                <stop offset="50%" stopColor="rgba(255,255,255,0.9)" />
+                <stop offset="100%" stopColor="rgba(190,150,255,0.8)" />
               </linearGradient>
               <linearGradient id="entry-beam-grad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="rgba(255,255,255,0)" />
@@ -74,14 +91,14 @@ export default function Hero() {
                 <stop offset="100%" stopColor="rgba(255,255,255,0.95)" />
               </linearGradient>
               <radialGradient id="prism-body-glow" cx="50%" cy="55%" r="50%">
-                <stop offset="0%" stopColor="rgba(200,170,255,0.18)" />
-                <stop offset="50%" stopColor="rgba(160,120,255,0.08)" />
+                <stop offset="0%" stopColor="rgba(220,190,255,0.22)" />
+                <stop offset="40%" stopColor="rgba(180,140,255,0.12)" />
                 <stop offset="100%" stopColor="rgba(140,100,255,0)" />
               </radialGradient>
               <radialGradient id="apex-flare" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
-                <stop offset="25%" stopColor="rgba(230,210,255,0.5)" />
-                <stop offset="60%" stopColor="rgba(200,170,255,0.15)" />
+                <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+                <stop offset="20%" stopColor="rgba(240,220,255,0.6)" />
+                <stop offset="50%" stopColor="rgba(210,180,255,0.2)" />
                 <stop offset="100%" stopColor="transparent" />
               </radialGradient>
               <filter id="beam-glow" x="-50%" y="-10%" width="200%" height="140%">
@@ -92,6 +109,9 @@ export default function Hero() {
               </filter>
               <filter id="flare-glow" x="-100%" y="-100%" width="300%" height="300%">
                 <feGaussianBlur stdDeviation="3" />
+              </filter>
+              <filter id="edge-radiance" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="4" />
               </filter>
             </defs>
 
@@ -161,14 +181,51 @@ export default function Hero() {
               filter="url(#soft-glow)"
             />
 
-            {/* Prism triangle */}
+            {/* Prism triangle - main shape */}
             <polygon
               points="150,48 270,260 30,260"
               fill="rgba(178,112,255,0.09)"
               stroke="url(#prism-stroke-enhanced)"
               strokeWidth="2.7"
               strokeLinejoin="round"
+              className="prism-triangle-edge"
             />
+
+            {/* Glowing edge overlays for radiant edges */}
+            {/* Left edge glow */}
+            <motion.line
+              x1="150" y1="48" x2="30" y2="260"
+              stroke="url(#prism-edge-left)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              filter="url(#edge-radiance)"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            {/* Right edge glow */}
+            <motion.line
+              x1="150" y1="48" x2="270" y2="260"
+              stroke="url(#prism-edge-right)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              filter="url(#edge-radiance)"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 3.5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+            {/* Bottom edge glow */}
+            <motion.line
+              x1="30" y1="260" x2="270" y2="260"
+              stroke="url(#prism-edge-bottom)"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              filter="url(#edge-radiance)"
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: [0.3, 0.7, 0.3] }}
+              transition={{ duration: 4, delay: 1, repeat: Infinity, ease: "easeInOut" }}
+            />
+
             <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.45)" strokeWidth="1.1" />
             <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
             <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
@@ -329,6 +386,7 @@ export default function Hero() {
                 <img
                   src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop"
                   alt="Party"
+                  loading="lazy"
                   className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
                 />
               </motion.div>
@@ -342,6 +400,7 @@ export default function Hero() {
                 <img
                   src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"
                   alt="Club"
+                  loading="lazy"
                   className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
                 />
               </motion.div>

@@ -4,18 +4,28 @@
  */
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import EventsSection from './components/EventsSection';
-import Gallery from './components/Gallery';
 import Marquee from './components/Marquee';
 import Banners from './components/Banners';
-import Login from './components/Login';
-import AdminDashboard from './components/AdminDashboard';
-import Ticket from './pages/Ticket';
 import { ToastProvider } from './components/Toast';
 import { MapPin, Instagram } from 'lucide-react';
+
+// Lazy-load below-fold and heavy components for better initial load performance
+const EventsSection = lazy(() => import('./components/EventsSection'));
+const Gallery = lazy(() => import('./components/Gallery'));
+const Login = lazy(() => import('./components/Login'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const Ticket = lazy(() => import('./pages/Ticket'));
+
+function LazyFallback() {
+  return (
+    <div className="flex justify-center items-center py-20">
+      <div className="w-10 h-10 border-2 border-prisma-purple/30 border-t-prisma-accent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 // ── MAIN SINGLE-PAGE APP ──────────────────────────────
 function MainApp() {
@@ -61,20 +71,28 @@ function MainApp() {
             <main>
               <Hero />
               <Marquee text={settings.marquee_1 || 'PRISMA PUB • SAFE SPACE • GOOD VIBES • '} />
-              <EventsSection />
+              <Suspense fallback={<LazyFallback />}>
+                <EventsSection />
+              </Suspense>
               <Marquee text={settings.marquee_2 || 'GALLERY • UNFORGETTABLE NIGHTS • '} reverse />
-              <Gallery />
+              <Suspense fallback={<LazyFallback />}>
+                <Gallery />
+              </Suspense>
               <Footer settings={settings} />
             </main>
           </>
         )}
 
         {currentView === 'login' && (
-          <Login onLogin={handleLogin} onBack={() => setCurrentView('home')} />
+          <Suspense fallback={<LazyFallback />}>
+            <Login onLogin={handleLogin} onBack={() => setCurrentView('home')} />
+          </Suspense>
         )}
 
         {currentView === 'admin' && (
-          <AdminDashboard onLogout={() => { localStorage.removeItem('prisma_token'); handleBackToHome(); }} />
+          <Suspense fallback={<LazyFallback />}>
+            <AdminDashboard onLogout={() => { localStorage.removeItem('prisma_token'); handleBackToHome(); }} />
+          </Suspense>
         )}
       </div>
     </ToastProvider>
@@ -174,7 +192,9 @@ function Footer({ settings }: { settings: Record<string, string> }) {
 function TicketPage() {
   return (
     <div className="app-shell noise-bg min-h-screen bg-prisma-dark font-sans selection:bg-prisma-accent selection:text-white">
-      <Ticket />
+      <Suspense fallback={<LazyFallback />}>
+        <Ticket />
+      </Suspense>
     </div>
   );
 }
