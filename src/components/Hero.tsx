@@ -59,96 +59,87 @@ export default function Hero() {
       {/* ── PRISM AT THE VERY TOP ── */}
       {!imageUrl && (
         <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="relative z-20 pt-28 md:pt-36 flex flex-col items-center"
+          className="absolute inset-x-0 top-0 z-0 flex flex-col items-center justify-start pt-20 md:pt-28 pointer-events-none overflow-hidden h-full"
         >
-          <div className="prism-visual">
-            <div className="prism-star" />
-            <div className="prism-entry-beam" />
-            <svg viewBox="0 0 300 280" className="prism-svg w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
+          <div className="relative w-full max-w-[500px] h-[500px] flex items-center justify-center">
+            {/* The Star at the Apex */}
+            <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-30">
+              <div className="relative">
+                <div className="absolute inset-0 bg-white blur-xl opacity-80 scale-150 animate-pulse" />
+                <div className="relative w-2 h-2 bg-white rounded-full shadow-[0_0_20px_#fff,0_0_40px_#fff]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-[1px] bg-white/60 blur-[1px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-[1px] bg-white/60 blur-[1px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-[1px] bg-white/40 rotate-45" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-[1px] bg-white/40 -rotate-45" />
+              </div>
+            </div>
+
+            {/* The Prism Outline (SVG) */}
+            <svg viewBox="0 0 300 300" className="w-80 h-80 md:w-96 md:h-96 drop-shadow-[0_0_25px_rgba(168,85,247,0.4)] z-20">
               <defs>
-                <radialGradient id="prismFill" cx="50%" cy="35%" r="75%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
-                  <stop offset="40%" stopColor="rgba(158,122,255,0.08)" />
-                  <stop offset="100%" stopColor="transparent" />
-                </radialGradient>
-                <linearGradient id="prismEdge" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(215,189,255,0.75)" />
-                  <stop offset="30%" stopColor="rgba(255,255,255,0.95)" />
-                  <stop offset="70%" stopColor="rgba(195,157,255,0.9)" />
-                  <stop offset="100%" stopColor="rgba(163,118,255,0.75)" />
+                <linearGradient id="prism-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
+                  <stop offset="50%" stopColor="rgba(255,255,255,0.2)" />
+                  <stop offset="100%" stopColor="rgba(168,85,247,0.4)" />
                 </linearGradient>
-                <linearGradient id="innerEdge" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.2)" />
-                  <stop offset="100%" stopColor="rgba(201,173,255,0.3)" />
-                </linearGradient>
-                <filter id="prismGlow">
-                  <feGaussianBlur stdDeviation="2.8" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
               </defs>
-
-              {/* Outer bloom */}
-              <polygon
-                points="150,18 279,258 21,258"
+              <path
+                d="M150 25 L260 250 L40 250 Z"
                 fill="none"
-                stroke="rgba(186,143,255,0.22)"
-                strokeWidth="12"
-                strokeLinejoin="round"
-                style={{ filter: 'blur(8px)' }}
+                stroke="url(#prism-stroke)"
+                strokeWidth="1.5"
+                className="animate-pulse"
+                style={{ animationDuration: '4s' }}
               />
-
-              {/* Main prism */}
-              <polygon
-                points="150,18 279,258 21,258"
-                fill="url(#prismFill)"
-                stroke="url(#prismEdge)"
-                strokeWidth="2.2"
-                strokeLinejoin="round"
-                filter="url(#prismGlow)"
-              />
-
-              {/* Inner depth triangle */}
-              <polygon
-                points="150,72 238,218 62,218"
-                fill="none"
-                stroke="url(#innerEdge)"
-                strokeWidth="1"
-                strokeLinejoin="round"
-              />
-
-              <line x1="150" y1="18" x2="150" y2="72" stroke="rgba(255,255,255,0.17)" strokeWidth="0.9" />
-              <line x1="21" y1="258" x2="62" y2="218" stroke="rgba(255,255,255,0.14)" strokeWidth="0.9" />
-              <line x1="279" y1="258" x2="238" y2="218" stroke="rgba(255,255,255,0.14)" strokeWidth="0.9" />
-
-              <line x1="76" y1="217" x2="224" y2="217" stroke="rgba(126,181,255,0.22)" strokeWidth="1" />
-              <line x1="120" y1="57" x2="180" y2="57" stroke="rgba(255,255,255,0.14)" strokeWidth="0.8" />
+              {/* Internal 3D structure */}
+              <line x1="150" y1="25" x2="150" y2="250" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+              <line x1="40" y1="250" x2="150" y2="180" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
+              <line x1="260" y1="250" x2="150" y2="180" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
             </svg>
 
-            {/* Rainbow beam starting at the top prism vertex */}
-            <div className="prism-beams" aria-hidden="true">
-              <span className="prism-line prism-red" />
-              <span className="prism-line prism-orange" />
-              <span className="prism-line prism-yellow" />
-              <span className="prism-line prism-lime" />
-              <span className="prism-line prism-cyan" />
-              <span className="prism-line prism-blue" />
-              <span className="prism-line prism-magenta" />
-              <span className="prism-side-ray prism-side-left" />
-              <span className="prism-side-ray prism-side-right" />
+            {/* Rainbow Beams - originating from top point */}
+            <div className="absolute top-[8.5%] left-1/2 -translate-x-1/2 w-full h-[120vh] z-10">
+              {[
+                { color: '#FF0000', angle: -24 },
+                { color: '#FF7F00', angle: -16 },
+                { color: '#FFFF00', angle: -8 },
+                { color: '#00FF00', angle: 0 },
+                { color: '#0080FF', angle: 8 },
+                { color: '#4B0082', angle: 16 },
+                { color: '#9400D3', angle: 24 },
+              ].map((beam, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 0.9, height: '100%' }}
+                  transition={{ duration: 1.5, delay: i * 0.1, ease: "easeOut" }}
+                  className="absolute top-0 left-1/2 origin-top"
+                  style={{
+                    transform: `translateX(-50%) rotate(${beam.angle}deg)`,
+                    width: '10px',
+                    background: `linear-gradient(to bottom, ${beam.color} 0%, ${beam.color}88 30%, ${beam.color}44 60%, transparent 95%)`,
+                    boxShadow: `0 0 20px ${beam.color}66`,
+                    filter: 'blur(0.5px)',
+                  }}
+                >
+                  {/* Central glowing core for each beam */}
+                  <div 
+                    className="w-[2px] h-full mx-auto bg-white/40 blur-[1px]"
+                    style={{ animation: `pulse-beam 3s infinite alternate ${i * 0.2}s` }}
+                  />
+                </motion.div>
+              ))}
             </div>
           </div>
         </motion.div>
       )}
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-8 pb-16'}`}>
+      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-28 md:pt-48 pb-16'}`}>
         {/* Text Content */}
-        <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center hero-content-shell px-4 sm:px-8 py-5 sm:py-7 rounded-3xl'}`}>
+        <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center'}`}>
           {/* Small badge */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.8 }}

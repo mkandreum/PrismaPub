@@ -140,6 +140,11 @@ h1, h2 {
   opacity: 0.5;
 }
 
+@keyframes pulse-beam {
+  0% { transform: scaleX(1); opacity: 0.4; }
+  100% { transform: scaleX(1.8); opacity: 0.9; }
+}
+
 /* ── FLOATING PARTICLES ────────────────────────── */
 @keyframes float-up {
   0%   { transform: translateY(100vh) scale(0); opacity: 0; }
@@ -394,16 +399,17 @@ h1, h2 {
 
 .prism-line {
   position: absolute;
-  top: 20px;
+  top: 10px;
   left: 50%;
   height: 100%;
-  width: 5px;
+  width: 9px;
   border-radius: 9999px;
   transform-origin: 50% 0%;
   background: var(--beam-color);
   box-shadow:
-    0 0 7px color-mix(in srgb, var(--beam-color) 84%, white 16%),
-    0 0 14px color-mix(in srgb, var(--beam-color) 58%, white 42%);
+    0 0 12px color-mix(in srgb, var(--beam-color) 92%, white 8%),
+    0 0 24px color-mix(in srgb, var(--beam-color) 65%, white 35%),
+    0 0 50px color-mix(in srgb, var(--beam-color) 30%, transparent 70%);
   animation: prism-line-glow 3.2s ease-in-out infinite;
 }
 
@@ -534,19 +540,15 @@ h1, h2 {
 }
 
 .hero-content-shell {
-  background:
-    linear-gradient(180deg, rgba(12, 13, 28, 0.06) 0%, rgba(12, 13, 28, 0.62) 28%, rgba(12, 13, 28, 0.86) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 45px rgba(7, 9, 25, 0.4);
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
   .hero-content-shell {
-    background:
-      linear-gradient(180deg, rgba(12, 13, 28, 0.1) 0%, rgba(12, 13, 28, 0.68) 24%, rgba(12, 13, 28, 0.9) 100%);
+    background: transparent;
   }
 }
 
