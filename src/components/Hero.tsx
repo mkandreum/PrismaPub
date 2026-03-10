@@ -53,35 +53,27 @@ export default function Hero() {
           className="relative z-20 pt-28 md:pt-36 flex flex-col items-center"
         >
           <div className="prism-visual">
+            <div className="prism-star" />
+            <div className="prism-entry-beam" />
             <svg viewBox="0 0 300 280" className="prism-svg w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
               <defs>
-                <radialGradient id="centerGlow" cx="50%" cy="40%" r="40%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,1)" />
-                  <stop offset="30%" stopColor="rgba(200,200,255,0.5)" />
-                  <stop offset="60%" stopColor="rgba(139,92,246,0.15)" />
+                <radialGradient id="prismFill" cx="50%" cy="35%" r="75%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
+                  <stop offset="40%" stopColor="rgba(158,122,255,0.08)" />
                   <stop offset="100%" stopColor="transparent" />
                 </radialGradient>
-                <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(139,92,246,0.8)" />
-                  <stop offset="20%" stopColor="rgba(255,255,255,0.95)" />
-                  <stop offset="40%" stopColor="rgba(168,85,247,1)" />
-                  <stop offset="60%" stopColor="rgba(255,255,255,0.95)" />
-                  <stop offset="80%" stopColor="rgba(139,92,246,0.8)" />
-                  <stop offset="100%" stopColor="rgba(168,85,247,0.9)" />
+                <linearGradient id="prismEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(215,189,255,0.75)" />
+                  <stop offset="30%" stopColor="rgba(255,255,255,0.95)" />
+                  <stop offset="70%" stopColor="rgba(195,157,255,0.9)" />
+                  <stop offset="100%" stopColor="rgba(163,118,255,0.75)" />
                 </linearGradient>
-                <linearGradient id="glassFill" x1="50%" y1="0%" x2="50%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(139,92,246,0.06)" />
-                  <stop offset="50%" stopColor="rgba(255,255,255,0.04)" />
-                  <stop offset="100%" stopColor="rgba(168,85,247,0.08)" />
-                </linearGradient>
-                <linearGradient id="lightBeam" x1="0%" y1="0%" x2="100%" y2="50%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-                  <stop offset="40%" stopColor="rgba(255,255,255,0.6)" />
-                  <stop offset="60%" stopColor="rgba(255,255,255,0.8)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                <linearGradient id="innerEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.2)" />
+                  <stop offset="100%" stopColor="rgba(201,173,255,0.3)" />
                 </linearGradient>
                 <filter id="prismGlow">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feGaussianBlur stdDeviation="2.8" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
@@ -89,103 +81,43 @@ export default function Hero() {
                 </filter>
               </defs>
 
-              {/* Far outer glow */}
+              {/* Outer bloom */}
               <polygon
                 points="150,15 285,265 15,265"
                 fill="none"
-                stroke="rgba(139,92,246,0.15)"
-                strokeWidth="16"
+                stroke="rgba(186,143,255,0.22)"
+                strokeWidth="12"
                 strokeLinejoin="round"
-                style={{ filter: 'blur(10px)' }}
+                style={{ filter: 'blur(8px)' }}
               />
 
-              {/* Outer glow triangle */}
+              {/* Main prism */}
               <polygon
                 points="150,15 285,265 15,265"
-                fill="none"
-                stroke="rgba(139,92,246,0.4)"
-                strokeWidth="6"
-                strokeLinejoin="round"
-                style={{ filter: 'blur(4px)' }}
-              />
-
-              {/* Main triangle with glass fill */}
-              <polygon
-                points="150,15 285,265 15,265"
-                fill="url(#glassFill)"
-                stroke="url(#edgeGrad)"
-                strokeWidth="2.5"
+                fill="url(#prismFill)"
+                stroke="url(#prismEdge)"
+                strokeWidth="2.2"
                 strokeLinejoin="round"
                 filter="url(#prismGlow)"
               />
 
-              {/* Inner triangle (3D depth) */}
+              {/* Inner depth triangle */}
               <polygon
-                points="150,65 248,235 52,235"
+                points="150,58 247,231 53,231"
                 fill="none"
-                stroke="rgba(255,255,255,0.25)"
-                strokeWidth="1.2"
+                stroke="url(#innerEdge)"
+                strokeWidth="1"
                 strokeLinejoin="round"
               />
 
-              {/* 3D depth connecting lines */}
-              <line x1="150" y1="15" x2="150" y2="65" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-              <line x1="15" y1="265" x2="52" y2="235" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-              <line x1="285" y1="265" x2="248" y2="235" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+              <line x1="150" y1="15" x2="150" y2="58" stroke="rgba(255,255,255,0.18)" strokeWidth="0.9" />
+              <line x1="15" y1="265" x2="53" y2="231" stroke="rgba(255,255,255,0.16)" strokeWidth="0.9" />
+              <line x1="285" y1="265" x2="247" y2="231" stroke="rgba(255,255,255,0.16)" strokeWidth="0.9" />
 
-              {/* Inner refraction highlights */}
-              <line x1="100" y1="200" x2="200" y2="200" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
-              <line x1="120" y1="160" x2="180" y2="160" stroke="rgba(255,255,255,0.06)" strokeWidth="0.6" />
-
-              {/* Light beam entering from left */}
-              <line x1="0" y1="140" x2="120" y2="140" stroke="url(#lightBeam)" strokeWidth="2" opacity="0.5">
-                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" />
-              </line>
-
-              {/* Center glow */}
-              <ellipse cx="150" cy="140" rx="60" ry="50" fill="url(#centerGlow)" />
-
-              {/* Rainbow dispersion lines from right side of prism */}
-              <line x1="200" y1="130" x2="300" y2="100" stroke="rgba(228,3,3,0.3)" strokeWidth="1.5" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite" />
-              </line>
-              <line x1="200" y1="135" x2="300" y2="120" stroke="rgba(255,140,0,0.3)" strokeWidth="1.5" opacity="0.6">
-                <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.2s" repeatCount="indefinite" />
-              </line>
-              <line x1="200" y1="140" x2="300" y2="140" stroke="rgba(255,237,0,0.3)" strokeWidth="1.5" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.5s" repeatCount="indefinite" />
-              </line>
-              <line x1="200" y1="145" x2="300" y2="160" stroke="rgba(0,128,38,0.3)" strokeWidth="1.5" opacity="0.6">
-                <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.1s" repeatCount="indefinite" />
-              </line>
-              <line x1="200" y1="150" x2="300" y2="180" stroke="rgba(36,64,142,0.3)" strokeWidth="1.5" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.3s" repeatCount="indefinite" />
-              </line>
-              <line x1="200" y1="155" x2="300" y2="200" stroke="rgba(115,41,130,0.3)" strokeWidth="1.5" opacity="0.6">
-                <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.4s" repeatCount="indefinite" />
-              </line>
-
-              {/* Top vertex bright point */}
-              <circle cx="150" cy="15" r="5" fill="white" opacity="0.95" />
-              <circle cx="150" cy="15" r="20" fill="white" opacity="0.1">
-                <animate attributeName="r" values="14;24;14" dur="3s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.08;0.2;0.08" dur="3s" repeatCount="indefinite" />
-              </circle>
-
-              {/* Bottom vertex glow points */}
-              <circle cx="15" cy="265" r="3" fill="rgba(139,92,246,0.8)" />
-              <circle cx="285" cy="265" r="3" fill="rgba(168,85,247,0.8)" />
-
-              {/* Lens flare streaks at top */}
-              <line x1="105" y1="15" x2="195" y2="15" stroke="white" strokeWidth="0.7" opacity="0.5" />
-              <line x1="150" y1="-15" x2="150" y2="45" stroke="white" strokeWidth="0.7" opacity="0.35" />
-
-              {/* Diagonal flare */}
-              <line x1="125" y1="-5" x2="175" y2="35" stroke="white" strokeWidth="0.3" opacity="0.2" />
-              <line x1="175" y1="-5" x2="125" y2="35" stroke="white" strokeWidth="0.3" opacity="0.2" />
+              <line x1="90" y1="199" x2="210" y2="199" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
             </svg>
 
-            {/* Rainbow beams emanating from prism base */}
+            {/* Rainbow beam starting at the top prism vertex */}
             <div className="prism-beams" />
           </div>
         </motion.div>
