@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
 import { ArrowRight, Instagram, Sparkles } from "lucide-react";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 
 export default function Hero() {
   const [settings, setSettings] = useState<any>({});
@@ -10,8 +10,8 @@ export default function Hero() {
     target: sectionRef,
     offset: ["start start", "end start"],
   });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const parallaxOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const parallaxOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -25,6 +25,14 @@ export default function Hero() {
   const siteName = settings.site_name || "PRISMA PUB";
   const imageUrl = settings.hero_image_url;
   const showPhotos = settings.show_hero_photos !== "0";
+  const particles = useMemo(
+    () => Array.from({ length: 16 }).map(() => ({
+      x: `${5 + Math.random() * 90}%`,
+      delay: `${Math.random() * 12}s`,
+      duration: `${10 + Math.random() * 14}s`,
+    })),
+    [],
+  );
 
   return (
     <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center overflow-hidden px-4">
@@ -39,8 +47,12 @@ export default function Hero() {
 
       {/* Floating particles */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div key={i} className="particle" style={{ '--x': `${5 + Math.random() * 90}%`, '--delay': `${Math.random() * 12}s`, '--duration': `${8 + Math.random() * 15}s` } as React.CSSProperties} />
+        {particles.map((particle, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{ '--x': particle.x, '--delay': particle.delay, '--duration': particle.duration } as React.CSSProperties}
+          />
         ))}
       </div>
 
@@ -83,7 +95,7 @@ export default function Hero() {
 
               {/* Outer bloom */}
               <polygon
-                points="150,15 285,265 15,265"
+                points="150,18 279,258 21,258"
                 fill="none"
                 stroke="rgba(186,143,255,0.22)"
                 strokeWidth="12"
@@ -93,7 +105,7 @@ export default function Hero() {
 
               {/* Main prism */}
               <polygon
-                points="150,15 285,265 15,265"
+                points="150,18 279,258 21,258"
                 fill="url(#prismFill)"
                 stroke="url(#prismEdge)"
                 strokeWidth="2.2"
@@ -103,29 +115,40 @@ export default function Hero() {
 
               {/* Inner depth triangle */}
               <polygon
-                points="150,58 247,231 53,231"
+                points="150,72 238,218 62,218"
                 fill="none"
                 stroke="url(#innerEdge)"
                 strokeWidth="1"
                 strokeLinejoin="round"
               />
 
-              <line x1="150" y1="15" x2="150" y2="58" stroke="rgba(255,255,255,0.18)" strokeWidth="0.9" />
-              <line x1="15" y1="265" x2="53" y2="231" stroke="rgba(255,255,255,0.16)" strokeWidth="0.9" />
-              <line x1="285" y1="265" x2="247" y2="231" stroke="rgba(255,255,255,0.16)" strokeWidth="0.9" />
+              <line x1="150" y1="18" x2="150" y2="72" stroke="rgba(255,255,255,0.17)" strokeWidth="0.9" />
+              <line x1="21" y1="258" x2="62" y2="218" stroke="rgba(255,255,255,0.14)" strokeWidth="0.9" />
+              <line x1="279" y1="258" x2="238" y2="218" stroke="rgba(255,255,255,0.14)" strokeWidth="0.9" />
 
-              <line x1="90" y1="199" x2="210" y2="199" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+              <line x1="76" y1="217" x2="224" y2="217" stroke="rgba(126,181,255,0.22)" strokeWidth="1" />
+              <line x1="120" y1="57" x2="180" y2="57" stroke="rgba(255,255,255,0.14)" strokeWidth="0.8" />
             </svg>
 
             {/* Rainbow beam starting at the top prism vertex */}
-            <div className="prism-beams" />
+            <div className="prism-beams" aria-hidden="true">
+              <span className="prism-line prism-red" />
+              <span className="prism-line prism-orange" />
+              <span className="prism-line prism-yellow" />
+              <span className="prism-line prism-lime" />
+              <span className="prism-line prism-cyan" />
+              <span className="prism-line prism-blue" />
+              <span className="prism-line prism-magenta" />
+              <span className="prism-side-ray prism-side-left" />
+              <span className="prism-side-ray prism-side-right" />
+            </div>
           </div>
         </motion.div>
       )}
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-8 pb-16'}`}>
+      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-8 pb-16'}`}>
         {/* Text Content */}
-        <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center'}`}>
+        <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center hero-content-shell px-4 sm:px-8 py-5 sm:py-7 rounded-3xl'}`}>
           {/* Small badge */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.8 }}

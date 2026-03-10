@@ -44,26 +44,31 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
   return (
     <>
       {/* Navigation - Floating Pill (BOTTOM) */}
-      <nav className={`fixed left-1/2 -translate-x-1/2 bottom-[max(0.9rem,env(safe-area-inset-bottom))] md:bottom-8 w-[88vw] sm:w-auto max-w-[96vw] z-50 border-2 rounded-full backdrop-blur-md flex justify-between items-center px-4 py-2.5 sm:px-6 sm:py-3 md:px-12 md:py-5 shadow-[0_0_40px_rgba(139,92,246,0.2)] gap-2 sm:gap-7 md:gap-14 whitespace-nowrap overflow-hidden transition-all duration-300 ${scrolled ? 'border-prisma-purple/40 bg-prisma-dark/95' : 'border-white/10 bg-prisma-dark/60'}`}>
+      <motion.nav
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed left-1/2 -translate-x-1/2 bottom-[max(0.9rem,env(safe-area-inset-bottom))] md:bottom-7 w-[92vw] md:w-[min(1120px,94vw)] z-50 border-2 rounded-full backdrop-blur-md flex justify-between md:justify-center items-center px-3 py-2.5 sm:px-6 sm:py-3 md:px-7 lg:px-10 md:py-4 shadow-[0_0_40px_rgba(139,92,246,0.2)] gap-2 sm:gap-6 md:gap-8 lg:gap-11 whitespace-nowrap transition-all duration-300 ${scrolled ? 'border-prisma-purple/45 bg-prisma-dark/96' : 'border-white/10 bg-prisma-dark/62'}`}
+      >
         <button
           onClick={() => scrollTo('events')}
-          className="text-base leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
+          className="text-base leading-none sm:text-2xl md:text-[1.85rem] lg:text-3xl uppercase hover:text-prisma-accent transition-all duration-300 font-display tracking-[0.02em] sm:tracking-[0.08em] shrink text-white opacity-95"
         >
           Eventos
         </button>
 
         <button
           onClick={onLogoClick}
-          className="logo-aura mx-auto sm:mx-3 md:mx-6 px-1 sm:px-2 md:px-3 select-none flex items-center justify-center flex-shrink-0 min-w-fit"
+          className="logo-aura mx-auto sm:mx-3 md:mx-0 px-1 sm:px-2 md:px-1 select-none flex items-center justify-center flex-shrink-0 min-w-fit"
         >
           {logoUrl ? (
-            <img src={logoUrl} alt={siteName} className="logo-aura-img h-11 sm:h-14 md:h-18 w-auto object-contain" />
+            <img src={logoUrl} alt={siteName} className="logo-aura-img h-11 sm:h-14 md:h-16 lg:h-18 w-auto object-contain" />
           ) : (
             <>
               <span className="logo-aura-text font-display text-3xl sm:text-5xl md:text-6xl text-white tracking-tight sm:tracking-wider flex items-center gap-2 sm:hidden">
                 {shortName}
               </span>
-              <span className="logo-aura-text font-display text-4xl sm:text-6xl md:text-7xl text-white tracking-wider items-center gap-2 hidden sm:flex">
+              <span className="logo-aura-text font-display text-4xl sm:text-6xl md:text-[3.35rem] lg:text-7xl text-white tracking-[0.03em] lg:tracking-wider items-center gap-2 hidden sm:flex">
                 {siteName.replace(' PUB', '')}
                 <PrideFlag />
               </span>
@@ -73,21 +78,21 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
 
         <button
           onClick={() => scrollTo('gallery')}
-          className="text-base leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
+          className="text-base leading-none sm:text-2xl md:text-[1.85rem] lg:text-3xl uppercase hover:text-prisma-accent transition-all duration-300 font-display tracking-[0.02em] sm:tracking-[0.08em] shrink text-white opacity-95"
         >
           Galería
         </button>
 
         <button
           onClick={() => scrollTo('contact')}
-          className="text-base sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-widest shrink text-white hidden sm:block"
+          className="text-base sm:text-2xl md:text-[1.85rem] lg:text-3xl uppercase hover:text-prisma-accent transition-all duration-300 font-display tracking-[0.06em] shrink text-white hidden md:block"
         >
           Contacto
         </button>
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-7 h-5 sm:w-12 sm:h-8 z-50 flex-shrink-0 cursor-pointer"
+          className="relative w-7 h-5 sm:w-10 sm:h-7 md:w-11 md:h-7 z-50 flex-shrink-0 cursor-pointer"
           aria-label="Menu"
         >
           <motion.span
@@ -99,7 +104,7 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
             className="absolute left-0 w-full h-[2px] sm:h-[3px] md:h-[4px] bg-white block origin-center transition-all"
           />
         </button>
-      </nav>
+      </motion.nav>
 
       {/* Fullscreen Menu */}
       <AnimatePresence>
