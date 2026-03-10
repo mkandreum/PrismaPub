@@ -44,7 +44,7 @@ body::before {
   filter: blur(70px);
   pointer-events: none;
   z-index: -2;
-  will-change: auto;
+  will-change: transform;
   contain: strict;
 }
 

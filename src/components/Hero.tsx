@@ -61,7 +61,7 @@ export default function Hero() {
         className="relative z-0 flex flex-col items-center justify-start pt-10 md:pt-14 pointer-events-none"
       >
         <div className="relative flex items-start justify-center overflow-visible">
-          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true" style={{ filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.2))' }}>
+          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto overflow-visible" aria-hidden="true" style={{ filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.2))' }}>
             <defs>
               <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(255,255,255,1)" />
@@ -180,10 +180,10 @@ export default function Hero() {
               <circle cx="150" cy="48" r="18" fill="url(#apex-flare)" />
               {/* Bright core */}
               <motion.circle
-                cx="150" cy="48" r="4"
+                cx="150" cy="48" r={4}
                 fill="white"
                 initial={{ opacity: 0.8 }}
-                animate={{ opacity: [0.8, 1, 0.8], r: [4, 5, 4] as any }}
+                animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
               />
               {/* Main cross — long vertical spike */}
