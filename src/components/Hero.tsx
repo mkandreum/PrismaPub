@@ -13,10 +13,6 @@ export default function Hero() {
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const parallaxOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  // Prism scroll-based transforms
-  const beamOpacity = useTransform(scrollYProgress, [0, 0.08, 0.25, 0.5, 1.0], [0, 0.4, 0.7, 0.5, 0.15]);
-  const beamScale = useTransform(scrollYProgress, [0, 0.15, 0.5], [0.3, 1, 1]);
-
   useEffect(() => {
     fetch('/api/settings')
       .then(res => res.json())
@@ -47,14 +43,6 @@ export default function Hero() {
           <div key={i} className="particle" style={{ '--x': `${5 + Math.random() * 90}%`, '--delay': `${Math.random() * 12}s`, '--duration': `${8 + Math.random() * 15}s` } as React.CSSProperties} />
         ))}
       </div>
-
-      {/* Rainbow beam overlay — fixed so it "bathes" the entire page, appears on scroll */}
-      <motion.div
-        className="fixed top-0 left-0 w-full h-full pointer-events-none"
-        style={{ opacity: beamOpacity, scale: beamScale, zIndex: 1 }}
-      >
-        <div className="prism-page-rainbow" />
-      </motion.div>
 
       {/* ── PRISM AT THE VERY TOP ── */}
       {!imageUrl && (

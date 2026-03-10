@@ -249,53 +249,72 @@ h1, h2 {
 
 .prism-beams {
   position: absolute;
-  top: 55%;
+  top: 8%;
   left: 50%;
   transform: translateX(-50%);
-  width: 350%;
-  height: 100vh;
+  width: min(95vw, 640px);
+  height: min(145vh, 1100px);
   background: conic-gradient(
     from 180deg at 50% 0%,
-    transparent 150deg,
-    rgba(228, 3, 3, 0.85) 152deg,
-    rgba(228, 3, 3, 0.85) 153.5deg,
-    transparent 154deg,
-    transparent 156deg,
-    rgba(255, 80, 0, 0.8) 157deg,
-    rgba(255, 80, 0, 0.8) 158.5deg,
-    transparent 159deg,
-    transparent 161deg,
-    rgba(255, 140, 0, 0.8) 162deg,
-    rgba(255, 140, 0, 0.8) 163.5deg,
-    transparent 164deg,
-    transparent 166deg,
-    rgba(255, 237, 0, 0.8) 167deg,
-    rgba(255, 237, 0, 0.8) 168.5deg,
-    transparent 169deg,
-    transparent 171deg,
-    rgba(0, 180, 50, 0.8) 172deg,
-    rgba(0, 180, 50, 0.8) 173.5deg,
-    transparent 174deg,
-    transparent 176deg,
-    rgba(0, 200, 200, 0.8) 177deg,
-    rgba(0, 200, 200, 0.8) 178.5deg,
-    transparent 179deg,
-    transparent 181deg,
-    rgba(0, 77, 255, 0.8) 182deg,
-    rgba(0, 77, 255, 0.8) 183.5deg,
-    transparent 184deg,
-    transparent 186deg,
-    rgba(115, 41, 180, 0.8) 187deg,
-    rgba(115, 41, 180, 0.8) 188.5deg,
-    transparent 189deg,
-    transparent 191deg,
-    rgba(200, 50, 180, 0.75) 192deg,
-    rgba(200, 50, 180, 0.75) 193.5deg,
-    transparent 194deg
+    transparent 171.9deg,
+    rgba(228, 3, 3, 0.95) 172deg,
+    rgba(228, 3, 3, 0.95) 173.2deg,
+    transparent 173.4deg,
+    transparent 174.1deg,
+    rgba(255, 110, 0, 0.9) 174.2deg,
+    rgba(255, 110, 0, 0.9) 175.4deg,
+    transparent 175.6deg,
+    transparent 176.3deg,
+    rgba(255, 198, 0, 0.9) 176.4deg,
+    rgba(255, 198, 0, 0.9) 177.6deg,
+    transparent 177.8deg,
+    transparent 178.5deg,
+    rgba(235, 247, 70, 0.85) 178.6deg,
+    rgba(235, 247, 70, 0.85) 179.8deg,
+    transparent 180deg,
+    transparent 180.7deg,
+    rgba(70, 235, 110, 0.9) 180.8deg,
+    rgba(70, 235, 110, 0.9) 182deg,
+    transparent 182.2deg,
+    transparent 182.9deg,
+    rgba(80, 235, 255, 0.9) 183deg,
+    rgba(80, 235, 255, 0.9) 184.2deg,
+    transparent 184.4deg,
+    transparent 185.1deg,
+    rgba(80, 145, 255, 0.9) 185.2deg,
+    rgba(80, 145, 255, 0.9) 186.4deg,
+    transparent 186.6deg,
+    transparent 187.3deg,
+    rgba(225, 70, 255, 0.92) 187.4deg,
+    rgba(225, 70, 255, 0.92) 188.6deg,
+    transparent 188.8deg
   );
   pointer-events: none;
-  mask-image: linear-gradient(to bottom, transparent, black 3%, black 50%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 3%, black 50%, transparent);
+  filter:
+    drop-shadow(0 0 10px rgba(255, 80, 170, 0.45))
+    drop-shadow(0 0 22px rgba(113, 184, 255, 0.35));
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, black 8%, black 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, black 8%, black 72%, transparent 100%);
+}
+
+.prism-beams::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 171.8deg,
+    rgba(255, 70, 70, 0.32) 172deg,
+    rgba(255, 170, 60, 0.26) 175deg,
+    rgba(255, 240, 90, 0.22) 178deg,
+    rgba(95, 240, 120, 0.24) 181deg,
+    rgba(100, 205, 255, 0.24) 184deg,
+    rgba(230, 90, 255, 0.3) 188.6deg,
+    transparent 189deg
+  );
+  filter: blur(12px);
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 /* Full-page rainbow overlay that "bathes" the website — appears on scroll */
