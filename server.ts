@@ -8,6 +8,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import sharp from 'sharp';
+import nodemailer from 'nodemailer';
+import QRCode from 'qrcode';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +23,127 @@ const uploadsDir = path.join(__dirname, 'uploads');
 });
 
 const db = new Database(path.join(dataDir, 'prisma.db'));
+
+const getSetting = (key: string, fallback = ''): string => {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
+  return row?.value ?? fallback;
+};
+
+const ensureSettingDefault = (key: string, value: string) => {
+  const exists = db.prepare('SELECT 1 FROM settings WHERE key = ?').get(key);
+  if (!exists) db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run(key, value);
+};
+
+const escapeHtml = (value: string) => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+const getBaseUrl = (req: express.Request) => {
+  const protoHeader = String(req.headers['x-forwarded-proto'] || req.protocol || 'http');
+  const protocol = protoHeader.split(',')[0].trim();
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000');
+  return `${protocol}://${host}`;
+};
+
+const normalizeBool = (value: string) => ['1', 'true', 'yes', 'on'].includes(String(value || '').toLowerCase());
+
+async function buildTicketImageBuffer(ticket: {
+  qr_code: string;
+  user_name: string;
+  event_title: string;
+  event_date: string;
+  event_time: string;
+}) {
+  const qrDataUrl = await QRCode.toDataURL(ticket.qr_code, { margin: 1, width: 260 });
+  const ref = ticket.qr_code.split('-')[1] || ticket.qr_code;
+
+  const svg = `
+    <svg width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0b0f26"/>
+          <stop offset="55%" stop-color="#15123b"/>
+          <stop offset="100%" stop-color="#26135b"/>
+        </linearGradient>
+      </defs>
+      <rect width="1080" height="1350" fill="url(#bg)"/>
+      <rect x="60" y="70" rx="40" ry="40" width="960" height="1210" fill="#ffffff"/>
+      <text x="120" y="180" font-size="88" font-family="Arial Black, Arial, sans-serif" fill="#1b133e">PRISMA</text>
+      <text x="120" y="260" font-size="62" font-family="Arial, sans-serif" font-weight="700" fill="#8B5CF6">${escapeHtml(ticket.event_title).slice(0, 34)}</text>
+      <text x="120" y="330" font-size="34" font-family="Arial, sans-serif" fill="#4b5563">Fecha: ${escapeHtml(new Date(ticket.event_date).toLocaleDateString('es-ES'))}</text>
+      <text x="120" y="378" font-size="34" font-family="Arial, sans-serif" fill="#4b5563">Hora: ${escapeHtml(ticket.event_time)}</text>
+      <text x="120" y="426" font-size="34" font-family="Arial, sans-serif" fill="#4b5563">Nombre: ${escapeHtml(ticket.user_name).slice(0, 36)}</text>
+      <text x="120" y="474" font-size="30" font-family="Courier New, monospace" fill="#6b7280">Referencia: ${escapeHtml(ref)}</text>
+      <rect x="240" y="560" rx="24" ry="24" width="600" height="600" fill="#f5f3ff"/>
+      <image href="${qrDataUrl}" x="310" y="630" width="460" height="460"/>
+      <text x="540" y="1188" text-anchor="middle" font-size="24" font-family="Courier New, monospace" fill="#6b7280">${escapeHtml(ticket.qr_code)}</text>
+    </svg>
+  `;
+
+  return sharp(Buffer.from(svg)).png().toBuffer();
+}
+
+async function sendTicketEmail(req: express.Request, payload: {
+  qr_code: string;
+  user_name: string;
+  user_email: string;
+  event_title: string;
+  event_date: string;
+  event_time: string;
+}) {
+  const smtpEnabled = normalizeBool(getSetting('smtp_enabled', '0'));
+  if (!smtpEnabled) {
+    return { sent: false, skipped: true, reason: 'SMTP disabled' };
+  }
+
+  const host = getSetting('smtp_host');
+  const port = Number(getSetting('smtp_port', '587'));
+  const user = getSetting('smtp_user');
+  const pass = getSetting('smtp_pass');
+  const secure = normalizeBool(getSetting('smtp_secure', '0'));
+  const fromName = getSetting('smtp_from_name', 'PRISMA PUB');
+  const fromEmail = getSetting('smtp_from_email', user);
+
+  if (!host || !port || !fromEmail) {
+    throw new Error('SMTP no configurado correctamente en Ajustes');
+  }
+
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: user && pass ? { user, pass } : undefined,
+  });
+
+  const ticketImage = await buildTicketImageBuffer(payload);
+  const qrPng = await QRCode.toBuffer(payload.qr_code, { margin: 1, width: 420 });
+  const ticketUrl = `${getBaseUrl(req)}/ticket/${encodeURIComponent(payload.qr_code)}`;
+
+  await transporter.sendMail({
+    from: `${fromName} <${fromEmail}>`,
+    to: payload.user_email,
+    subject: `Tu entrada para ${payload.event_title} · PRISMA PUB`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
+        <h2 style="margin-bottom: 8px;">¡Tu entrada está lista! 🎉</h2>
+        <p style="margin-top: 0; color: #4b5563;">Evento: <strong>${escapeHtml(payload.event_title)}</strong></p>
+        <p style="color: #4b5563;">Fecha: ${escapeHtml(new Date(payload.event_date).toLocaleDateString('es-ES'))} · Hora: ${escapeHtml(payload.event_time)}</p>
+        <p style="color: #4b5563;">Adjuntamos tu entrada en imagen y tu QR.</p>
+        <p><a href="${ticketUrl}" style="display:inline-block;background:#8B5CF6;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700;">Ver entrada online</a></p>
+        <img src="cid:ticket-image" alt="Entrada" style="width:100%;max-width:520px;border-radius:16px;border:1px solid #e5e7eb;margin-top:12px;"/>
+      </div>
+    `,
+    attachments: [
+      { filename: `entrada-${payload.qr_code}.png`, content: ticketImage, cid: 'ticket-image' },
+      { filename: `qr-${payload.qr_code}.png`, content: qrPng },
+    ],
+  });
+
+  return { sent: true, skipped: false };
+}
 
 // ── Schema ──────────────────────────────────────────────
 db.exec(`
@@ -85,6 +208,15 @@ if (adminRow.count === 0) {
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('marquee_2', 'GALLERY • UNFORGETTABLE NIGHTS • ');
 }
 
+ensureSettingDefault('smtp_enabled', '0');
+ensureSettingDefault('smtp_host', '');
+ensureSettingDefault('smtp_port', '587');
+ensureSettingDefault('smtp_user', '');
+ensureSettingDefault('smtp_pass', '');
+ensureSettingDefault('smtp_secure', '0');
+ensureSettingDefault('smtp_from_name', 'PRISMA PUB');
+ensureSettingDefault('smtp_from_email', '');
+
 // Seed events
 const eventsCount = db.prepare('SELECT COUNT(*) as count FROM events').get() as { count: number };
 if (eventsCount.count === 0) {
@@ -134,10 +266,23 @@ app.post('/api/login', (req, res) => {
 // ── PUBLIC API ──────────────────────────────────────────
 app.get('/api/settings', (_req, res) => {
   const settings = db.prepare('SELECT * FROM settings').all();
+  const publicKeys = new Set([
+    'site_name', 'hero_phrase', 'hero_subtitle', 'address', 'instagram_url',
+    'logo_url', 'footer_text', 'marquee_1', 'marquee_2', 'hero_image_url',
+  ]);
   const obj = (settings as any[]).reduce((acc, curr) => {
-    if (curr.key !== 'admin_password') acc[curr.key] = curr.value;
+    if (publicKeys.has(curr.key)) acc[curr.key] = curr.value;
     return acc;
   }, {} as any);
+  res.json(obj);
+});
+
+app.get('/api/admin/settings', authenticate, (_req, res) => {
+  const settings = db.prepare('SELECT * FROM settings').all() as any[];
+  const obj = settings.reduce((acc, curr) => {
+    if (curr.key !== 'admin_password') acc[curr.key] = curr.value;
+    return acc;
+  }, {} as Record<string, string>);
   res.json(obj);
 });
 
@@ -156,14 +301,38 @@ app.get('/api/events/:id', (req, res) => {
   } catch { res.status(500).json({ error: 'Failed to fetch event' }); }
 });
 
-app.post('/api/tickets', (req, res) => {
+app.post('/api/tickets', async (req, res) => {
   const { event_id, user_name, user_email } = req.body;
   if (!event_id || !user_name || !user_email) return res.status(400).json({ error: 'Missing required fields' });
   try {
+    const event = db.prepare('SELECT id, title, date, time, image FROM events WHERE id = ? AND is_active = 1').get(event_id) as any;
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+
     const qr_code = `PRISMA-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const result = db.prepare('INSERT INTO tickets (event_id, user_name, user_email, qr_code) VALUES (?, ?, ?, ?)').run(event_id, user_name, user_email, qr_code);
     logActivity('TICKET_PURCHASE', `${user_name} bought ticket for event #${event_id}`);
-    res.json({ id: result.lastInsertRowid, qr_code });
+
+    const emailPayload = {
+      qr_code,
+      user_name,
+      user_email,
+      event_title: event.title,
+      event_date: event.date,
+      event_time: event.time,
+    };
+
+    try {
+      const emailResult = await sendTicketEmail(req, emailPayload);
+      if (emailResult.sent) {
+        logActivity('TICKET_EMAIL_SENT', `Ticket ${qr_code} sent to ${user_email}`);
+      } else if (emailResult.skipped) {
+        logActivity('TICKET_EMAIL_SKIPPED', `SMTP disabled for ${user_email}`);
+      }
+      res.json({ id: result.lastInsertRowid, qr_code, email_sent: emailResult.sent, email_skipped: emailResult.skipped });
+    } catch (mailErr: any) {
+      logActivity('TICKET_EMAIL_FAILED', `Ticket ${qr_code} email failed: ${mailErr?.message || 'unknown error'}`);
+      res.json({ id: result.lastInsertRowid, qr_code, email_sent: false, email_error: mailErr?.message || 'Email failed' });
+    }
   } catch { res.status(500).json({ error: 'Failed to create ticket' }); }
 });
 
@@ -199,6 +368,22 @@ app.post('/api/admin/events', authenticate, (req, res) => {
     logActivity('EVENT_CREATE', `Created: ${title}`);
     res.json({ id: result.lastInsertRowid });
   } catch { res.status(500).json({ error: 'Failed to create event' }); }
+});
+
+app.post('/api/admin/events/image', authenticate, upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image' });
+  try {
+    const filename = `event-${Date.now()}-${Math.round(Math.random() * 1E9)}.webp`;
+    await sharp(req.file.buffer)
+      .resize({ width: 1600, withoutEnlargement: true })
+      .webp({ quality: 84 })
+      .toFile(path.join(uploadsDir, filename));
+    const url = `/uploads/${filename}`;
+    logActivity('EVENT_IMAGE', `Uploaded event image: ${url}`);
+    res.json({ url });
+  } catch {
+    res.status(500).json({ error: 'Failed to upload event image' });
+  }
 });
 
 app.patch('/api/admin/events/:id', authenticate, (req, res) => {
@@ -270,10 +455,15 @@ app.get('/api/admin/banners', authenticate, (_req, res) => {
 });
 
 app.post('/api/admin/banners', authenticate, (req, res) => {
-  const { text } = req.body;
-  const info = db.prepare('INSERT INTO banners (text) VALUES (?)').run(text);
-  logActivity('BANNER_CREATE', `Banner: ${text}`);
-  res.json({ id: info.lastInsertRowid });
+  const text = String(req.body?.text ?? '').trim();
+  if (!text) return res.status(400).json({ error: 'Banner text is required' });
+  try {
+    const info = db.prepare('INSERT INTO banners (text) VALUES (?)').run(text);
+    logActivity('BANNER_CREATE', `Banner: ${text}`);
+    res.json({ id: info.lastInsertRowid });
+  } catch {
+    res.status(500).json({ error: 'Failed to create banner' });
+  }
 });
 
 app.put('/api/admin/banners/:id', authenticate, (req, res) => {

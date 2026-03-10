@@ -184,6 +184,8 @@ function EventsTab() {
   const [events, setEvents] = useState<any[]>([]);
   const [editing, setEditing] = useState<any | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [eventImageUrl, setEventImageUrl] = useState("");
+  const [uploadingEventImage, setUploadingEventImage] = useState(false);
   const { showToast } = useToast();
 
   const load = useCallback(() => {
@@ -202,7 +204,7 @@ function EventsTab() {
       time: fd.get("time") as string,
       description: fd.get("description") as string,
       price: parseFloat(fd.get("price") as string),
-      image: fd.get("image") as string,
+      image: eventImageUrl,
       is_active: editing?.is_active ?? 1,
     };
 
@@ -215,7 +217,27 @@ function EventsTab() {
     }
     setShowForm(false);
     setEditing(null);
+    setEventImageUrl("");
     load();
+  };
+
+  const uploadEventImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    setUploadingEventImage(true);
+    const fd = new FormData();
+    fd.append("image", e.target.files[0]);
+    try {
+      const res = await apiFetch("/api/admin/events/image", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Error");
+      setEventImageUrl(data.url || "");
+      showToast("Imagen del evento subida", "success");
+    } catch {
+      showToast("Error al subir la imagen del evento", "error");
+    } finally {
+      setUploadingEventImage(false);
+      e.target.value = "";
+    }
   };
 
   const remove = async (id: number) => {
@@ -230,7 +252,7 @@ function EventsTab() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="font-display text-3xl uppercase text-gray-900">Eventos</h2>
         <button
-          onClick={() => { setEditing(null); setShowForm(true); }}
+          onClick={() => { setEditing(null); setEventImageUrl(""); setShowForm(true); }}
           className="bg-prisma-accent text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-prisma-accent/90 transition-colors"
         >
           <Plus size={18} /> Nuevo evento
@@ -254,7 +276,7 @@ function EventsTab() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="font-display text-2xl uppercase text-gray-900">{editing?.id ? "Editar" : "Nuevo"} evento</h3>
-                <button onClick={() => { setShowForm(false); setEditing(null); }} className="text-gray-400 hover:text-gray-700">
+                <button onClick={() => { setShowForm(false); setEditing(null); setEventImageUrl(""); }} className="text-gray-400 hover:text-gray-700">
                   <X size={24} />
                 </button>
               </div>
@@ -265,7 +287,20 @@ function EventsTab() {
                   <FormInput name="time" label="Hora" type="time" defaultValue={editing?.time} required />
                 </div>
                 <FormInput name="price" label="Precio (€)" type="number" step="0.01" defaultValue={editing?.price} required />
-                <FormInput name="image" label="URL de imagen" defaultValue={editing?.image} />
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen del evento</label>
+                  {(eventImageUrl || editing?.image) && (
+                    <img
+                      src={eventImageUrl || editing?.image}
+                      alt="Evento"
+                      className="w-full max-w-xs h-32 object-cover rounded-xl mb-3 border border-gray-200"
+                    />
+                  )}
+                  <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors ${uploadingEventImage ? 'bg-gray-100 text-gray-400 pointer-events-none' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
+                    <Upload size={16} /> {uploadingEventImage ? 'Subiendo imagen...' : 'Subir imagen'}
+                    <input type="file" accept="image/*" onChange={uploadEventImage} className="hidden" />
+                  </label>
+                </div>
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Descripción</label>
                   <textarea
@@ -300,7 +335,7 @@ function EventsTab() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => { setEditing(ev); setShowForm(true); }}
+                onClick={() => { setEditing(ev); setEventImageUrl(ev.image || ""); setShowForm(true); }}
                 className="p-2 rounded-lg border border-gray-200 hover:border-prisma-accent hover:text-prisma-accent transition-colors"
               >
                 <Edit3 size={16} />
@@ -478,11 +513,21 @@ function BannersTab() {
 
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newText.trim()) return;
-    await apiFetch("/api/admin/banners", { method: "POST", body: JSON.stringify({ text: newText }) });
-    setNewText("");
-    showToast("Banner añadido", "success");
-    load();
+    const text = newText.trim();
+    if (!text) {
+      showToast("Escribe un texto para el banner", "error");
+      return;
+    }
+    try {
+      const res = await apiFetch("/api/admin/banners", { method: "POST", body: JSON.stringify({ text }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Error");
+      setNewText("");
+      showToast("Banner añadido", "success");
+      load();
+    } catch {
+      showToast("No se pudo añadir el banner", "error");
+    }
   };
 
   const toggle = async (b: any) => {
@@ -592,13 +637,14 @@ function SettingsTab() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [newPassword, setNewPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [showSmtpPass, setShowSmtpPass] = useState(false);
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
   const heroRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("/api/settings").then(r => r.json()).then(setSettings);
+    apiFetch("/api/admin/settings").then(r => r.json()).then(setSettings);
   }, []);
 
   const save = async (e: React.FormEvent) => {
@@ -686,6 +732,57 @@ function SettingsTab() {
           <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Textos desplazables</h3>
           <FormInput label="Texto 1 (después del hero)" value={settings.marquee_1 || ""} onChange={(v) => update("marquee_1", v)} />
           <FormInput label="Texto 2 (después de eventos)" value={settings.marquee_2 || ""} onChange={(v) => update("marquee_2", v)} />
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
+          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">SMTP (envío automático de entradas)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput label="Servidor SMTP" value={settings.smtp_host || ""} onChange={(v) => update("smtp_host", v)} />
+            <FormInput label="Puerto SMTP" type="number" value={settings.smtp_port || "587"} onChange={(v) => update("smtp_port", v)} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput label="Usuario SMTP" value={settings.smtp_user || ""} onChange={(v) => update("smtp_user", v)} />
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Contraseña SMTP</label>
+              <div className="relative">
+                <input
+                  type={showSmtpPass ? "text" : "password"}
+                  value={settings.smtp_pass || ""}
+                  onChange={(e) => update("smtp_pass", e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 pr-12 text-sm focus:border-prisma-accent outline-none transition-colors"
+                  placeholder="Contraseña de la cuenta SMTP"
+                />
+                <button type="button" onClick={() => setShowSmtpPass(!showSmtpPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700">
+                  {showSmtpPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput label="Nombre remitente" value={settings.smtp_from_name || "PRISMA PUB"} onChange={(v) => update("smtp_from_name", v)} />
+            <FormInput label="Email remitente" type="email" value={settings.smtp_from_email || ""} onChange={(v) => update("smtp_from_email", v)} />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={(settings.smtp_enabled || "0") === "1"}
+                onChange={(e) => update("smtp_enabled", e.target.checked ? "1" : "0")}
+                className="accent-prisma-accent"
+              />
+              Activar envío de entradas por email
+            </label>
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={(settings.smtp_secure || "0") === "1"}
+                onChange={(e) => update("smtp_secure", e.target.checked ? "1" : "0")}
+                className="accent-prisma-accent"
+              />
+              Usar conexión segura (SSL/TLS)
+            </label>
+          </div>
+          <p className="text-xs text-gray-500">Ejemplo: puerto 587 sin SSL directo (STARTTLS) o 465 con SSL/TLS.</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">

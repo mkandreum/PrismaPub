@@ -19,8 +19,6 @@ export default function Gallery() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  if (photos.length === 0 && !isLoading) return null;
-
   return (
     <section id="gallery" className="relative py-24 px-4 md:px-8 bg-prisma-dark overflow-hidden">
       {/* Section heading */}
@@ -40,37 +38,46 @@ export default function Gallery() {
         </motion.div>
 
         {/* Masonry Layout */}
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-          {photos.map((src, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
-              whileHover={{ scale: 1.03, zIndex: 20, transition: { duration: 0.3 } }}
-              className="relative group break-inside-avoid cursor-pointer"
-              onClick={() => setSelectedImage(src)}
-            >
-              <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl group-hover:shadow-prisma-purple/30 group-hover:border-prisma-purple/30 transition-all duration-500">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={src}
-                    alt={`Gallery ${i + 1}`}
-                    className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-prisma-purple/0 group-hover:bg-prisma-purple/25 transition-colors duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-prisma-dark p-3 rounded-full shadow-lg">
-                      <Maximize2 size={20} />
+        {isLoading ? (
+          <div className="text-center py-12 text-gray-400 uppercase tracking-wider text-sm">Cargando galería...</div>
+        ) : photos.length === 0 ? (
+          <div className="text-center py-14 rounded-2xl border border-white/10 bg-white/5">
+            <p className="text-white/80 font-display text-2xl uppercase mb-2">Aún no hay fotos</p>
+            <p className="text-gray-400 text-sm uppercase tracking-wider">Sube imágenes desde el panel de administración</p>
+          </div>
+        ) : (
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+            {photos.map((src, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
+                whileHover={{ scale: 1.03, zIndex: 20, transition: { duration: 0.3 } }}
+                className="relative group break-inside-avoid cursor-pointer"
+                onClick={() => setSelectedImage(src)}
+              >
+                <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl group-hover:shadow-prisma-purple/30 group-hover:border-prisma-purple/30 transition-all duration-500">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={src}
+                      alt={`Galería ${i + 1}`}
+                      className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-prisma-purple/0 group-hover:bg-prisma-purple/25 transition-colors duration-300 flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-prisma-dark p-3 rounded-full shadow-lg">
+                        <Maximize2 size={20} />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Lightbox */}

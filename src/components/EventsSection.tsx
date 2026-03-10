@@ -21,6 +21,7 @@ export default function EventsSection() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [buying, setBuying] = useState(false);
   const [purchasedQR, setPurchasedQR] = useState<string | null>(null);
+  const [autoRedirecting, setAutoRedirecting] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -48,7 +49,19 @@ export default function EventsSection() {
       const data = await res.json();
       if (data.qr_code) {
         setPurchasedQR(data.qr_code);
-        showToast("¡Entrada comprada! Revisa tu código QR.", "success");
+        if (data.email_sent) {
+          showToast("¡Entrada enviada al correo indicado!", "success");
+        } else if (data.email_skipped) {
+          showToast("Entrada creada. El envío por email está desactivado en admin.", "error");
+        } else if (data.email_error) {
+          showToast(`Entrada creada, pero falló el email: ${data.email_error}`, "error");
+        } else {
+          showToast("¡Entrada comprada!", "success");
+        }
+        setAutoRedirecting(true);
+        setTimeout(() => {
+          window.location.href = `/ticket/${data.qr_code}`;
+        }, 1200);
       } else {
         showToast(data.error || "Error al comprar la entrada", "error");
       }
@@ -64,6 +77,7 @@ export default function EventsSection() {
     setCustomerName("");
     setCustomerEmail("");
     setPurchasedQR(null);
+    setAutoRedirecting(false);
   };
 
   return (
@@ -195,6 +209,11 @@ export default function EventsSection() {
                   </p>
 
                   <form onSubmit={handlePurchase} className="space-y-6">
+                    {buying && (
+                      <div className="rounded-xl border border-prisma-purple/40 bg-prisma-purple/15 px-4 py-3 text-sm text-prisma-light uppercase tracking-wide">
+                        Enviando entrada al mail indicado...
+                      </div>
+                    )}
                     <div>
                       <label className="block text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Nombre completo</label>
                       <input
@@ -230,7 +249,7 @@ export default function EventsSection() {
                       disabled={buying}
                       className="w-full bg-prisma-purple text-white py-4 rounded-full font-display text-xl uppercase tracking-wider hover:bg-white hover:text-prisma-dark transition-colors disabled:opacity-50 shadow-[0_0_30px_rgba(139,92,246,0.5)]"
                     >
-                      {buying ? 'Procesando...' : 'Completar compra'}
+                      {buying ? 'Enviando entrada...' : 'Completar compra'}
                     </button>
                   </form>
                 </>
@@ -238,19 +257,13 @@ export default function EventsSection() {
                 <div className="text-center py-6">
                   <div className="text-6xl mb-4">🎉</div>
                   <h2 className="font-display text-3xl uppercase text-white mb-4">¡Entrada confirmada!</h2>
-                  <p className="text-gray-300 mb-6">Tu entrada para <strong>{selectedEvent.title}</strong> está lista.</p>
-                  <a
-                    href={`/ticket/${purchasedQR}`}
-                    className="inline-block bg-prisma-accent text-white px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-sm hover:bg-white hover:text-prisma-dark transition-all"
-                  >
-                    Ver entrada y código QR
-                  </a>
-                  <button
-                    onClick={closeModal}
-                    className="block mx-auto mt-4 text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-wider"
-                  >
-                    Cerrar
-                  </button>
+                  <p className="text-gray-300 mb-6">Tu entrada para <strong>{selectedEvent.title}</strong> está lista y se abrirá automáticamente.</p>
+                  {autoRedirecting && (
+                    <div className="flex items-center justify-center gap-3 text-prisma-accent">
+                      <div className="w-5 h-5 border-2 border-prisma-accent/40 border-t-prisma-accent rounded-full animate-spin" />
+                      <span className="text-sm uppercase tracking-wider">Abriendo entrada...</span>
+                    </div>
+                  )}
                 </div>
               )}
             </motion.div>

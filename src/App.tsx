@@ -88,7 +88,7 @@ function Footer({ settings }: { settings: Record<string, string> }) {
   const footerText = settings.footer_text || 'Your safe space for unforgettable nights. Music, love, and freedom.';
 
   return (
-    <footer id="contact" className="bg-prisma-dark border-t border-prisma-purple/20 py-16 px-4 md:px-8 relative overflow-hidden">
+    <footer id="contact" className="bg-prisma-dark border-t border-prisma-purple/20 pt-16 pb-28 md:pb-32 px-4 md:px-8 relative overflow-hidden">
       {/* Subtle footer glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-prisma-purple/5 rounded-full blur-[150px] -z-0" />
       <div className="max-w-7xl mx-auto relative z-10">
