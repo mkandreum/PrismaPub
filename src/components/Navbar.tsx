@@ -51,22 +51,16 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
         >
           Eventos
         </button>
-        <button
-          onClick={() => scrollTo('gallery')}
-          className="text-base leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
-        >
-          Galería
-        </button>
 
         <button
           onClick={onLogoClick}
-          className="mx-1 sm:mx-3 md:mx-6 px-1 sm:px-2 md:px-3 select-none flex items-center justify-center flex-shrink-0 min-w-fit"
+          className="mx-auto sm:mx-3 md:mx-6 px-1 sm:px-2 md:px-3 select-none flex items-center justify-center flex-shrink-0 min-w-fit"
         >
           {logoUrl ? (
-            <img src={logoUrl} alt={siteName} className="h-9 sm:h-14 md:h-18 w-auto object-contain" />
+            <img src={logoUrl} alt={siteName} className="h-11 sm:h-14 md:h-18 w-auto object-contain" />
           ) : (
             <>
-              <span className="font-display text-2xl sm:text-5xl md:text-6xl text-white tracking-tight sm:tracking-wider flex items-center gap-2 sm:hidden">
+              <span className="font-display text-3xl sm:text-5xl md:text-6xl text-white tracking-tight sm:tracking-wider flex items-center gap-2 sm:hidden">
                 {shortName}
               </span>
               <span className="font-display text-4xl sm:text-6xl md:text-7xl text-white tracking-wider items-center gap-2 hidden sm:flex">
@@ -75,6 +69,13 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
               </span>
             </>
           )}
+        </button>
+
+        <button
+          onClick={() => scrollTo('gallery')}
+          className="text-base leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
+        >
+          Galería
         </button>
 
         <button
