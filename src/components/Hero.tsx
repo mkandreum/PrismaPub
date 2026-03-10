@@ -1,9 +1,11 @@
-import { motion, useScroll, useTransform } from "motion/react";
-import { ArrowRight, Instagram, Sparkles } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { ArrowRight, Instagram, Sparkles, X } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 
 export default function Hero() {
   const [settings, setSettings] = useState<any>({});
+  const [image1Visible, setImage1Visible] = useState(true);
+  const [image2Visible, setImage2Visible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -12,6 +14,10 @@ export default function Hero() {
   });
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const parallaxOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  // Prism scroll-based transforms
+  const prismGlow = useTransform(scrollYProgress, [0, 0.4], [0.5, 1]);
+  const beamOpacity = useTransform(scrollYProgress, [0, 0.1, 0.5, 1.0], [0.05, 0.3, 0.6, 0.15]);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -42,6 +48,14 @@ export default function Hero() {
           <div key={i} className="particle" style={{ '--x': `${5 + Math.random() * 90}%`, '--delay': `${Math.random() * 12}s`, '--duration': `${8 + Math.random() * 15}s` } as React.CSSProperties} />
         ))}
       </div>
+
+      {/* Rainbow beam overlay — fixed so it "bathes" the entire page */}
+      <motion.div
+        className="fixed top-0 left-0 w-full h-full pointer-events-none"
+        style={{ opacity: beamOpacity, zIndex: 1 }}
+      >
+        <div className="prism-page-rainbow" />
+      </motion.div>
 
       <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 py-16">
         {/* Text Content */}
@@ -164,24 +178,136 @@ export default function Hero() {
               </motion.div>
             </motion.div>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10 w-full max-w-[480px]">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10 w-full max-w-[520px]">
+              {/* Prism Visual */}
+              <motion.div
+                className="relative flex justify-center mb-4"
+                style={{ opacity: prismGlow }}
+              >
+                <div className="prism-visual">
+                  <svg viewBox="0 0 300 280" className="prism-svg w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80">
+                    <defs>
+                      <radialGradient id="centerGlow" cx="50%" cy="40%" r="35%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="40%" stopColor="rgba(200,200,255,0.3)" />
+                        <stop offset="100%" stopColor="transparent" />
+                      </radialGradient>
+                      <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(139,92,246,0.7)" />
+                        <stop offset="25%" stopColor="rgba(255,255,255,0.85)" />
+                        <stop offset="50%" stopColor="rgba(168,85,247,0.9)" />
+                        <stop offset="75%" stopColor="rgba(255,255,255,0.85)" />
+                        <stop offset="100%" stopColor="rgba(139,92,246,0.7)" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Outer glow triangle */}
+                    <polygon
+                      points="150,15 285,265 15,265"
+                      fill="none"
+                      stroke="rgba(139,92,246,0.3)"
+                      strokeWidth="8"
+                      strokeLinejoin="round"
+                      style={{ filter: 'blur(4px)' }}
+                    />
+
+                    {/* Outer triangle */}
+                    <polygon
+                      points="150,15 285,265 15,265"
+                      fill="none"
+                      stroke="url(#edgeGrad)"
+                      strokeWidth="2.5"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Inner triangle */}
+                    <polygon
+                      points="150,65 248,235 52,235"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.2)"
+                      strokeWidth="1.5"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* 3D depth connecting lines */}
+                    <line x1="150" y1="15" x2="150" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                    <line x1="15" y1="265" x2="52" y2="235" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                    <line x1="285" y1="265" x2="248" y2="235" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+
+                    {/* Center glow */}
+                    <ellipse cx="150" cy="130" rx="55" ry="45" fill="url(#centerGlow)" />
+
+                    {/* Top vertex bright point */}
+                    <circle cx="150" cy="15" r="4" fill="white" opacity="0.9" />
+                    <circle cx="150" cy="15" r="12" fill="white" opacity="0.15">
+                      <animate attributeName="r" values="10;18;10" dur="3s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.1;0.25;0.1" dur="3s" repeatCount="indefinite" />
+                    </circle>
+
+                    {/* Lens flare streaks at top */}
+                    <line x1="115" y1="15" x2="185" y2="15" stroke="white" strokeWidth="0.5" opacity="0.4" />
+                    <line x1="150" y1="-8" x2="150" y2="38" stroke="white" strokeWidth="0.5" opacity="0.3" />
+                  </svg>
+
+                  {/* Rainbow beams emanating from prism base */}
+                  <div className="prism-beams" />
+                </div>
+              </motion.div>
+
+              {/* Toggleable images */}
               <div className="relative w-full h-[50vh] md:h-[55vh]">
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
-                  animate={{ opacity: 1, scale: 1, rotate: -5 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                  src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop"
-                  alt="Party"
-                  className="absolute left-0 top-0 w-2/3 h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 z-10 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
-                />
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 5 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"
-                  alt="Club"
-                  className="absolute right-0 top-10 w-1/2 h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 z-20 border-2 border-prisma-purple/30"
-                />
+                <AnimatePresence>
+                  {image1Visible && (
+                    <motion.div
+                      key="img1"
+                      initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                      animate={{ opacity: 1, scale: 1, rotate: -5 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute left-0 top-0 w-2/3 h-full z-10"
+                    >
+                      <button
+                        onClick={() => setImage1Visible(false)}
+                        className="absolute top-3 right-3 z-20 bg-black/50 hover:bg-black/80 text-white/80 hover:text-white rounded-full p-1.5 transition-all duration-200 backdrop-blur-sm border border-white/10"
+                        aria-label="Ocultar imagen de fiesta"
+                      >
+                        <X size={14} />
+                      </button>
+                      <img
+                        src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop"
+                        alt="Party"
+                        className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {image2Visible && (
+                    <motion.div
+                      key="img2"
+                      initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 5 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                      transition={{ duration: 0.4, delay: 0.1 }}
+                      className="absolute right-0 top-10 w-1/2 h-full z-20"
+                    >
+                      <button
+                        onClick={() => setImage2Visible(false)}
+                        className="absolute top-3 right-3 z-30 bg-black/50 hover:bg-black/80 text-white/80 hover:text-white rounded-full p-1.5 transition-all duration-200 backdrop-blur-sm border border-white/10"
+                        aria-label="Ocultar imagen de club"
+                      >
+                        <X size={14} />
+                      </button>
+                      <img
+                        src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"
+                        alt="Club"
+                        className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <motion.div
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
