@@ -1,37 +1,38 @@
-FROM node:22-alpine AS builder
+# Build stage
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY package*.json ./
+RUN npm install
 
-# Copy source code
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Production stage
-FROM node:22-alpine
+# Runtime stage
+FROM node:20-slim
 
 WORKDIR /app
 
-# Copy built assets and dependencies
+# Install production dependencies only
+COPY package*.json ./
+RUN npm install --omit=dev && npm install -g tsx
+
+# Copy build files
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/server.ts ./server.ts
+COPY server.ts ./server.ts
 
-# Install tsx globally or locally to run server.ts
-RUN npm install -g tsx
+# Copy entrypoint
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
-# Expose port
+# Persistence volumes
+VOLUME ["/app/data", "/app/uploads"]
+
 EXPOSE 3000
 
-# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Start the server
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["tsx", "server.ts"]

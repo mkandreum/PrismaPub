@@ -53,10 +53,10 @@ export default function Ticket() {
     <div className="pt-24 min-h-screen bg-prisma-dark text-white px-4 sm:px-6 lg:px-8 pb-20 flex flex-col items-center">
       <div className="w-full max-w-md mb-8">
         <Link
-          to="/events"
+          to="/"
           className="flex items-center gap-2 text-gray-400 hover:text-prisma-accent transition-colors font-semibold uppercase tracking-widest text-sm"
         >
-          <ArrowLeft size={20} /> Back to Events
+          <ArrowLeft size={20} /> Back to Home
         </Link>
       </div>
 
@@ -73,7 +73,7 @@ export default function Ticket() {
             className="w-full h-full object-cover opacity-80 mix-blend-overlay"
           />
           <div className="absolute top-6 left-6 right-6 flex justify-between items-center text-white">
-            <span className="font-display text-2xl tracking-wider">PRIMA</span>
+            <span className="font-display text-2xl tracking-wider">PRISMA</span>
             <div className="w-8 h-6 flex flex-col">
               <div className="h-1/6 w-full bg-[#E40303]"></div>
               <div className="h-1/6 w-full bg-[#FF8C00]"></div>

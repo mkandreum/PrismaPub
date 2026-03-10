@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  prisma-app:
+    build: .
+    container_name: prisma_pub
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-prismaadmin}
+      - JWT_SECRET=${JWT_SECRET:-prisma-pub-jwt-secret-change-me-in-production}
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    labels:
+      - "coolify.managed=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.prisma-pub.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.prisma-pub.entrypoints=https"
+      - "traefik.http.routers.prisma-pub.tls=true"
+      - "traefik.http.services.prisma-pub.loadbalancer.server.port=3000"
+
+volumes:
+  data:
+    driver: local
+  uploads:
+    driver: local
