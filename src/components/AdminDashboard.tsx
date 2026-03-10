@@ -14,13 +14,13 @@ interface AdminDashboardProps {
 type Tab = "stats" | "events" | "tickets" | "gallery" | "banners" | "activity" | "settings";
 
 const TABS: { key: Tab; icon: React.ReactNode; label: string }[] = [
-  { key: "stats", icon: <BarChart3 size={20} />, label: "Dashboard" },
-  { key: "events", icon: <CalendarDays size={20} />, label: "Events" },
-  { key: "tickets", icon: <Ticket size={20} />, label: "Tickets" },
-  { key: "gallery", icon: <Image size={20} />, label: "Gallery" },
+  { key: "stats", icon: <BarChart3 size={20} />, label: "Resumen" },
+  { key: "events", icon: <CalendarDays size={20} />, label: "Eventos" },
+  { key: "tickets", icon: <Ticket size={20} />, label: "Entradas" },
+  { key: "gallery", icon: <Image size={20} />, label: "Galería" },
   { key: "banners", icon: <Megaphone size={20} />, label: "Banners" },
-  { key: "activity", icon: <Activity size={20} />, label: "Activity" },
-  { key: "settings", icon: <Settings size={20} />, label: "Settings" },
+  { key: "activity", icon: <Activity size={20} />, label: "Actividad" },
+  { key: "settings", icon: <Settings size={20} />, label: "Ajustes" },
 ];
 
 function authHeaders() {
@@ -56,7 +56,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       <aside className={`fixed lg:sticky top-0 left-0 h-screen w-64 bg-prisma-dark z-50 flex flex-col transform transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="p-6 border-b border-white/10">
           <h1 className="font-display text-2xl text-white tracking-tight">PRISMA</h1>
-          <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Admin Panel</p>
+          <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">Panel de Administración</p>
         </div>
 
         <nav className="flex-1 py-4 overflow-y-auto">
@@ -82,13 +82,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-prisma-accent transition-colors text-sm font-medium rounded-lg hover:bg-white/5"
           >
             <LogOut size={18} />
-            Sign Out
+            Cerrar sesión
           </button>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 text-gray-900">
         {/* Top mobile bar */}
         <header className="lg:hidden sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4 z-30">
           <button onClick={() => setSidebarOpen(true)} className="text-gray-700">
@@ -139,12 +139,12 @@ function StatsTab() {
 
   return (
     <div>
-      <h2 className="font-display text-3xl uppercase mb-6">Dashboard</h2>
+      <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Resumen</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
-          { label: "Active Events", value: stats.totalEvents, color: "bg-violet-500" },
-          { label: "Tickets Sold", value: stats.totalTickets, color: "bg-prisma-accent" },
-          { label: "Gallery Photos", value: stats.totalPhotos, color: "bg-blue-500" },
+          { label: "Eventos activos", value: stats.totalEvents, color: "bg-violet-500" },
+          { label: "Entradas vendidas", value: stats.totalTickets, color: "bg-prisma-accent" },
+          { label: "Fotos en galería", value: stats.totalPhotos, color: "bg-blue-500" },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2">{s.label}</p>
@@ -156,7 +156,7 @@ function StatsTab() {
 
       {stats.ticketsPerEvent?.length > 0 && (
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="font-display text-xl uppercase mb-4">Tickets per Event</h3>
+          <h3 className="font-display text-xl uppercase mb-4 text-gray-900">Entradas por evento</h3>
           <div className="space-y-3">
             {stats.ticketsPerEvent.map((e: any, i: number) => (
               <div key={i} className="flex items-center gap-4">
@@ -208,10 +208,10 @@ function EventsTab() {
 
     if (editing?.id) {
       await apiFetch(`/api/admin/events/${editing.id}`, { method: "PATCH", body: JSON.stringify(data) });
-      showToast("Event updated", "success");
+      showToast("Evento actualizado", "success");
     } else {
       await apiFetch("/api/admin/events", { method: "POST", body: JSON.stringify(data) });
-      showToast("Event created", "success");
+      showToast("Evento creado", "success");
     }
     setShowForm(false);
     setEditing(null);
@@ -219,21 +219,21 @@ function EventsTab() {
   };
 
   const remove = async (id: number) => {
-    if (!confirm("Delete this event?")) return;
+    if (!confirm("¿Eliminar este evento?")) return;
     await apiFetch(`/api/admin/events/${id}`, { method: "DELETE" });
-    showToast("Event deleted", "success");
+    showToast("Evento eliminado", "success");
     load();
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="font-display text-3xl uppercase">Events</h2>
+        <h2 className="font-display text-3xl uppercase text-gray-900">Eventos</h2>
         <button
           onClick={() => { setEditing(null); setShowForm(true); }}
           className="bg-prisma-accent text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-prisma-accent/90 transition-colors"
         >
-          <Plus size={18} /> New Event
+          <Plus size={18} /> Nuevo evento
         </button>
       </div>
 
@@ -253,21 +253,21 @@ function EventsTab() {
               className="bg-white rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-display text-2xl uppercase">{editing?.id ? "Edit" : "New"} Event</h3>
+                <h3 className="font-display text-2xl uppercase text-gray-900">{editing?.id ? "Editar" : "Nuevo"} evento</h3>
                 <button onClick={() => { setShowForm(false); setEditing(null); }} className="text-gray-400 hover:text-gray-700">
                   <X size={24} />
                 </button>
               </div>
               <form onSubmit={save} className="space-y-4">
-                <FormInput name="title" label="Title" defaultValue={editing?.title} required />
+                <FormInput name="title" label="Título" defaultValue={editing?.title} required />
                 <div className="grid grid-cols-2 gap-4">
-                  <FormInput name="date" label="Date" type="date" defaultValue={editing?.date} required />
-                  <FormInput name="time" label="Time" type="time" defaultValue={editing?.time} required />
+                  <FormInput name="date" label="Fecha" type="date" defaultValue={editing?.date} required />
+                  <FormInput name="time" label="Hora" type="time" defaultValue={editing?.time} required />
                 </div>
-                <FormInput name="price" label="Price (€)" type="number" step="0.01" defaultValue={editing?.price} required />
-                <FormInput name="image" label="Image URL" defaultValue={editing?.image} />
+                <FormInput name="price" label="Precio (€)" type="number" step="0.01" defaultValue={editing?.price} required />
+                <FormInput name="image" label="URL de imagen" defaultValue={editing?.image} />
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Description</label>
+                  <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Descripción</label>
                   <textarea
                     name="description"
                     defaultValue={editing?.description}
@@ -276,7 +276,7 @@ function EventsTab() {
                   />
                 </div>
                 <button type="submit" className="w-full bg-prisma-accent text-white py-3 rounded-xl font-semibold uppercase tracking-wider hover:bg-prisma-accent/90 transition-colors flex items-center justify-center gap-2">
-                  <Save size={18} /> {editing?.id ? "Update" : "Create"} Event
+                  <Save size={18} /> {editing?.id ? "Actualizar" : "Crear"} evento
                 </button>
               </form>
             </motion.div>
@@ -294,7 +294,7 @@ function EventsTab() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h4 className="font-display text-lg uppercase truncate">{ev.title}</h4>
-                {!ev.is_active && <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Inactive</span>}
+                {!ev.is_active && <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Inactivo</span>}
               </div>
               <p className="text-xs text-gray-400">{ev.date} • {ev.time} • {ev.price}€</p>
             </div>
@@ -314,7 +314,7 @@ function EventsTab() {
             </div>
           </div>
         ))}
-        {events.length === 0 && <EmptyState text="No events yet" />}
+        {events.length === 0 && <EmptyState text="Aún no hay eventos" />}
       </div>
     </div>
   );
@@ -340,7 +340,7 @@ function TicketsTab() {
 
   return (
     <div>
-      <h2 className="font-display text-3xl uppercase mb-6">Tickets</h2>
+      <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Entradas</h2>
 
       <div className="relative mb-6">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -348,7 +348,7 @@ function TicketsTab() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name, email, event or QR code..."
+          placeholder="Buscar por nombre, email, evento o código QR..."
           className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:border-prisma-accent outline-none transition-colors"
         />
       </div>
@@ -358,11 +358,11 @@ function TicketsTab() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Name</th>
+                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Nombre</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Email</th>
-                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Event</th>
-                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">QR Code</th>
-                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Date</th>
+                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Evento</th>
+                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Código QR</th>
+                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Fecha</th>
               </tr>
             </thead>
             <tbody>
@@ -381,7 +381,7 @@ function TicketsTab() {
           </table>
           {filtered.length === 0 && (
             <div className="text-center py-12 text-gray-400 text-sm">
-              {search ? "No tickets match search" : "No tickets sold yet"}
+              {search ? "No hay entradas que coincidan con la búsqueda" : "Aún no se han vendido entradas"}
             </div>
           )}
         </div>
@@ -412,10 +412,10 @@ function GalleryTab() {
     Array.from(e.target.files).forEach((f: File) => fd.append("photos", f));
     try {
       await apiFetch("/api/admin/gallery", { method: "POST", body: fd });
-      showToast(`${e.target.files.length} photo(s) uploaded!`, "success");
+      showToast(`${e.target.files.length} foto(s) subida(s)`, "success");
       load();
     } catch {
-      showToast("Upload failed", "error");
+      showToast("Error al subir imágenes", "error");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -424,19 +424,19 @@ function GalleryTab() {
 
   const remove = async (id: number) => {
     await apiFetch(`/api/admin/gallery/${id}`, { method: "DELETE" });
-    showToast("Photo deleted", "success");
+    showToast("Foto eliminada", "success");
     load();
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="font-display text-3xl uppercase">Gallery</h2>
+        <h2 className="font-display text-3xl uppercase text-gray-900">Galería</h2>
         <label
           className={`bg-prisma-accent text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 cursor-pointer hover:bg-prisma-accent/90 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}
         >
           <Upload size={18} />
-          {uploading ? "Uploading..." : "Upload Photos"}
+          {uploading ? "Subiendo..." : "Subir fotos"}
           <input ref={fileRef} type="file" multiple accept="image/*" onChange={handleUpload} className="hidden" />
         </label>
       </div>
@@ -457,7 +457,7 @@ function GalleryTab() {
         ))}
       </div>
 
-      {images.length === 0 && !uploading && <EmptyState text="Gallery is empty. Upload some photos!" />}
+      {images.length === 0 && !uploading && <EmptyState text="La galería está vacía. ¡Sube algunas fotos!" />}
     </div>
   );
 }
@@ -481,7 +481,7 @@ function BannersTab() {
     if (!newText.trim()) return;
     await apiFetch("/api/admin/banners", { method: "POST", body: JSON.stringify({ text: newText }) });
     setNewText("");
-    showToast("Banner added", "success");
+    showToast("Banner añadido", "success");
     load();
   };
 
@@ -492,23 +492,23 @@ function BannersTab() {
 
   const remove = async (id: number) => {
     await apiFetch(`/api/admin/banners/${id}`, { method: "DELETE" });
-    showToast("Banner deleted", "success");
+    showToast("Banner eliminado", "success");
     load();
   };
 
   return (
     <div>
-      <h2 className="font-display text-3xl uppercase mb-6">Banners</h2>
+      <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Banners</h2>
 
       <form onSubmit={add} className="flex gap-3 mb-8">
         <input
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
-          placeholder="Enter banner text..."
+          placeholder="Escribe el texto del banner..."
           className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors"
         />
         <button type="submit" className="bg-prisma-accent text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-prisma-accent/90 transition-colors">
-          <Plus size={18} /> Add
+          <Plus size={18} /> Añadir
         </button>
       </form>
 
@@ -528,7 +528,7 @@ function BannersTab() {
             </button>
           </div>
         ))}
-        {banners.length === 0 && <EmptyState text="No banners. Add one above!" />}
+        {banners.length === 0 && <EmptyState text="No hay banners. ¡Añade uno arriba!" />}
       </div>
     </div>
   );
@@ -553,14 +553,25 @@ function ActivityTab() {
     return "bg-gray-100 text-gray-700";
   };
 
+  const actionLabel = (action: string) => {
+    if (action.includes("CREATE")) return "CREADO";
+    if (action.includes("UPLOAD")) return "SUBIDA";
+    if (action.includes("DELETE")) return "ELIMINADO";
+    if (action.includes("UPDATE")) return "ACTUALIZADO";
+    if (action.includes("LOGIN")) return "ACCESO";
+    if (action.includes("IMAGE")) return "IMAGEN";
+    if (action.includes("TICKET")) return "ENTRADA";
+    return action;
+  };
+
   return (
     <div>
-      <h2 className="font-display text-3xl uppercase mb-6">Activity Log</h2>
+      <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Registro de actividad</h2>
       <div className="space-y-2">
         {logs.map((log) => (
           <div key={log.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-start gap-4 shadow-sm">
             <span className={`text-xs font-bold uppercase px-2 py-1 rounded-lg flex-shrink-0 ${actionColor(log.action)}`}>
-              {log.action}
+              {actionLabel(log.action)}
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-gray-700">{log.details}</p>
@@ -568,7 +579,7 @@ function ActivityTab() {
             </div>
           </div>
         ))}
-        {logs.length === 0 && <EmptyState text="No activity recorded yet" />}
+        {logs.length === 0 && <EmptyState text="Aún no hay actividad registrada" />}
       </div>
     </div>
   );
@@ -597,10 +608,10 @@ function SettingsTab() {
     if (newPassword.trim()) body.admin_password = newPassword;
     try {
       await apiFetch("/api/admin/settings", { method: "POST", body: JSON.stringify(body) });
-      showToast("Settings saved", "success");
+      showToast("Ajustes guardados", "success");
       setNewPassword("");
     } catch {
-      showToast("Failed to save", "error");
+      showToast("Error al guardar", "error");
     } finally {
       setSaving(false);
     }
@@ -614,9 +625,9 @@ function SettingsTab() {
       const res = await apiFetch("/api/admin/settings/hero-image", { method: "POST", body: fd });
       const data = await res.json();
       setSettings(s => ({ ...s, hero_image_url: data.url }));
-      showToast("Hero image updated", "success");
+      showToast("Imagen principal actualizada", "success");
     } catch {
-      showToast("Upload failed", "error");
+      showToast("Error al subir imagen", "error");
     }
   };
 
@@ -628,9 +639,9 @@ function SettingsTab() {
       const res = await apiFetch("/api/admin/settings/logo", { method: "POST", body: fd });
       const data = await res.json();
       setSettings(s => ({ ...s, logo_url: data.url }));
-      showToast("Logo updated", "success");
+      showToast("Logo actualizado", "success");
     } catch {
-      showToast("Upload failed", "error");
+      showToast("Error al subir imagen", "error");
     }
   };
 
@@ -642,67 +653,67 @@ function SettingsTab() {
 
   return (
     <div>
-      <h2 className="font-display text-3xl uppercase mb-6">Settings</h2>
+      <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Ajustes</h2>
 
       <form onSubmit={save} className="max-w-2xl space-y-6">
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
           <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">General</h3>
-          <FormInput label="Site Name" value={settings.site_name || ""} onChange={(v) => update("site_name", v)} />
-          <FormInput label="Address" value={settings.address || ""} onChange={(v) => update("address", v)} />
-          <FormInput label="Instagram URL" value={settings.instagram_url || ""} onChange={(v) => update("instagram_url", v)} />
-          <FormInput label="Footer Text" value={settings.footer_text || ""} onChange={(v) => update("footer_text", v)} />
+          <FormInput label="Nombre del sitio" value={settings.site_name || ""} onChange={(v) => update("site_name", v)} />
+          <FormInput label="Dirección" value={settings.address || ""} onChange={(v) => update("address", v)} />
+          <FormInput label="URL de Instagram" value={settings.instagram_url || ""} onChange={(v) => update("instagram_url", v)} />
+          <FormInput label="Texto del pie de página" value={settings.footer_text || ""} onChange={(v) => update("footer_text", v)} />
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Logo (Navbar & Footer)</h3>
+          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Logo (Navbar y pie de página)</h3>
           <div>
-            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Logo Image</label>
-            <p className="text-xs text-gray-400 mb-3">If set, replaces the text logo in the navbar and footer. Leave empty to show text + pride flag.</p>
+            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen del logo</label>
+            <p className="text-xs text-gray-400 mb-3">Si se configura, reemplaza el logo de texto en la barra y el pie de página. Déjalo vacío para mostrar texto + bandera pride.</p>
             {settings.logo_url && (
               <div className="flex items-center gap-4 mb-3">
                 <img src={settings.logo_url} alt="Logo" className="h-14 w-auto object-contain bg-gray-900 rounded-xl p-2 border" />
-                <button onClick={removeLogo} type="button" className="text-xs text-red-500 hover:text-red-700 underline">Remove logo</button>
+                <button onClick={removeLogo} type="button" className="text-xs text-red-500 hover:text-red-700 underline">Quitar logo</button>
               </div>
             )}
             <label className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
-              <Upload size={16} /> {settings.logo_url ? 'Change Logo' : 'Upload Logo'}
+              <Upload size={16} /> {settings.logo_url ? 'Cambiar logo' : 'Subir logo'}
               <input ref={logoRef} type="file" accept="image/*" onChange={uploadLogo} className="hidden" />
             </label>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Marquee Texts</h3>
-          <FormInput label="Marquee 1 (after Hero)" value={settings.marquee_1 || ""} onChange={(v) => update("marquee_1", v)} />
-          <FormInput label="Marquee 2 (after Events)" value={settings.marquee_2 || ""} onChange={(v) => update("marquee_2", v)} />
+          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Textos desplazables</h3>
+          <FormInput label="Texto 1 (después del hero)" value={settings.marquee_1 || ""} onChange={(v) => update("marquee_1", v)} />
+          <FormInput label="Texto 2 (después de eventos)" value={settings.marquee_2 || ""} onChange={(v) => update("marquee_2", v)} />
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Hero Section</h3>
-          <FormInput label="Hero Phrase" value={settings.hero_phrase || ""} onChange={(v) => update("hero_phrase", v)} />
-          <FormInput label="Hero Subtitle" value={settings.hero_subtitle || ""} onChange={(v) => update("hero_subtitle", v)} />
+          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Sección principal (Hero)</h3>
+          <FormInput label="Título principal (THE ULTIMATE...)" value={settings.hero_phrase || ""} onChange={(v) => update("hero_phrase", v)} />
+          <FormInput label="Subtítulo principal" value={settings.hero_subtitle || ""} onChange={(v) => update("hero_subtitle", v)} />
           <div>
-            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Hero Image</label>
+            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen principal</label>
             {settings.hero_image_url && (
               <img src={settings.hero_image_url} alt="Hero" className="w-full max-w-xs h-32 object-cover rounded-xl mb-3 border" />
             )}
             <label className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
-              <Upload size={16} /> Change Image
+              <Upload size={16} /> Cambiar imagen
               <input ref={heroRef} type="file" accept="image/*" onChange={uploadHero} className="hidden" />
             </label>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Security</h3>
+          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Seguridad</h3>
           <div>
-            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">New Admin Password</label>
+            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Nueva contraseña de admin</label>
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Leave blank to keep current"
+                placeholder="Déjalo vacío para mantener la actual"
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 pr-12 text-sm focus:border-prisma-accent outline-none transition-colors"
               />
               <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700">
@@ -717,7 +728,7 @@ function SettingsTab() {
           disabled={saving}
           className="bg-prisma-accent text-white px-8 py-3 rounded-xl font-semibold uppercase tracking-wider hover:bg-prisma-accent/90 transition-colors disabled:opacity-50 flex items-center gap-2"
         >
-          <Save size={18} /> {saving ? "Saving..." : "Save All Settings"}
+          <Save size={18} /> {saving ? "Guardando..." : "Guardar todos los ajustes"}
         </button>
       </form>
     </div>

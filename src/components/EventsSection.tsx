@@ -48,12 +48,12 @@ export default function EventsSection() {
       const data = await res.json();
       if (data.qr_code) {
         setPurchasedQR(data.qr_code);
-        showToast("Ticket purchased! Check your QR code.", "success");
+        showToast("¡Entrada comprada! Revisa tu código QR.", "success");
       } else {
-        showToast(data.error || "Error purchasing ticket", "error");
+        showToast(data.error || "Error al comprar la entrada", "error");
       }
     } catch {
-      showToast("Error processing ticket", "error");
+      showToast("Error al procesar la compra", "error");
     } finally {
       setBuying(false);
     }
@@ -81,10 +81,10 @@ export default function EventsSection() {
           className="mb-16 text-center"
         >
           <h2 className="font-display text-6xl md:text-[10vw] leading-none uppercase tracking-tighter text-white mb-4">
-            Upcoming <span className="text-prisma-accent">Events</span>
+            Próximos <span className="text-prisma-accent">eventos</span>
           </h2>
           <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto font-medium">
-            Don't miss out on the best nights. Get your tickets now.
+            No te pierdas las mejores noches. Compra tus entradas ahora.
           </p>
         </motion.div>
 
@@ -131,7 +131,7 @@ export default function EventsSection() {
                         </span>
                         <span className="flex items-center gap-2">
                           <MapPin size={16} className="text-prisma-accent" />
-                          Prisma Pub
+                          PRISMA PUB
                         </span>
                       </div>
                       <p className="text-gray-400 text-sm line-clamp-2">{event.description}</p>
@@ -146,7 +146,7 @@ export default function EventsSection() {
                         className="w-full md:w-auto bg-prisma-purple text-white px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-sm hover:bg-white hover:text-prisma-dark transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)]"
                       >
                         <Ticket size={18} />
-                        Get Tickets
+                        Comprar
                       </button>
                     </div>
                   </div>
@@ -156,7 +156,7 @@ export default function EventsSection() {
 
             {events.length === 0 && !isLoading && (
               <div className="text-center py-20 border border-white/10 rounded-2xl">
-                <p className="text-2xl uppercase font-display text-gray-500">No upcoming events</p>
+                <p className="text-2xl uppercase font-display text-gray-500">No hay eventos próximos</p>
               </div>
             )}
           </div>
@@ -189,32 +189,32 @@ export default function EventsSection() {
 
               {!purchasedQR ? (
                 <>
-                  <h2 className="font-display text-4xl uppercase text-white mb-2">Get Tickets</h2>
+                  <h2 className="font-display text-4xl uppercase text-white mb-2">Comprar entradas</h2>
                   <p className="text-gray-400 font-medium mb-8 uppercase tracking-wider text-sm">
                     {selectedEvent.title} • {new Date(selectedEvent.date).toLocaleDateString()} • {selectedEvent.time}
                   </p>
 
                   <form onSubmit={handlePurchase} className="space-y-6">
                     <div>
-                      <label className="block text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Full Name</label>
+                      <label className="block text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Nombre completo</label>
                       <input
                         required
                         type="text"
                         value={customerName}
                         onChange={e => setCustomerName(e.target.value)}
                         className="w-full border-b-2 border-white/20 py-3 px-4 bg-white/5 focus:bg-white/10 focus:border-prisma-accent outline-none transition-colors rounded-t-xl text-white placeholder-gray-500"
-                        placeholder="Enter your name"
+                        placeholder="Escribe tu nombre"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Email</label>
+                      <label className="block text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Correo electrónico</label>
                       <input
                         required
                         type="email"
                         value={customerEmail}
                         onChange={e => setCustomerEmail(e.target.value)}
                         className="w-full border-b-2 border-white/20 py-3 px-4 bg-white/5 focus:bg-white/10 focus:border-prisma-accent outline-none transition-colors rounded-t-xl text-white placeholder-gray-500"
-                        placeholder="Enter your email"
+                        placeholder="Escribe tu correo"
                       />
                     </div>
 
@@ -230,26 +230,26 @@ export default function EventsSection() {
                       disabled={buying}
                       className="w-full bg-prisma-purple text-white py-4 rounded-full font-display text-xl uppercase tracking-wider hover:bg-white hover:text-prisma-dark transition-colors disabled:opacity-50 shadow-[0_0_30px_rgba(139,92,246,0.5)]"
                     >
-                      {buying ? 'Processing...' : 'Complete Purchase'}
+                      {buying ? 'Procesando...' : 'Completar compra'}
                     </button>
                   </form>
                 </>
               ) : (
                 <div className="text-center py-6">
                   <div className="text-6xl mb-4">🎉</div>
-                  <h2 className="font-display text-3xl uppercase text-white mb-4">Ticket Confirmed!</h2>
-                  <p className="text-gray-300 mb-6">Your ticket for <strong>{selectedEvent.title}</strong> is ready.</p>
+                  <h2 className="font-display text-3xl uppercase text-white mb-4">¡Entrada confirmada!</h2>
+                  <p className="text-gray-300 mb-6">Tu entrada para <strong>{selectedEvent.title}</strong> está lista.</p>
                   <a
                     href={`/ticket/${purchasedQR}`}
                     className="inline-block bg-prisma-accent text-white px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-sm hover:bg-white hover:text-prisma-dark transition-all"
                   >
-                    View Your Ticket & QR Code
+                    Ver entrada y código QR
                   </a>
                   <button
                     onClick={closeModal}
                     className="block mx-auto mt-4 text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-wider"
                   >
-                    Close
+                    Cerrar
                   </button>
                 </div>
               )}

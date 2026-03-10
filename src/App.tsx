@@ -119,15 +119,19 @@ function Footer({ settings }: { settings: Record<string, string> }) {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-lg uppercase text-white mb-4">Navigate</h4>
+            <h4 className="font-display text-lg uppercase text-white mb-4">Navegación</h4>
             <div className="flex flex-col gap-2">
-              {['events', 'gallery', 'contact'].map(section => (
+              {[
+                { id: 'events', label: 'eventos' },
+                { id: 'gallery', label: 'galería' },
+                { id: 'contact', label: 'contacto' },
+              ].map(section => (
                 <button
-                  key={section}
-                  onClick={() => document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' })}
+                  key={section.id}
+                  onClick={() => document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' })}
                   className="text-gray-400 hover:text-prisma-accent transition-colors text-sm capitalize text-left"
                 >
-                  {section}
+                  {section.label}
                 </button>
               ))}
             </div>
@@ -135,7 +139,7 @@ function Footer({ settings }: { settings: Record<string, string> }) {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display text-lg uppercase text-white mb-4">Find Us</h4>
+            <h4 className="font-display text-lg uppercase text-white mb-4">Encuéntranos</h4>
             {settings.address && (
               <p className="text-gray-400 text-sm flex items-center gap-2 mb-3">
                 <MapPin size={16} className="text-prisma-accent flex-shrink-0" />
@@ -158,7 +162,7 @@ function Footer({ settings }: { settings: Record<string, string> }) {
 
         <div className="border-t border-white/10 pt-6 text-center">
           <p className="text-gray-500 text-xs uppercase tracking-widest">
-            &copy; {new Date().getFullYear()} {siteName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {siteName}. Todos los derechos reservados.
           </p>
         </div>
       </div>

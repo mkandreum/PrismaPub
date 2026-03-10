@@ -20,8 +20,8 @@ export default function Hero() {
       .catch(err => console.error("Error fetching settings:", err));
   }, []);
 
-  const phrase = settings.hero_phrase || "The Ultimate LGBT+ Experience";
-  const subtitle = settings.hero_subtitle || "Music • Dance • Freedom";
+  const phrase = settings.hero_phrase || "La experiencia LGBT+ definitiva";
+  const subtitle = settings.hero_subtitle || "Música • Baile • Libertad";
   const siteName = settings.site_name || "PRISMA PUB";
   const imageUrl = settings.hero_image_url;
 
@@ -54,7 +54,7 @@ export default function Hero() {
             className="inline-flex items-center gap-2 bg-prisma-purple/20 border border-prisma-purple/30 text-prisma-purple px-4 py-1.5 rounded-full text-xs uppercase tracking-widest font-semibold mb-6"
           >
             <Sparkles size={14} />
-            Safe Space
+            Espacio seguro
           </motion.div>
 
           {/* Main heading with glitch on hover */}
@@ -103,7 +103,7 @@ export default function Hero() {
               className="group inline-flex items-center justify-center gap-3 bg-prisma-purple text-white px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm transition-all duration-300 shadow-[0_0_30px_rgba(139,92,246,0.3)] relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-3">
-                Get Tickets
+                Comprar entradas
                 <ArrowRight className="group-hover:translate-x-2 transition-transform" size={20} />
               </span>
               <motion.div className="absolute inset-0 bg-gradient-to-r from-prisma-deep to-prisma-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -115,7 +115,7 @@ export default function Hero() {
               whileTap={{ scale: 0.97 }}
               className="group inline-flex items-center justify-center gap-3 bg-white/5 backdrop-blur-sm border border-prisma-purple/30 text-white px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm hover:bg-prisma-purple/20 hover:border-prisma-purple/60 transition-all duration-300"
             >
-              See Gallery
+              Ver galería
             </motion.a>
 
             {settings.instagram_url && (
@@ -153,14 +153,14 @@ export default function Hero() {
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -top-4 -right-4 bg-prisma-purple text-white px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-prisma-purple/30 border border-white/20"
               >
-                Safe Space ✨
+                Espacio seguro ✨
               </motion.div>
               <motion.div
                 animate={{ y: [0, 10, 0], rotate: [0, 3, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 className="absolute -bottom-4 -left-4 bg-white text-prisma-dark px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg rotate-3"
               >
-                Join Us! 🏳️‍🌈
+                ¡Únete! 🏳️‍🌈
               </motion.div>
             </motion.div>
           ) : (
@@ -188,7 +188,7 @@ export default function Hero() {
                   transition={{ delay: 0.8, type: "spring" }}
                   className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-prisma-purple text-white w-28 h-28 rounded-full flex items-center justify-center z-30 shadow-xl shadow-prisma-purple/40 border-2 border-white/20 pulse-ring"
                 >
-                  <span className="font-display text-2xl rotate-[-12deg]">JOIN</span>
+                  <span className="font-display text-2xl rotate-[-12deg]">VEN</span>
                 </motion.div>
               </div>
             </motion.div>
@@ -208,7 +208,7 @@ export default function Hero() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-medium">Scroll</span>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-medium">Desliza</span>
           <div className="w-5 h-8 rounded-full border-2 border-prisma-purple/40 flex items-start justify-center p-1">
             <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 2, repeat: Infinity }} className="w-1.5 h-1.5 bg-prisma-purple rounded-full" />
           </div>

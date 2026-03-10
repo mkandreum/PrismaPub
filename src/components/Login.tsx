@@ -28,10 +28,10 @@ export default function Login({ onLogin, onBack }: LoginProps) {
         localStorage.setItem("prisma_token", data.token);
         onLogin(data.token);
       } else {
-        setError("Wrong password");
+        setError("Contraseña incorrecta");
       }
     } catch {
-      setError("Connection error");
+      setError("Error de conexión");
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
           className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-10 group"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm uppercase tracking-widest font-medium">Back</span>
+          <span className="text-sm uppercase tracking-widest font-medium">Volver</span>
         </button>
 
         <div className="mb-10">
@@ -64,10 +64,10 @@ export default function Login({ onLogin, onBack }: LoginProps) {
             </div>
           </div>
           <h1 className="font-display text-5xl md:text-6xl uppercase text-white tracking-tighter">
-            Admin<br /><span className="text-prisma-purple">Access</span>
+            Acceso<br /><span className="text-prisma-purple">Admin</span>
           </h1>
           <p className="text-gray-400 mt-3 text-sm uppercase tracking-wider font-medium">
-            Prisma Pub Management Panel
+            Panel de gestión de Prisma Pub
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
               type={showPass ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
+              placeholder="Introduce la contraseña de admin"
               className="w-full bg-white/5 border-2 border-white/10 rounded-2xl px-5 py-4 text-white placeholder-gray-500 focus:border-prisma-accent focus:bg-white/10 outline-none transition-all text-lg"
               autoFocus
             />
@@ -108,10 +108,10 @@ export default function Login({ onLogin, onBack }: LoginProps) {
             {loading ? (
               <span className="flex items-center justify-center gap-3">
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Authenticating...
+                Verificando...
               </span>
             ) : (
-              "Sign In"
+              "Entrar"
             )}
           </button>
         </form>

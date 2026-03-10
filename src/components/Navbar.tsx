@@ -48,13 +48,13 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
           onClick={() => scrollTo('events')}
           className="text-sm sm:text-xl md:text-2xl uppercase hover:text-prisma-accent transition-all font-display tracking-widest shrink text-white"
         >
-          Events
+          Eventos
         </button>
         <button
           onClick={() => scrollTo('gallery')}
           className="text-sm sm:text-xl md:text-2xl uppercase hover:text-prisma-accent transition-all font-display tracking-widest shrink text-white"
         >
-          Gallery
+          Galería
         </button>
 
         <button
@@ -75,7 +75,7 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
           onClick={() => scrollTo('contact')}
           className="text-sm sm:text-xl md:text-2xl uppercase hover:text-prisma-accent transition-all font-display tracking-widest shrink text-white hidden sm:block"
         >
-          Contact
+          Contacto
         </button>
 
         <button
@@ -121,16 +121,16 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
 
             <div className="flex flex-col gap-6 text-center">
               <button onClick={() => { setIsOpen(false); onLogoClick(); }} className="font-display text-5xl md:text-7xl text-white hover:text-prisma-accent transition-colors uppercase">
-                Home
+                Inicio
               </button>
               <button onClick={() => scrollTo('events')} className="font-display text-5xl md:text-7xl text-white hover:text-prisma-accent transition-colors uppercase">
-                Events
+                Eventos
               </button>
               <button onClick={() => scrollTo('gallery')} className="font-display text-5xl md:text-7xl text-white hover:text-prisma-accent transition-colors uppercase">
-                Gallery
+                Galería
               </button>
               <button onClick={() => scrollTo('contact')} className="font-display text-5xl md:text-7xl text-white hover:text-prisma-accent transition-colors uppercase">
-                Contact
+                Contacto
               </button>
 
               <div className="mt-6 pt-6 border-t border-white/10">
@@ -139,7 +139,7 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
                   className="flex items-center gap-3 mx-auto text-gray-400 hover:text-prisma-accent transition-colors group"
                 >
                   <Lock size={18} className="group-hover:scale-110 transition-transform" />
-                  <span className="font-display text-xl uppercase tracking-widest">Admin Login</span>
+                  <span className="font-display text-xl uppercase tracking-widest">Acceso admin</span>
                 </button>
               </div>
             </div>

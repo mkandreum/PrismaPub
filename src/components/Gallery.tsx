@@ -32,10 +32,10 @@ export default function Gallery() {
           className="mb-16 text-center"
         >
           <h2 className="font-display text-6xl md:text-[10vw] leading-none uppercase tracking-tighter text-white mb-4 drop-shadow-[0_0_40px_rgba(139,92,246,0.3)]">
-            <span className="text-prisma-accent">Photo</span> Gallery
+            <span className="text-prisma-accent">Foto</span> Galería
           </h2>
           <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto font-medium uppercase tracking-widest">
-            Unforgettable moments from our nights
+            Momentos inolvidables de nuestras noches
           </p>
         </motion.div>
 
