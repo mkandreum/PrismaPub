@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700;800;900&family=Sora:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Sora:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "League Spartan", sans-serif;
+  --font-sans: "Playfair Display", "Sora", ui-serif, serif;
+  --font-display: "Playfair Display", ui-serif, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   
   --color-prisma-purple: #8B5CF6;
@@ -58,8 +58,8 @@ body::after {
 }
 
 h1, h2, h3, .font-display {
-  font-family: 'Syne', sans-serif;
-  letter-spacing: -0.06em;
+  font-family: 'Playfair Display', ui-serif, serif;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   font-weight: 800;
 }
