@@ -45,7 +45,7 @@ export default function Hero() {
 
       <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 py-16">
         {/* Text Content */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1">
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1">
           {/* Small badge */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
@@ -94,13 +94,13 @@ export default function Hero() {
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9, type: "spring" }}
-            className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+            className="flex flex-row flex-wrap justify-center sm:justify-start gap-3 sm:gap-4 w-full sm:w-auto"
           >
             <motion.a
               href="#events"
               whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(139,92,246,0.5)" }}
               whileTap={{ scale: 0.97 }}
-              className="group inline-flex items-center justify-center gap-3 bg-prisma-purple text-white px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm transition-all duration-300 shadow-[0_0_30px_rgba(139,92,246,0.3)] relative overflow-hidden"
+              className="group inline-flex items-center justify-center gap-2 sm:gap-3 bg-prisma-purple text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold uppercase tracking-widest text-xs sm:text-sm transition-all duration-300 shadow-[0_0_30px_rgba(139,92,246,0.3)] relative overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-3">
                 Comprar entradas
@@ -113,7 +113,7 @@ export default function Hero() {
               href="#gallery"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="group inline-flex items-center justify-center gap-3 bg-white/5 backdrop-blur-sm border border-prisma-purple/30 text-white px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm hover:bg-prisma-purple/20 hover:border-prisma-purple/60 transition-all duration-300"
+              className="group inline-flex items-center justify-center gap-2 sm:gap-3 bg-white/5 backdrop-blur-sm border border-prisma-purple/30 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold uppercase tracking-widest text-xs sm:text-sm hover:bg-prisma-purple/20 hover:border-prisma-purple/60 transition-all duration-300"
             >
               Ver galería
             </motion.a>
@@ -125,7 +125,7 @@ export default function Hero() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 whileTap={{ scale: 0.9 }}
-                className="group inline-flex items-center justify-center gap-3 border border-prisma-purple/30 text-white px-6 py-4 rounded-full hover:bg-prisma-purple hover:border-prisma-purple transition-all duration-300"
+                className="group inline-flex items-center justify-center gap-2 sm:gap-3 border border-prisma-purple/30 text-white px-5 py-3 sm:px-6 sm:py-4 rounded-full hover:bg-prisma-purple hover:border-prisma-purple transition-all duration-300"
               >
                 <Instagram size={20} />
               </motion.a>
@@ -134,7 +134,7 @@ export default function Hero() {
         </div>
 
         {/* Hero Visual */}
-        <div className="relative order-1 lg:order-2 flex justify-center items-center">
+        <div className="relative order-2 flex justify-center items-center">
           {imageUrl ? (
             <motion.div
               initial={{ scale: 0.7, opacity: 0, rotate: 8 }}
