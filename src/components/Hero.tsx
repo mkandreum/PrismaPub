@@ -60,8 +60,8 @@ export default function Hero() {
         transition={{ duration: 1.2, ease: "easeOut" }}
         className="relative z-0 flex flex-col items-center justify-start pt-10 md:pt-14 pointer-events-none"
       >
-        <div className="relative flex items-start justify-center" style={{ overflow: 'visible' }}>
-          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" style={{ overflow: 'visible' }} aria-hidden="true">
+        <div className="relative flex items-start justify-center overflow-visible">
+          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true">
             <defs>
               <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(255,255,255,1)" />
