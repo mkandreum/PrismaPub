@@ -206,6 +206,7 @@ if (adminRow.count === 0) {
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('footer_text', 'Your safe space for unforgettable nights. Music, love, and freedom.');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('marquee_1', 'PRISMA PUB • SAFE SPACE • GOOD VIBES • ');
   db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('marquee_2', 'GALLERY • UNFORGETTABLE NIGHTS • ');
+  db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run('show_hero_photos', '1');
 }
 
 ensureSettingDefault('smtp_enabled', '0');
@@ -269,6 +270,7 @@ app.get('/api/settings', (_req, res) => {
   const publicKeys = new Set([
     'site_name', 'hero_phrase', 'hero_subtitle', 'address', 'instagram_url',
     'logo_url', 'footer_text', 'marquee_1', 'marquee_2', 'hero_image_url',
+    'show_hero_photos',
   ]);
   const obj = (settings as any[]).reduce((acc, curr) => {
     if (publicKeys.has(curr.key)) acc[curr.key] = curr.value;

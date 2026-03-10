@@ -225,15 +225,26 @@ h1, h2 {
 
 @keyframes prism-pulse {
   0%, 100% {
-    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.3)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.15));
+    filter:
+      drop-shadow(0 0 20px rgba(139, 92, 246, 0.5))
+      drop-shadow(0 0 50px rgba(139, 92, 246, 0.25))
+      drop-shadow(0 0 80px rgba(168, 85, 247, 0.15));
   }
   50% {
-    filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 60px rgba(139, 92, 246, 0.3));
+    filter:
+      drop-shadow(0 0 35px rgba(139, 92, 246, 0.8))
+      drop-shadow(0 0 70px rgba(139, 92, 246, 0.4))
+      drop-shadow(0 0 120px rgba(168, 85, 247, 0.25));
   }
 }
 
+@keyframes prism-shimmer {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
 .prism-svg {
-  animation: prism-pulse 4s ease-in-out infinite;
+  animation: prism-pulse 4s ease-in-out infinite, prism-shimmer 6s ease-in-out infinite;
 }
 
 .prism-beams {
@@ -241,46 +252,48 @@ h1, h2 {
   top: 55%;
   left: 50%;
   transform: translateX(-50%);
-  width: 300%;
-  height: 80vh;
+  width: 350%;
+  height: 100vh;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 125deg,
+    rgba(228, 3, 3, 0.25) 145deg,
+    rgba(255, 140, 0, 0.25) 152deg,
+    rgba(255, 237, 0, 0.25) 159deg,
+    rgba(0, 128, 38, 0.25) 166deg,
+    rgba(0, 77, 255, 0.25) 173deg,
+    rgba(36, 64, 142, 0.25) 180deg,
+    rgba(115, 41, 130, 0.25) 187deg,
+    rgba(139, 92, 246, 0.2) 194deg,
+    transparent 235deg
+  );
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 3%, black 50%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 3%, black 50%, transparent);
+}
+
+/* Full-page rainbow overlay that "bathes" the website — appears on scroll */
+.prism-page-rainbow {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 250%;
   background: conic-gradient(
     from 180deg at 50% 0%,
     transparent 130deg,
-    rgba(228, 3, 3, 0.2) 148deg,
-    rgba(255, 140, 0, 0.2) 156deg,
-    rgba(255, 237, 0, 0.2) 164deg,
-    rgba(0, 128, 38, 0.2) 172deg,
-    rgba(36, 64, 142, 0.2) 180deg,
-    rgba(115, 41, 130, 0.2) 188deg,
-    rgba(139, 92, 246, 0.15) 196deg,
+    rgba(228, 3, 3, 0.1) 147deg,
+    rgba(255, 140, 0, 0.1) 154deg,
+    rgba(255, 237, 0, 0.1) 161deg,
+    rgba(0, 128, 38, 0.1) 168deg,
+    rgba(0, 77, 255, 0.1) 175deg,
+    rgba(36, 64, 142, 0.1) 182deg,
+    rgba(115, 41, 130, 0.1) 189deg,
+    rgba(139, 92, 246, 0.08) 198deg,
     transparent 230deg
   );
   pointer-events: none;
-  mask-image: linear-gradient(to bottom, transparent, black 5%, black 60%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 60%, transparent);
-}
-
-/* Full-page rainbow overlay that "bathes" the website */
-.prism-page-rainbow {
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120%;
-  height: 200%;
-  background: conic-gradient(
-    from 180deg at 50% 0%,
-    transparent 135deg,
-    rgba(228, 3, 3, 0.08) 150deg,
-    rgba(255, 140, 0, 0.08) 158deg,
-    rgba(255, 237, 0, 0.08) 166deg,
-    rgba(0, 128, 38, 0.08) 174deg,
-    rgba(36, 64, 142, 0.08) 182deg,
-    rgba(115, 41, 130, 0.08) 190deg,
-    rgba(139, 92, 246, 0.06) 200deg,
-    transparent 225deg
-  );
-  pointer-events: none;
-  mask-image: linear-gradient(to bottom, transparent, black 8%, black 50%, transparent 90%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 8%, black 50%, transparent 90%);
+  mask-image: linear-gradient(to bottom, transparent, black 5%, black 45%, transparent 85%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 45%, transparent 85%);
 }

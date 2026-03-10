@@ -790,6 +790,18 @@ function SettingsTab() {
           <FormInput label="Título principal (THE ULTIMATE...)" value={settings.hero_phrase || ""} onChange={(v) => update("hero_phrase", v)} />
           <FormInput label="Subtítulo principal" value={settings.hero_subtitle || ""} onChange={(v) => update("hero_subtitle", v)} />
           <div>
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={(settings.show_hero_photos || "1") === "1"}
+                onChange={(e) => update("show_hero_photos", e.target.checked ? "1" : "0")}
+                className="accent-prisma-accent"
+              />
+              Mostrar fotos de inicio (fiesta y club)
+            </label>
+            <p className="text-xs text-gray-400 mt-1">Si se desactiva, solo se mostrará el prisma y el texto en la sección principal.</p>
+          </div>
+          <div>
             <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen principal</label>
             {settings.hero_image_url && (
               <img src={settings.hero_image_url} alt="Hero" className="w-full max-w-xs h-32 object-cover rounded-xl mb-3 border" />
