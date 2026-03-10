@@ -44,16 +44,16 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
   return (
     <>
       {/* Navigation - Floating Pill (BOTTOM) */}
-      <nav className={`fixed left-1/2 -translate-x-1/2 bottom-[max(0.9rem,env(safe-area-inset-bottom))] md:bottom-8 w-[96vw] sm:w-auto max-w-[96vw] z-50 border-2 rounded-full backdrop-blur-md flex justify-between items-center px-3 py-2.5 sm:px-6 sm:py-3 md:px-12 md:py-5 shadow-[0_0_40px_rgba(139,92,246,0.2)] gap-2 sm:gap-7 md:gap-14 whitespace-nowrap overflow-hidden transition-all duration-300 ${scrolled ? 'border-prisma-purple/40 bg-prisma-dark/95' : 'border-white/10 bg-prisma-dark/60'}`}>
+      <nav className={`fixed left-1/2 -translate-x-1/2 bottom-[max(0.9rem,env(safe-area-inset-bottom))] md:bottom-8 w-[88vw] sm:w-auto max-w-[96vw] z-50 border-2 rounded-full backdrop-blur-md flex justify-between items-center px-5 py-4 sm:px-6 sm:py-3 md:px-12 md:py-5 shadow-[0_0_40px_rgba(139,92,246,0.2)] gap-3 sm:gap-7 md:gap-14 whitespace-nowrap overflow-hidden transition-all duration-300 ${scrolled ? 'border-prisma-purple/40 bg-prisma-dark/95' : 'border-white/10 bg-prisma-dark/60'}`}>
         <button
           onClick={() => scrollTo('events')}
-          className="text-[11px] leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
+          className="text-sm leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
         >
           Eventos
         </button>
         <button
           onClick={() => scrollTo('gallery')}
-          className="text-[11px] leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
+          className="text-sm leading-none sm:text-2xl md:text-3xl uppercase hover:text-prisma-accent transition-all font-display tracking-[0.02em] sm:tracking-widest shrink text-white opacity-95"
         >
           Galería
         </button>
@@ -63,10 +63,10 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
           className="mx-1 sm:mx-3 md:mx-6 px-1 sm:px-2 md:px-3 select-none flex items-center justify-center flex-shrink-0 min-w-fit"
         >
           {logoUrl ? (
-            <img src={logoUrl} alt={siteName} className="h-9 sm:h-14 md:h-18 w-auto object-contain" />
+            <img src={logoUrl} alt={siteName} className="h-12 sm:h-14 md:h-18 w-auto object-contain" />
           ) : (
             <>
-              <span className="font-display text-[1.55rem] sm:text-5xl md:text-6xl text-white tracking-tight sm:tracking-wider flex items-center gap-2 sm:hidden">
+              <span className="font-display text-2xl sm:text-5xl md:text-6xl text-white tracking-tight sm:tracking-wider flex items-center gap-2 sm:hidden">
                 {shortName}
               </span>
               <span className="font-display text-4xl sm:text-6xl md:text-7xl text-white tracking-wider items-center gap-2 hidden sm:flex">
