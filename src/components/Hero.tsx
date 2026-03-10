@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { ArrowRight, Instagram, Sparkles } from "lucide-react";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 
@@ -22,8 +22,6 @@ export default function Hero() {
 
   const phrase = settings.hero_phrase || "La experiencia LGBT+ definitiva";
   const subtitle = settings.hero_subtitle || "Música • Baile • Libertad";
-  const siteName = settings.site_name || "PRISMA PUB";
-  const imageUrl = settings.hero_image_url;
   const showPhotos = settings.show_hero_photos !== "0";
   const particles = useMemo(
     () => Array.from({ length: 16 }).map(() => ({
@@ -55,98 +53,96 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* ── PRISM AT THE VERY TOP ── */}
-      {!imageUrl && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="absolute inset-x-0 top-0 z-0 flex flex-col items-center justify-start pt-16 md:pt-20 pointer-events-none overflow-hidden h-full"
-        >
-          <div className="relative w-full max-w-[640px] h-[760px] flex items-start justify-center">
-            <svg viewBox="0 0 300 760" className="w-[92vw] max-w-[640px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true">
-              <defs>
-                <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,1)" />
-                  <stop offset="50%" stopColor="rgba(210,160,255,1)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,1)" />
-                </linearGradient>
-                <filter id="beam-glow" x="-50%" y="-10%" width="200%" height="140%">
-                  <feGaussianBlur stdDeviation="5" />
-                </filter>
-                <filter id="star-glow" x="-120%" y="-120%" width="340%" height="340%">
-                  <feGaussianBlur stdDeviation="4" />
-                </filter>
-              </defs>
+      {/* ── PRISM AT THE VERY TOP (always visible) ── */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        className="relative z-0 flex flex-col items-center justify-start pt-10 md:pt-14 pointer-events-none"
+      >
+        <div className="relative flex items-start justify-center overflow-visible">
+          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true">
+            <defs>
+              <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+                <stop offset="50%" stopColor="rgba(210,160,255,1)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,1)" />
+              </linearGradient>
+              <filter id="beam-glow" x="-50%" y="-10%" width="200%" height="140%">
+                <feGaussianBlur stdDeviation="5" />
+              </filter>
+              <filter id="star-glow" x="-120%" y="-120%" width="340%" height="340%">
+                <feGaussianBlur stdDeviation="4" />
+              </filter>
+            </defs>
 
-              {/* Rainbow beam drawn in the same coordinate system as the prism apex */}
-              {[
-                { x2: 14, color: "#ff1737" },
-                { x2: 52, color: "#ff7b00" },
-                { x2: 92, color: "#fff200" },
-                { x2: 130, color: "#48ff3a" },
-                { x2: 170, color: "#33e6ff" },
-                { x2: 212, color: "#3f69ff" },
-                { x2: 286, color: "#ff2dff" },
-              ].map((beam, i) => (
-                <g key={beam.color}>
-                  <motion.line
-                    x1="150"
-                    y1="48"
-                    x2={beam.x2}
-                    y2="760"
-                    stroke={beam.color}
-                    strokeWidth="12"
-                    strokeLinecap="round"
-                    filter="url(#beam-glow)"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0.55, 0.92, 0.65] }}
-                    transition={{ duration: 2.8, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-                  />
-                  <motion.line
-                    x1="150"
-                    y1="48"
-                    x2={beam.x2}
-                    y2="760"
-                    stroke={beam.color}
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0.72, 1, 0.8] }}
-                    transition={{ duration: 2.1, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-                  />
-                </g>
-              ))}
-
-              {/* Prism */}
-              <polygon
-                points="150,48 270,260 30,260"
-                fill="rgba(178,112,255,0.09)"
-                stroke="url(#prism-stroke-enhanced)"
-                strokeWidth="2.7"
-                strokeLinejoin="round"
-              />
-              <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.45)" strokeWidth="1.1" />
-              <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
-              <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
-              <line x1="72" y1="218" x2="228" y2="218" stroke="rgba(117,178,255,0.22)" strokeWidth="1" />
-
-              {/* Star */}
-              <g>
-                <circle cx="150" cy="48" r="5" fill="white" filter="url(#star-glow)" />
-                <line x1="150" y1="26" x2="150" y2="70" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
-                <line x1="128" y1="48" x2="172" y2="48" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
-                <line x1="135" y1="33" x2="165" y2="63" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
-                <line x1="135" y1="63" x2="165" y2="33" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
+            {/* Rainbow beams — extend beyond viewBox via overflow:visible */}
+            {[
+              { x2: 14, color: "#ff1737" },
+              { x2: 52, color: "#ff7b00" },
+              { x2: 92, color: "#fff200" },
+              { x2: 130, color: "#48ff3a" },
+              { x2: 170, color: "#33e6ff" },
+              { x2: 212, color: "#3f69ff" },
+              { x2: 286, color: "#ff2dff" },
+            ].map((beam, i) => (
+              <g key={beam.color}>
+                <motion.line
+                  x1="150"
+                  y1="48"
+                  x2={beam.x2}
+                  y2="760"
+                  stroke={beam.color}
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  filter="url(#beam-glow)"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0.55, 0.92, 0.65] }}
+                  transition={{ duration: 2.8, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+                />
+                <motion.line
+                  x1="150"
+                  y1="48"
+                  x2={beam.x2}
+                  y2="760"
+                  stroke={beam.color}
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0.72, 1, 0.8] }}
+                  transition={{ duration: 2.1, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+                />
               </g>
-            </svg>
-          </div>
-        </motion.div>
-      )}
+            ))}
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-6xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-14 md:py-16' : 'flex flex-col items-center text-center pt-28 md:pt-36 pb-12 md:pb-14'}`}>
+            {/* Prism triangle */}
+            <polygon
+              points="150,48 270,260 30,260"
+              fill="rgba(178,112,255,0.09)"
+              stroke="url(#prism-stroke-enhanced)"
+              strokeWidth="2.7"
+              strokeLinejoin="round"
+            />
+            <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.45)" strokeWidth="1.1" />
+            <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
+            <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
+            <line x1="72" y1="218" x2="228" y2="218" stroke="rgba(117,178,255,0.22)" strokeWidth="1" />
+
+            {/* Star at apex */}
+            <g>
+              <circle cx="150" cy="48" r="5" fill="white" filter="url(#star-glow)" />
+              <line x1="150" y1="26" x2="150" y2="70" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
+              <line x1="128" y1="48" x2="172" y2="48" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
+              <line x1="135" y1="33" x2="165" y2="63" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
+              <line x1="135" y1="63" x2="165" y2="33" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
+            </g>
+          </svg>
+        </div>
+      </motion.div>
+
+      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className="max-w-6xl w-full relative z-10 will-change-transform flex flex-col items-center text-center pt-4 md:pt-6 pb-12 md:pb-14">
         {/* Text Content */}
-        <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center'}`}>
+        <div className="flex flex-col items-center text-center">
           {/* Small badge */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
@@ -234,41 +230,8 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Hero Visual — only when hero image is configured */}
-        {imageUrl && (
-          <div className="relative order-2 flex justify-center items-center">
-            <motion.div
-              initial={{ scale: 0.7, opacity: 0, rotate: 8 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: "spring", bounce: 0.25, duration: 1.5, delay: 0.3 }}
-              className="relative z-10 w-full max-w-[480px] aspect-[4/5]"
-            >
-              {/* Purple glow behind */}
-              <div className="absolute -inset-4 bg-prisma-purple/20 rounded-[2rem] blur-2xl -z-[1]" />
-              <div className="absolute inset-0 bg-gradient-to-br from-prisma-purple/30 to-prisma-accent/20 rounded-3xl translate-x-4 translate-y-4 -z-[1]" />
-              <img src={imageUrl} alt={siteName} className="w-full h-full object-cover rounded-3xl border-2 border-prisma-purple/40 shadow-2xl shadow-prisma-purple/20" />
-              
-              {/* Floating badges */}
-              <motion.div
-                animate={{ y: [0, -10, 0], rotate: [0, -3, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-4 -right-4 bg-prisma-purple text-white px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg shadow-prisma-purple/30 border border-white/20"
-              >
-                Espacio seguro ✨
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 10, 0], rotate: [0, 3, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-4 -left-4 bg-white text-prisma-dark px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg rotate-3"
-              >
-                ¡Únete! 🏳️‍🌈
-              </motion.div>
-            </motion.div>
-          </div>
-        )}
-
-        {/* Photos below prism — controlled by admin setting, no X buttons */}
-        {!imageUrl && showPhotos && (
+        {/* Photos below prism — controlled by admin setting */}
+        {showPhotos && (
           <div className="w-full max-w-[600px] mt-8">
             <div className="relative w-full h-[40vh] md:h-[45vh]">
               <motion.div
