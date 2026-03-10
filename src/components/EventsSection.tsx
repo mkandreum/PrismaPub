@@ -81,23 +81,23 @@ export default function EventsSection() {
   };
 
   return (
-    <section id="events" className="py-24 px-4 md:px-8 bg-prisma-dark text-white relative overflow-hidden">
+    <section id="events" className="py-12 md:py-16 px-4 md:px-6 bg-prisma-dark text-white relative overflow-hidden">
       {/* Animated background accents */}
       <motion.div animate={{ x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} className="absolute top-0 right-0 w-96 h-96 bg-prisma-accent/8 rounded-full blur-[160px] -z-1" />
       <motion.div animate={{ x: [0, -30, 0], y: [0, 20, 0] }} transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-0 left-0 w-96 h-96 bg-prisma-purple/15 rounded-full blur-[160px] -z-1" />
       <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-prisma-deep/5 rounded-full blur-[200px] -z-1" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-10 md:mb-12 text-center"
         >
-          <h2 className="font-display text-6xl md:text-[10vw] leading-none uppercase tracking-tighter text-white mb-4">
+          <h2 className="font-display text-5xl md:text-[8vw] leading-[0.9] uppercase tracking-tighter text-white mb-3">
             Próximos <span className="text-prisma-accent">eventos</span>
           </h2>
-          <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto font-medium">
+          <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto font-medium">
             No te pierdas las mejores noches. Compra tus entradas ahora.
           </p>
         </motion.div>
@@ -107,7 +107,7 @@ export default function EventsSection() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-prisma-accent" />
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4 md:gap-5">
             {events.map((event, i) => (
               <motion.div
                 key={event.id}

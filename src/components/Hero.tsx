@@ -63,76 +63,88 @@ export default function Hero() {
           transition={{ duration: 1.2, ease: "easeOut" }}
           className="absolute inset-x-0 top-0 z-0 flex flex-col items-center justify-start pt-16 md:pt-20 pointer-events-none overflow-hidden h-full"
         >
-          <div className="relative w-full max-w-[600px] h-[600px] flex items-center justify-center">
-            {/* Rainbow Beams - Precisely aligned to Y: 48 within the relative 300 viewBox equivalent */}
-            <div className="absolute top-[16%] left-1/2 -translate-x-1/2 w-full h-[150vh] z-10">
-              {[
-                { color: '#FF0000', angle: -28 },
-                { color: '#FF4500', angle: -19 },
-                { color: '#FFFF00', angle: -10 },
-                { color: '#00FF00', angle: 0 },
-                { color: '#00BFFF', angle: 10 },
-                { color: '#0000FF', angle: 19 },
-                { color: '#FF00FF', angle: 28 },
-              ].map((beam, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: '100%' }}
-                  transition={{ duration: 1.5, delay: i * 0.1, ease: "easeOut" }}
-                  className="absolute top-0 left-1/2 origin-top"
-                  style={{
-                    transform: `translateX(-50%) rotate(${beam.angle}deg)`,
-                    width: '14px',
-                    background: `linear-gradient(to bottom, ${beam.color} 0%, ${beam.color} 30%, ${beam.color}CC 60%, transparent 95%)`,
-                    boxShadow: `0 0 45px ${beam.color}AA`,
-                    filter: 'blur(0.4px)',
-                  }}
-                >
-                  <div 
-                    className="w-[5px] h-full mx-auto bg-white/70 blur-[1px]"
-                    style={{ animation: `pulse-beam 2.5s infinite alternate ${i * 0.15}s` }}
-                  />
-                </motion.div>
-              ))}
-            </div>
-
-            {/* The Star at the Apex - Perfectly centered at Y: 16% */}
-            <div className="absolute top-[16%] left-1/2 -translate-x-1/2 z-40 -translate-y-[2px]">
-              <div className="relative">
-                <div className="absolute inset-0 bg-white blur-2xl opacity-100 scale-[2.2] animate-pulse" />
-                <div className="relative w-4 h-4 bg-white rounded-full shadow-[0_0_35px_#fff,0_0_70px_#fff]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-[3px] bg-white blur-[2px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-20 w-[3px] bg-white blur-[2px]" />
-              </div>
-            </div>
-
-            {/* The Prism Outline (SVG) */}
-            <svg viewBox="0 0 300 300" className="w-[85vw] h-[85vw] max-w-[450px] max-h-[450px] drop-shadow-[0_0_40px_rgba(255,255,255,0.4)] z-30">
+          <div className="relative w-full max-w-[640px] h-[760px] flex items-start justify-center">
+            <svg viewBox="0 0 300 760" className="w-[92vw] max-w-[640px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true">
               <defs>
                 <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="rgba(255,255,255,1)" />
-                  <stop offset="50%" stopColor="rgba(192,132,252,1)" />
+                  <stop offset="50%" stopColor="rgba(210,160,255,1)" />
                   <stop offset="100%" stopColor="rgba(255,255,255,1)" />
                 </linearGradient>
+                <filter id="beam-glow" x="-50%" y="-10%" width="200%" height="140%">
+                  <feGaussianBlur stdDeviation="5" />
+                </filter>
+                <filter id="star-glow" x="-120%" y="-120%" width="340%" height="340%">
+                  <feGaussianBlur stdDeviation="4" />
+                </filter>
               </defs>
-              <path
-                d="M150 48 L270 260 L30 260 Z"
-                fill="rgba(168,85,247,0.12)"
+
+              {/* Rainbow beam drawn in the same coordinate system as the prism apex */}
+              {[
+                { x2: 14, color: "#ff1737" },
+                { x2: 52, color: "#ff7b00" },
+                { x2: 92, color: "#fff200" },
+                { x2: 130, color: "#48ff3a" },
+                { x2: 170, color: "#33e6ff" },
+                { x2: 212, color: "#3f69ff" },
+                { x2: 286, color: "#ff2dff" },
+              ].map((beam, i) => (
+                <g key={beam.color}>
+                  <motion.line
+                    x1="150"
+                    y1="48"
+                    x2={beam.x2}
+                    y2="760"
+                    stroke={beam.color}
+                    strokeWidth="12"
+                    strokeLinecap="round"
+                    filter="url(#beam-glow)"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0.55, 0.92, 0.65] }}
+                    transition={{ duration: 2.8, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+                  />
+                  <motion.line
+                    x1="150"
+                    y1="48"
+                    x2={beam.x2}
+                    y2="760"
+                    stroke={beam.color}
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0.72, 1, 0.8] }}
+                    transition={{ duration: 2.1, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+                  />
+                </g>
+              ))}
+
+              {/* Prism */}
+              <polygon
+                points="150,48 270,260 30,260"
+                fill="rgba(178,112,255,0.09)"
                 stroke="url(#prism-stroke-enhanced)"
-                strokeWidth="3"
-                className="animate-pulse"
-                style={{ animationDuration: '3s' }}
+                strokeWidth="2.7"
+                strokeLinejoin="round"
               />
-              <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" />
-              <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-              <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
+              <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.45)" strokeWidth="1.1" />
+              <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
+              <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
+              <line x1="72" y1="218" x2="228" y2="218" stroke="rgba(117,178,255,0.22)" strokeWidth="1" />
+
+              {/* Star */}
+              <g>
+                <circle cx="150" cy="48" r="5" fill="white" filter="url(#star-glow)" />
+                <line x1="150" y1="26" x2="150" y2="70" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
+                <line x1="128" y1="48" x2="172" y2="48" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
+                <line x1="135" y1="33" x2="165" y2="63" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
+                <line x1="135" y1="63" x2="165" y2="33" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
+              </g>
             </svg>
           </div>
         </motion.div>
       )}
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-32 md:pt-40 pb-16'}`}>
+      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-6xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-14 md:py-16' : 'flex flex-col items-center text-center pt-28 md:pt-36 pb-12 md:pb-14'}`}>
         {/* Text Content */}
         <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center'}`}>
           {/* Small badge */}
@@ -140,7 +152,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-prisma-purple/20 border border-prisma-purple/30 text-prisma-purple px-4 py-1.5 rounded-full text-xs uppercase tracking-widest font-semibold mb-6"
+            className="inline-flex items-center gap-2 bg-prisma-purple/20 border border-prisma-purple/30 text-prisma-purple px-4 py-1.5 rounded-full text-xs uppercase tracking-[0.18em] font-semibold mb-4"
           >
             <Sparkles size={14} />
             Espacio seguro
@@ -153,7 +165,7 @@ export default function Hero() {
             transition={{ type: "spring", duration: 1 }}
             className="max-w-[760px]"
           >
-            <h1 className="headline-glow text-6xl md:text-8xl xl:text-[8.8rem] font-display uppercase text-white mb-6 tracking-[-0.08em]">
+            <h1 className="headline-glow text-6xl md:text-8xl xl:text-[8.4rem] font-display uppercase text-white mb-5 tracking-[-0.08em]">
               {phrase.split(' ').map((word: string, i: number) => (
                 <motion.span
                   key={i}
@@ -173,7 +185,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.8 }}
-            className="text-sm md:text-base text-white/72 font-semibold uppercase tracking-[0.28em] mb-10"
+            className="text-sm md:text-base text-white/72 font-semibold uppercase tracking-[0.2em] mb-8"
           >
             {subtitle}
           </motion.p>

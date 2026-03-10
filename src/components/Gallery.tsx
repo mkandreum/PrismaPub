@@ -20,19 +20,19 @@ export default function Gallery() {
   }, []);
 
   return (
-    <section id="gallery" className="relative py-24 px-4 md:px-8 bg-prisma-dark overflow-hidden">
+    <section id="gallery" className="relative py-12 md:py-16 px-4 md:px-6 bg-prisma-dark overflow-hidden">
       {/* Section heading */}
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-10 md:mb-12 text-center"
         >
-          <h2 className="font-display text-6xl md:text-[10vw] leading-none uppercase tracking-tighter text-white mb-4 drop-shadow-[0_0_40px_rgba(139,92,246,0.3)]">
+          <h2 className="font-display text-5xl md:text-[8vw] leading-[0.9] uppercase tracking-tighter text-white mb-3 drop-shadow-[0_0_40px_rgba(139,92,246,0.3)]">
             <span className="text-prisma-accent">Foto</span> Galería
           </h2>
-          <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto font-medium uppercase tracking-widest">
+          <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto font-medium uppercase tracking-[0.15em]">
             Momentos inolvidables de nuestras noches
           </p>
         </motion.div>
@@ -46,7 +46,7 @@ export default function Gallery() {
             <p className="text-gray-400 text-sm uppercase tracking-wider">Sube imágenes desde el panel de administración</p>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-5 space-y-4 md:space-y-5">
             {photos.map((src, i) => (
               <motion.div
                 key={i}

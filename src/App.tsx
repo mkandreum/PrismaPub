@@ -88,14 +88,14 @@ function Footer({ settings }: { settings: Record<string, string> }) {
   const footerText = settings.footer_text || 'Your safe space for unforgettable nights. Music, love, and freedom.';
 
   return (
-    <footer id="contact" className="bg-prisma-dark border-t border-prisma-purple/20 pt-16 pb-28 md:pb-32 px-4 md:px-8 relative overflow-hidden">
+    <footer id="contact" className="bg-prisma-dark border-t border-prisma-purple/20 pt-10 md:pt-12 pb-24 md:pb-28 px-4 md:px-6 relative overflow-hidden">
       {/* Subtle footer glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-prisma-purple/5 rounded-full blur-[150px] -z-0" />
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid md:grid-cols-3 gap-12 mb-12">
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-10 mb-10">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               {logoUrl ? (
                 <img src={logoUrl} alt={siteName} className="h-10 w-auto object-contain" />
               ) : (
@@ -112,14 +112,14 @@ function Footer({ settings }: { settings: Record<string, string> }) {
                 </>
               )}
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
               {footerText}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-lg uppercase text-white mb-4">Navegación</h4>
+            <h4 className="font-display text-lg uppercase text-white mb-3">Navegación</h4>
             <div className="flex flex-col gap-2">
               {[
                 { id: 'events', label: 'eventos' },
@@ -139,7 +139,7 @@ function Footer({ settings }: { settings: Record<string, string> }) {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display text-lg uppercase text-white mb-4">Encuéntranos</h4>
+            <h4 className="font-display text-lg uppercase text-white mb-3">Encuéntranos</h4>
             {settings.address && (
               <p className="text-gray-400 text-sm flex items-center gap-2 mb-3">
                 <MapPin size={16} className="text-prisma-accent flex-shrink-0" />
