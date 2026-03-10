@@ -214,3 +214,73 @@ h1, h2 {
     0 0 24px rgba(255, 255, 255, 0.06),
     0 0 60px rgba(111, 83, 255, 0.22);
 }
+
+/* ── PRISM VISUAL ──────────────────────────────── */
+.prism-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes prism-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.3)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 60px rgba(139, 92, 246, 0.3));
+  }
+}
+
+.prism-svg {
+  animation: prism-pulse 4s ease-in-out infinite;
+}
+
+.prism-beams {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300%;
+  height: 80vh;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 130deg,
+    rgba(228, 3, 3, 0.2) 148deg,
+    rgba(255, 140, 0, 0.2) 156deg,
+    rgba(255, 237, 0, 0.2) 164deg,
+    rgba(0, 128, 38, 0.2) 172deg,
+    rgba(36, 64, 142, 0.2) 180deg,
+    rgba(115, 41, 130, 0.2) 188deg,
+    rgba(139, 92, 246, 0.15) 196deg,
+    transparent 230deg
+  );
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 5%, black 60%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 60%, transparent);
+}
+
+/* Full-page rainbow overlay that "bathes" the website */
+.prism-page-rainbow {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 200%;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 135deg,
+    rgba(228, 3, 3, 0.08) 150deg,
+    rgba(255, 140, 0, 0.08) 158deg,
+    rgba(255, 237, 0, 0.08) 166deg,
+    rgba(0, 128, 38, 0.08) 174deg,
+    rgba(36, 64, 142, 0.08) 182deg,
+    rgba(115, 41, 130, 0.08) 190deg,
+    rgba(139, 92, 246, 0.06) 200deg,
+    transparent 225deg
+  );
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 8%, black 50%, transparent 90%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 8%, black 50%, transparent 90%);
+}
