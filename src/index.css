@@ -56,12 +56,14 @@ body::after {
 }
 
 h1, h2, h3, .font-display {
-  font-family: var(--font-display);
-  letter-spacing: -0.04em;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+  font-weight: 800;
 }
 
 h1, h2 {
-  line-height: 0.88;
+  line-height: 0.85;
 }
 
 .app-shell {

@@ -38,11 +38,10 @@ export default function Hero() {
     <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center overflow-hidden px-4">
       {/* Animated gradient bg */}
       <div className="absolute inset-0 -z-20">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,11,29,0.6),rgba(10,10,20,0.9))]" />
-        <motion.div className="glow-orb left-[-8%] top-[-2%] h-[340px] w-[340px] bg-[#5d4dff]/75" animate={{ x: [0, 34, 0], y: [0, -24, 0], scale: [1, 1.08, 1] }} transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="glow-orb right-[-10%] top-[5%] h-[360px] w-[360px] bg-[#ff4dc4]/80" animate={{ x: [0, -22, 0], y: [0, 20, 0], scale: [1, 1.12, 1] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="glow-orb right-[10%] top-[18%] h-[420px] w-[420px] bg-[#5068ff]/65" animate={{ x: [0, 18, 0], y: [0, 36, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="glow-orb bottom-[-12%] left-[18%] h-[320px] w-[320px] bg-prisma-accent/40" animate={{ x: [0, -24, 0], y: [0, 12, 0] }} transition={{ duration: 13, repeat: Infinity, ease: "easeInOut" }} />
+        <div className="absolute inset-0 bg-[#050510]" />
+        <motion.div className="glow-orb left-[-10%] top-[-5%] h-[500px] w-[500px] bg-[#3a1a7a]/40 blur-[120px]" animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="glow-orb right-[-10%] top-[10%] h-[600px] w-[600px] bg-[#4c0577]/35 blur-[130px]" animate={{ x: [0, -40, 0], y: [0, 40, 0], scale: [1, 1.2, 1] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="glow-orb bottom-[-10%] left-[20%] h-[450px] w-[450px] bg-[#1e0b4a]/50 blur-[100px]" animate={{ x: [0, 30, 0], y: [0, 20, 0] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
       </div>
 
       {/* Floating particles */}
@@ -62,46 +61,11 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="absolute inset-x-0 top-0 z-0 flex flex-col items-center justify-start pt-20 md:pt-28 pointer-events-none overflow-hidden h-full"
+          className="absolute inset-x-0 top-0 z-0 flex flex-col items-center justify-start pt-16 md:pt-20 pointer-events-none overflow-hidden h-full"
         >
-          <div className="relative w-full max-w-[500px] h-[500px] flex items-center justify-center">
-            {/* The Star at the Apex */}
-            <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-30">
-              <div className="relative">
-                <div className="absolute inset-0 bg-white blur-xl opacity-80 scale-150 animate-pulse" />
-                <div className="relative w-2 h-2 bg-white rounded-full shadow-[0_0_20px_#fff,0_0_40px_#fff]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-[1px] bg-white/60 blur-[1px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-[1px] bg-white/60 blur-[1px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-[1px] bg-white/40 rotate-45" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-[1px] bg-white/40 -rotate-45" />
-              </div>
-            </div>
-
-            {/* The Prism Outline (SVG) */}
-            <svg viewBox="0 0 300 300" className="w-80 h-80 md:w-96 md:h-96 drop-shadow-[0_0_25px_rgba(168,85,247,0.4)] z-20">
-              <defs>
-                <linearGradient id="prism-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
-                  <stop offset="50%" stopColor="rgba(255,255,255,0.2)" />
-                  <stop offset="100%" stopColor="rgba(168,85,247,0.4)" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M150 25 L260 250 L40 250 Z"
-                fill="none"
-                stroke="url(#prism-stroke)"
-                strokeWidth="1.5"
-                className="animate-pulse"
-                style={{ animationDuration: '4s' }}
-              />
-              {/* Internal 3D structure */}
-              <line x1="150" y1="25" x2="150" y2="250" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-              <line x1="40" y1="250" x2="150" y2="180" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-              <line x1="260" y1="250" x2="150" y2="180" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-            </svg>
-
+          <div className="relative w-full max-w-[600px] h-[600px] flex items-center justify-center">
             {/* Rainbow Beams - originating from top point */}
-            <div className="absolute top-[8.5%] left-1/2 -translate-x-1/2 w-full h-[120vh] z-10">
+            <div className="absolute top-[16.5%] left-1/2 -translate-x-1/2 w-full h-[120vh] z-10">
               {[
                 { color: '#FF0000', angle: -24 },
                 { color: '#FF7F00', angle: -16 },
@@ -114,30 +78,63 @@ export default function Hero() {
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 0.9, height: '100%' }}
+                  animate={{ opacity: 0.92, height: '100%' }}
                   transition={{ duration: 1.5, delay: i * 0.1, ease: "easeOut" }}
                   className="absolute top-0 left-1/2 origin-top"
                   style={{
                     transform: `translateX(-50%) rotate(${beam.angle}deg)`,
-                    width: '10px',
-                    background: `linear-gradient(to bottom, ${beam.color} 0%, ${beam.color}88 30%, ${beam.color}44 60%, transparent 95%)`,
-                    boxShadow: `0 0 20px ${beam.color}66`,
+                    width: '12px',
+                    background: `linear-gradient(to bottom, ${beam.color} 0%, ${beam.color}AA 25%, ${beam.color}66 50%, transparent 95%)`,
+                    boxShadow: `0 0 35px ${beam.color}88`,
                     filter: 'blur(0.5px)',
                   }}
                 >
-                  {/* Central glowing core for each beam */}
                   <div 
-                    className="w-[2px] h-full mx-auto bg-white/40 blur-[1px]"
+                    className="w-[3px] h-full mx-auto bg-white/50 blur-[1px]"
                     style={{ animation: `pulse-beam 3s infinite alternate ${i * 0.2}s` }}
                   />
                 </motion.div>
               ))}
             </div>
+
+            {/* The Star at the Apex - Perfectly centered with beams */}
+            <div className="absolute top-[16%] left-1/2 -translate-x-1/2 z-40">
+              <div className="relative">
+                <div className="absolute inset-0 bg-white blur-2xl opacity-90 scale-[2] animate-pulse" />
+                <div className="relative w-3 h-3 bg-white rounded-full shadow-[0_0_25px_#fff,0_0_50px_#fff]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-[2px] bg-white blur-[1.5px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-16 w-[2px] bg-white blur-[1.5px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-[1.5px] bg-white rotate-45" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-[1.5px] bg-white -rotate-45" />
+              </div>
+            </div>
+
+            {/* The Prism Outline (SVG) - Positioned so apex is at top-[16%] */}
+            <svg viewBox="0 0 300 300" className="w-[85vw] h-[85vw] max-w-[450px] max-h-[450px] drop-shadow-[0_0_40px_rgba(255,255,255,0.4)] z-30">
+              <defs>
+                <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
+                  <stop offset="50%" stopColor="rgba(168,85,247,0.8)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.9)" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M150 48 L270 260 L30 260 Z"
+                fill="rgba(168,85,247,0.08)"
+                stroke="url(#prism-stroke-enhanced)"
+                strokeWidth="2.5"
+                className="animate-pulse"
+                style={{ animationDuration: '3s' }}
+              />
+              <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+              <line x1="30" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+              <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+            </svg>
           </div>
         </motion.div>
       )}
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-28 md:pt-48 pb-16'}`}>
+      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 will-change-transform ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-32 md:pt-40 pb-16'}`}>
         {/* Text Content */}
         <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center'}`}>
           {/* Small badge */}
