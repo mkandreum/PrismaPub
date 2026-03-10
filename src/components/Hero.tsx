@@ -61,20 +61,59 @@ export default function Hero() {
         className="relative z-0 flex flex-col items-center justify-start pt-10 md:pt-14 pointer-events-none"
       >
         <div className="relative flex items-start justify-center overflow-visible">
-          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true">
+          <svg viewBox="0 0 300 280" className="w-[65vw] max-w-[360px] h-auto overflow-visible drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]" aria-hidden="true" style={{ filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.2))' }}>
             <defs>
               <linearGradient id="prism-stroke-enhanced" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(255,255,255,1)" />
                 <stop offset="50%" stopColor="rgba(210,160,255,1)" />
                 <stop offset="100%" stopColor="rgba(255,255,255,1)" />
               </linearGradient>
+              <linearGradient id="entry-beam-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+                <stop offset="20%" stopColor="rgba(255,255,255,0.7)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0.95)" />
+              </linearGradient>
+              <radialGradient id="prism-body-glow" cx="50%" cy="55%" r="50%">
+                <stop offset="0%" stopColor="rgba(200,170,255,0.18)" />
+                <stop offset="50%" stopColor="rgba(160,120,255,0.08)" />
+                <stop offset="100%" stopColor="rgba(140,100,255,0)" />
+              </radialGradient>
+              <radialGradient id="apex-flare" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
+                <stop offset="25%" stopColor="rgba(230,210,255,0.5)" />
+                <stop offset="60%" stopColor="rgba(200,170,255,0.15)" />
+                <stop offset="100%" stopColor="transparent" />
+              </radialGradient>
               <filter id="beam-glow" x="-50%" y="-10%" width="200%" height="140%">
                 <feGaussianBlur stdDeviation="5" />
               </filter>
-              <filter id="star-glow" x="-120%" y="-120%" width="340%" height="340%">
-                <feGaussianBlur stdDeviation="4" />
+              <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="8" />
+              </filter>
+              <filter id="flare-glow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="3" />
               </filter>
             </defs>
+
+            {/* Entry beam — white light entering the prism from above */}
+            <motion.line
+              x1="150" y1="-60" x2="150" y2="48"
+              stroke="white"
+              strokeWidth="3"
+              strokeLinecap="round"
+              filter="url(#soft-glow)"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.4, 0.7, 0.4] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.line
+              x1="150" y1="-60" x2="150" y2="48"
+              stroke="white"
+              strokeWidth="1.2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            />
 
             {/* Rainbow beams — extend beyond viewBox via overflow:visible */}
             {[
@@ -91,7 +130,7 @@ export default function Hero() {
                   x1="150"
                   y1="48"
                   x2={beam.x2}
-                  y2="760"
+                  y2="1100"
                   stroke={beam.color}
                   strokeWidth="12"
                   strokeLinecap="round"
@@ -104,7 +143,7 @@ export default function Hero() {
                   x1="150"
                   y1="48"
                   x2={beam.x2}
-                  y2="760"
+                  y2="1100"
                   stroke={beam.color}
                   strokeWidth="5"
                   strokeLinecap="round"
@@ -114,6 +153,13 @@ export default function Hero() {
                 />
               </g>
             ))}
+
+            {/* Prism body glow */}
+            <polygon
+              points="150,48 270,260 30,260"
+              fill="url(#prism-body-glow)"
+              filter="url(#soft-glow)"
+            />
 
             {/* Prism triangle */}
             <polygon
@@ -128,13 +174,53 @@ export default function Hero() {
             <line x1="270" y1="260" x2="150" y2="190" stroke="rgba(255,255,255,0.28)" strokeWidth="1" />
             <line x1="72" y1="218" x2="228" y2="218" stroke="rgba(117,178,255,0.22)" strokeWidth="1" />
 
-            {/* Star at apex */}
+            {/* Realistic lens flare at apex */}
             <g>
-              <circle cx="150" cy="48" r="5" fill="white" filter="url(#star-glow)" />
-              <line x1="150" y1="26" x2="150" y2="70" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
-              <line x1="128" y1="48" x2="172" y2="48" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" />
-              <line x1="135" y1="33" x2="165" y2="63" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
-              <line x1="135" y1="63" x2="165" y2="33" stroke="rgba(255,255,255,0.7)" strokeWidth="1.1" />
+              {/* Soft radial glow */}
+              <circle cx="150" cy="48" r="18" fill="url(#apex-flare)" />
+              {/* Bright core */}
+              <motion.circle
+                cx="150" cy="48" r="4"
+                fill="white"
+                initial={{ opacity: 0.8 }}
+                animate={{ opacity: [0.8, 1, 0.8], r: [4, 5, 4] as any }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Main cross — long vertical spike */}
+              <motion.line
+                x1="150" y1="20" x2="150" y2="76"
+                stroke="white" strokeWidth="1"
+                filter="url(#flare-glow)"
+                initial={{ opacity: 0.6 }}
+                animate={{ opacity: [0.6, 0.9, 0.6] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Main cross — long horizontal spike */}
+              <motion.line
+                x1="122" y1="48" x2="178" y2="48"
+                stroke="white" strokeWidth="1"
+                filter="url(#flare-glow)"
+                initial={{ opacity: 0.6 }}
+                animate={{ opacity: [0.6, 0.9, 0.6] }}
+                transition={{ duration: 3, delay: 0.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Shorter diagonal spikes */}
+              <motion.line
+                x1="136" y1="34" x2="164" y2="62"
+                stroke="rgba(220,200,255,0.7)" strokeWidth="0.6"
+                filter="url(#flare-glow)"
+                initial={{ opacity: 0.4 }}
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2.4, delay: 0.1, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.line
+                x1="164" y1="34" x2="136" y2="62"
+                stroke="rgba(220,200,255,0.7)" strokeWidth="0.6"
+                filter="url(#flare-glow)"
+                initial={{ opacity: 0.4 }}
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2.4, delay: 0.3, repeat: Infinity, ease: "easeInOut" }}
+              />
             </g>
           </svg>
         </div>
@@ -148,7 +234,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-prisma-purple/20 border border-prisma-purple/30 text-prisma-purple px-4 py-1.5 rounded-full text-xs uppercase tracking-[0.18em] font-semibold mb-4"
+            className="inline-flex items-center gap-2 bg-prisma-purple/20 border border-prisma-purple/30 text-white px-4 py-1.5 rounded-full text-xs uppercase tracking-[0.18em] font-semibold mb-4"
           >
             <Sparkles size={14} />
             Espacio seguro
