@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Anton", sans-serif;
+  
+  --color-prisma-purple: #4A0080;
+  --color-prisma-dark: #2B004D;
+  --color-prisma-light: #F4F4F4;
+  --color-prisma-accent: #FF0055;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-prisma-dark);
+  color: white;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-prisma-light);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-prisma-purple);
+  border-radius: 4px;
+}
