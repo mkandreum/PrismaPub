@@ -260,7 +260,7 @@ export default function Hero() {
                   {image1Visible && (
                     <motion.div
                       key="img1"
-                      initial={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
                       animate={{ opacity: 1, scale: 1, rotate: -5 }}
                       exit={{ opacity: 0, scale: 0.8, y: 20 }}
                       transition={{ duration: 0.4 }}
@@ -269,7 +269,7 @@ export default function Hero() {
                       <button
                         onClick={() => setImage1Visible(false)}
                         className="absolute top-3 right-3 z-20 bg-black/50 hover:bg-black/80 text-white/80 hover:text-white rounded-full p-1.5 transition-all duration-200 backdrop-blur-sm border border-white/10"
-                        aria-label="Ocultar imagen"
+                        aria-label="Ocultar imagen de fiesta"
                       >
                         <X size={14} />
                       </button>
@@ -286,7 +286,7 @@ export default function Hero() {
                   {image2Visible && (
                     <motion.div
                       key="img2"
-                      initial={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
                       animate={{ opacity: 1, scale: 1, rotate: 5 }}
                       exit={{ opacity: 0, scale: 0.8, y: 20 }}
                       transition={{ duration: 0.4, delay: 0.1 }}
@@ -295,7 +295,7 @@ export default function Hero() {
                       <button
                         onClick={() => setImage2Visible(false)}
                         className="absolute top-3 right-3 z-30 bg-black/50 hover:bg-black/80 text-white/80 hover:text-white rounded-full p-1.5 transition-all duration-200 backdrop-blur-sm border border-white/10"
-                        aria-label="Ocultar imagen"
+                        aria-label="Ocultar imagen de club"
                       >
                         <X size={14} />
                       </button>
