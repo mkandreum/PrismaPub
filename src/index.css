@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Sora:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.cdnfonts.com/css/amplitude-brk');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Playfair Display", "Sora", ui-serif, serif;
-  --font-display: "Playfair Display", ui-serif, serif;
+  --font-sans: "Amplitude BRK", ui-sans-serif, sans-serif;
+  --font-display: "Amplitude BRK", ui-sans-serif, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   
   --color-prisma-purple: #8B5CF6;
@@ -58,7 +58,7 @@ body::after {
 }
 
 h1, h2, h3, .font-display {
-  font-family: 'Playfair Display', ui-serif, serif;
+  font-family: 'Amplitude BRK', ui-sans-serif, sans-serif;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   font-weight: 800;
@@ -222,6 +222,20 @@ h1, h2 {
   contain: layout style;
 }
 
+/* GPU-accelerated glow-orb drift animations (replaces JS-driven motion) */
+@keyframes glow-drift-1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(50px, -30px, 0) scale(1.1); }
+}
+@keyframes glow-drift-2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-40px, 40px, 0) scale(1.2); }
+}
+@keyframes glow-drift-3 {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(30px, 20px, 0); }
+}
+
 .headline-glow {
   text-shadow:
     0 0 24px rgba(255, 255, 255, 0.06),
@@ -241,14 +255,31 @@ h1, h2 {
 @keyframes prism-pulse {
   0%, 100% {
     filter:
-      drop-shadow(0 0 11px rgba(197, 156, 255, 0.34))
-      drop-shadow(0 0 34px rgba(153, 100, 255, 0.2));
+      drop-shadow(0 0 16px rgba(220, 190, 255, 0.5))
+      drop-shadow(0 0 40px rgba(170, 120, 255, 0.35))
+      drop-shadow(0 0 70px rgba(140, 90, 255, 0.2));
   }
   50% {
     filter:
-      drop-shadow(0 0 14px rgba(212, 183, 255, 0.42))
-      drop-shadow(0 0 40px rgba(170, 118, 255, 0.24));
+      drop-shadow(0 0 22px rgba(235, 210, 255, 0.6))
+      drop-shadow(0 0 50px rgba(190, 140, 255, 0.4))
+      drop-shadow(0 0 90px rgba(160, 110, 255, 0.25));
   }
+}
+
+@keyframes prism-edge-glow {
+  0%, 100% {
+    stroke-width: 2.7;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 20px rgba(200, 160, 255, 0.4));
+  }
+  50% {
+    stroke-width: 3.2;
+    filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.85)) drop-shadow(0 0 30px rgba(210, 170, 255, 0.55));
+  }
+}
+
+.prism-triangle-edge {
+  animation: prism-edge-glow 4s ease-in-out infinite;
 }
 
 @keyframes prism-shimmer {
@@ -279,15 +310,16 @@ h1, h2 {
   position: absolute;
   top: -56px;
   left: 50%;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 9999px;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 18%, rgba(255, 255, 255, 0.2) 50%, transparent 75%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 15%, rgba(255, 255, 255, 0.3) 45%, transparent 72%);
   box-shadow:
-    0 0 12px rgba(255, 255, 255, 1),
-    0 0 34px rgba(229, 207, 255, 0.56),
-    0 0 68px rgba(194, 144, 255, 0.4);
+    0 0 16px rgba(255, 255, 255, 1),
+    0 0 40px rgba(229, 207, 255, 0.7),
+    0 0 80px rgba(194, 144, 255, 0.5),
+    0 0 120px rgba(160, 100, 255, 0.25);
   z-index: 6;
   animation: star-flicker 3.2s ease-in-out infinite;
 }
@@ -303,13 +335,13 @@ h1, h2 {
 }
 
 .prism-star::before {
-  width: 86px;
-  height: 1.2px;
+  width: 100px;
+  height: 1.4px;
 }
 
 .prism-star::after {
-  width: 1.2px;
-  height: 86px;
+  width: 1.4px;
+  height: 100px;
 }
 
 .prism-star {
@@ -416,9 +448,10 @@ h1, h2 {
   transform-origin: 50% 0%;
   background: var(--beam-color);
   box-shadow:
-    0 0 12px color-mix(in srgb, var(--beam-color) 92%, white 8%),
-    0 0 24px color-mix(in srgb, var(--beam-color) 65%, white 35%),
-    0 0 50px color-mix(in srgb, var(--beam-color) 30%, transparent 70%);
+    0 0 14px color-mix(in srgb, var(--beam-color) 95%, white 5%),
+    0 0 28px color-mix(in srgb, var(--beam-color) 70%, white 30%),
+    0 0 56px color-mix(in srgb, var(--beam-color) 40%, transparent 60%),
+    0 0 90px color-mix(in srgb, var(--beam-color) 20%, transparent 80%);
   animation: prism-line-glow 3.2s ease-in-out infinite;
   will-change: opacity;
   contain: layout style;

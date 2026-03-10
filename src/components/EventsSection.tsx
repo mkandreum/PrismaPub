@@ -83,9 +83,9 @@ export default function EventsSection() {
   return (
     <section id="events" className="py-12 md:py-16 px-4 md:px-6 bg-prisma-dark text-white relative overflow-hidden">
       {/* Animated background accents */}
-      <motion.div animate={{ x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} className="absolute top-0 right-0 w-96 h-96 bg-prisma-accent/8 rounded-full blur-[160px] -z-1" />
-      <motion.div animate={{ x: [0, -30, 0], y: [0, 20, 0] }} transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-0 left-0 w-96 h-96 bg-prisma-purple/15 rounded-full blur-[160px] -z-1" />
-      <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-prisma-deep/5 rounded-full blur-[200px] -z-1" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-prisma-accent/8 rounded-full blur-[160px] -z-1 animate-[glow-drift-1_12s_ease-in-out_infinite]" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-prisma-purple/15 rounded-full blur-[160px] -z-1 animate-[glow-drift-2_14s_ease-in-out_infinite]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-prisma-deep/5 rounded-full blur-[200px] -z-1 animate-[glow-drift-3_10s_ease-in-out_infinite]" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
@@ -107,59 +107,68 @@ export default function EventsSection() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-prisma-accent" />
           </div>
         ) : (
-          <div className="grid gap-4 md:gap-5">
+          <div className="grid gap-5 md:gap-6">
             {events.map((event, i) => (
               <motion.div
                 key={event.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:border-prisma-purple/40 hover:shadow-[0_0_40px_rgba(139,92,246,0.15)] transition-all duration-500 group"
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ delay: i * 0.08, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md border border-white/[0.12] rounded-3xl overflow-hidden hover:border-prisma-purple/50 hover:shadow-[0_0_50px_rgba(139,92,246,0.2),0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-500 group"
               >
-                <div className="flex flex-col md:flex-row">
+                {/* Subtle gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-prisma-purple/0 via-prisma-purple/[0.04] to-prisma-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                <div className="flex flex-col md:flex-row relative">
                   {/* Event image */}
-                  <div className="md:w-64 h-48 md:h-auto relative overflow-hidden flex-shrink-0">
+                  <div className="md:w-72 h-52 md:h-auto relative overflow-hidden flex-shrink-0">
                     <img
                       src={event.image || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop'}
                       alt={event.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-prisma-dark/80 hidden md:block" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-prisma-dark/90 via-prisma-dark/20 to-transparent md:bg-gradient-to-r md:from-transparent md:to-prisma-dark/90" />
+                    {/* Price badge on image */}
+                    <div className="absolute top-4 right-4 bg-prisma-dark/70 backdrop-blur-sm border border-prisma-accent/30 rounded-full px-4 py-1.5 md:hidden">
+                      <span className="text-prisma-accent font-display text-lg">{event.price.toFixed(2)}€</span>
+                    </div>
                   </div>
 
                   {/* Event details */}
-                  <div className="flex-1 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="flex-1 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
                     <div className="flex-1">
-                      <h3 className="font-display text-3xl md:text-4xl uppercase tracking-tight text-white group-hover:text-prisma-accent transition-colors mb-3">
+                      <h3 className="font-display text-3xl md:text-4xl uppercase tracking-tight text-white group-hover:text-prisma-accent transition-colors duration-300 mb-3">
                         {event.title}
                       </h3>
-                      <div className="flex flex-wrap gap-4 text-gray-300 text-sm font-medium mb-3">
-                        <span className="flex items-center gap-2">
-                          <Calendar size={16} className="text-prisma-accent" />
+                      <div className="flex flex-wrap gap-3 text-gray-300 text-sm font-medium mb-4">
+                        <span className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1">
+                          <Calendar size={14} className="text-prisma-accent" />
                           {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                         </span>
-                        <span className="flex items-center gap-2">
-                          <Clock size={16} className="text-prisma-accent" />
+                        <span className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1">
+                          <Clock size={14} className="text-prisma-accent" />
                           {event.time}
                         </span>
-                        <span className="flex items-center gap-2">
-                          <MapPin size={16} className="text-prisma-accent" />
+                        <span className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1">
+                          <MapPin size={14} className="text-prisma-accent" />
                           PRISMA PUB
                         </span>
                       </div>
-                      <p className="text-gray-400 text-sm line-clamp-2">{event.description}</p>
+                      <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">{event.description}</p>
                     </div>
 
                     <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
-                      <div className="text-3xl font-display text-prisma-accent">
+                      <div className="hidden md:block text-3xl font-display text-prisma-accent">
                         {event.price.toFixed(2)}€
                       </div>
                       <button
                         onClick={() => setSelectedEvent(event)}
-                        className="w-full md:w-auto bg-prisma-purple text-white px-8 py-3 rounded-full font-semibold uppercase tracking-wider text-sm hover:bg-white hover:text-prisma-dark transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)]"
+                        className="w-full md:w-auto bg-gradient-to-r from-prisma-purple to-prisma-accent text-white px-8 py-3.5 rounded-full font-semibold uppercase tracking-wider text-sm hover:shadow-[0_0_35px_rgba(139,92,246,0.5)] transition-all duration-300 flex items-center justify-center gap-2 group/btn"
                       >
-                        <Ticket size={18} />
+                        <Ticket size={18} className="group-hover/btn:rotate-12 transition-transform duration-300" />
                         Comprar
                       </button>
                     </div>
