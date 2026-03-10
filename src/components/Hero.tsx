@@ -1,11 +1,9 @@
 import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
-import { ArrowRight, Instagram, Sparkles, X } from "lucide-react";
+import { ArrowRight, Instagram, Sparkles } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 
 export default function Hero() {
   const [settings, setSettings] = useState<any>({});
-  const [image1Visible, setImage1Visible] = useState(true);
-  const [image2Visible, setImage2Visible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -16,8 +14,8 @@ export default function Hero() {
   const parallaxOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   // Prism scroll-based transforms
-  const prismGlow = useTransform(scrollYProgress, [0, 0.4], [0.5, 1]);
-  const beamOpacity = useTransform(scrollYProgress, [0, 0.1, 0.5, 1.0], [0.05, 0.3, 0.6, 0.15]);
+  const beamOpacity = useTransform(scrollYProgress, [0, 0.08, 0.25, 0.5, 1.0], [0, 0.4, 0.7, 0.5, 0.15]);
+  const beamScale = useTransform(scrollYProgress, [0, 0.15, 0.5], [0.3, 1, 1]);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -30,9 +28,10 @@ export default function Hero() {
   const subtitle = settings.hero_subtitle || "Música • Baile • Libertad";
   const siteName = settings.site_name || "PRISMA PUB";
   const imageUrl = settings.hero_image_url;
+  const showPhotos = settings.show_hero_photos !== "0";
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4">
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center overflow-hidden px-4">
       {/* Animated gradient bg */}
       <div className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,11,29,0.6),rgba(10,10,20,0.9))]" />
@@ -49,17 +48,164 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* Rainbow beam overlay — fixed so it "bathes" the entire page */}
+      {/* Rainbow beam overlay — fixed so it "bathes" the entire page, appears on scroll */}
       <motion.div
         className="fixed top-0 left-0 w-full h-full pointer-events-none"
-        style={{ opacity: beamOpacity, zIndex: 1 }}
+        style={{ opacity: beamOpacity, scale: beamScale, zIndex: 1 }}
       >
         <div className="prism-page-rainbow" />
       </motion.div>
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 py-16">
+      {/* ── PRISM AT THE VERY TOP ── */}
+      {!imageUrl && (
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="relative z-20 pt-28 md:pt-36 flex flex-col items-center"
+        >
+          <div className="prism-visual">
+            <svg viewBox="0 0 300 280" className="prism-svg w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
+              <defs>
+                <radialGradient id="centerGlow" cx="50%" cy="40%" r="40%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,1)" />
+                  <stop offset="30%" stopColor="rgba(200,200,255,0.5)" />
+                  <stop offset="60%" stopColor="rgba(139,92,246,0.15)" />
+                  <stop offset="100%" stopColor="transparent" />
+                </radialGradient>
+                <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(139,92,246,0.8)" />
+                  <stop offset="20%" stopColor="rgba(255,255,255,0.95)" />
+                  <stop offset="40%" stopColor="rgba(168,85,247,1)" />
+                  <stop offset="60%" stopColor="rgba(255,255,255,0.95)" />
+                  <stop offset="80%" stopColor="rgba(139,92,246,0.8)" />
+                  <stop offset="100%" stopColor="rgba(168,85,247,0.9)" />
+                </linearGradient>
+                <linearGradient id="glassFill" x1="50%" y1="0%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(139,92,246,0.06)" />
+                  <stop offset="50%" stopColor="rgba(255,255,255,0.04)" />
+                  <stop offset="100%" stopColor="rgba(168,85,247,0.08)" />
+                </linearGradient>
+                <linearGradient id="lightBeam" x1="0%" y1="0%" x2="100%" y2="50%">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+                  <stop offset="40%" stopColor="rgba(255,255,255,0.6)" />
+                  <stop offset="60%" stopColor="rgba(255,255,255,0.8)" />
+                  <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                </linearGradient>
+                <filter id="prismGlow">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* Far outer glow */}
+              <polygon
+                points="150,15 285,265 15,265"
+                fill="none"
+                stroke="rgba(139,92,246,0.15)"
+                strokeWidth="16"
+                strokeLinejoin="round"
+                style={{ filter: 'blur(10px)' }}
+              />
+
+              {/* Outer glow triangle */}
+              <polygon
+                points="150,15 285,265 15,265"
+                fill="none"
+                stroke="rgba(139,92,246,0.4)"
+                strokeWidth="6"
+                strokeLinejoin="round"
+                style={{ filter: 'blur(4px)' }}
+              />
+
+              {/* Main triangle with glass fill */}
+              <polygon
+                points="150,15 285,265 15,265"
+                fill="url(#glassFill)"
+                stroke="url(#edgeGrad)"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+                filter="url(#prismGlow)"
+              />
+
+              {/* Inner triangle (3D depth) */}
+              <polygon
+                points="150,65 248,235 52,235"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+              />
+
+              {/* 3D depth connecting lines */}
+              <line x1="150" y1="15" x2="150" y2="65" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+              <line x1="15" y1="265" x2="52" y2="235" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+              <line x1="285" y1="265" x2="248" y2="235" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+
+              {/* Inner refraction highlights */}
+              <line x1="100" y1="200" x2="200" y2="200" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+              <line x1="120" y1="160" x2="180" y2="160" stroke="rgba(255,255,255,0.06)" strokeWidth="0.6" />
+
+              {/* Light beam entering from left */}
+              <line x1="0" y1="140" x2="120" y2="140" stroke="url(#lightBeam)" strokeWidth="2" opacity="0.5">
+                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" />
+              </line>
+
+              {/* Center glow */}
+              <ellipse cx="150" cy="140" rx="60" ry="50" fill="url(#centerGlow)" />
+
+              {/* Rainbow dispersion lines from right side of prism */}
+              <line x1="200" y1="130" x2="300" y2="100" stroke="rgba(228,3,3,0.3)" strokeWidth="1.5" opacity="0.6">
+                <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite" />
+              </line>
+              <line x1="200" y1="135" x2="300" y2="120" stroke="rgba(255,140,0,0.3)" strokeWidth="1.5" opacity="0.6">
+                <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.2s" repeatCount="indefinite" />
+              </line>
+              <line x1="200" y1="140" x2="300" y2="140" stroke="rgba(255,237,0,0.3)" strokeWidth="1.5" opacity="0.6">
+                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.5s" repeatCount="indefinite" />
+              </line>
+              <line x1="200" y1="145" x2="300" y2="160" stroke="rgba(0,128,38,0.3)" strokeWidth="1.5" opacity="0.6">
+                <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.1s" repeatCount="indefinite" />
+              </line>
+              <line x1="200" y1="150" x2="300" y2="180" stroke="rgba(36,64,142,0.3)" strokeWidth="1.5" opacity="0.6">
+                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3.3s" repeatCount="indefinite" />
+              </line>
+              <line x1="200" y1="155" x2="300" y2="200" stroke="rgba(115,41,130,0.3)" strokeWidth="1.5" opacity="0.6">
+                <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.4s" repeatCount="indefinite" />
+              </line>
+
+              {/* Top vertex bright point */}
+              <circle cx="150" cy="15" r="5" fill="white" opacity="0.95" />
+              <circle cx="150" cy="15" r="20" fill="white" opacity="0.1">
+                <animate attributeName="r" values="14;24;14" dur="3s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.08;0.2;0.08" dur="3s" repeatCount="indefinite" />
+              </circle>
+
+              {/* Bottom vertex glow points */}
+              <circle cx="15" cy="265" r="3" fill="rgba(139,92,246,0.8)" />
+              <circle cx="285" cy="265" r="3" fill="rgba(168,85,247,0.8)" />
+
+              {/* Lens flare streaks at top */}
+              <line x1="105" y1="15" x2="195" y2="15" stroke="white" strokeWidth="0.7" opacity="0.5" />
+              <line x1="150" y1="-15" x2="150" y2="45" stroke="white" strokeWidth="0.7" opacity="0.35" />
+
+              {/* Diagonal flare */}
+              <line x1="125" y1="-5" x2="175" y2="35" stroke="white" strokeWidth="0.3" opacity="0.2" />
+              <line x1="175" y1="-5" x2="125" y2="35" stroke="white" strokeWidth="0.3" opacity="0.2" />
+            </svg>
+
+            {/* Rainbow beams emanating from prism base */}
+            <div className="prism-beams" />
+          </div>
+        </motion.div>
+      )}
+
+      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className={`max-w-7xl w-full relative z-10 ${imageUrl ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16' : 'flex flex-col items-center text-center pt-8 pb-16'}`}>
         {/* Text Content */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1">
+        <div className={`flex flex-col items-center ${imageUrl ? 'lg:items-start text-center lg:text-left order-1' : 'text-center'}`}>
           {/* Small badge */}
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
@@ -71,7 +217,7 @@ export default function Hero() {
             Espacio seguro
           </motion.div>
 
-          {/* Main heading with glitch on hover */}
+          {/* Main heading */}
           <motion.div
             initial={{ x: -80, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -108,7 +254,7 @@ export default function Hero() {
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9, type: "spring" }}
-            className="flex flex-row flex-wrap justify-center sm:justify-start gap-3 sm:gap-4 w-full sm:w-auto"
+            className="flex flex-row flex-wrap justify-center gap-3 sm:gap-4 w-full sm:w-auto"
           >
             <motion.a
               href="#events"
@@ -147,9 +293,9 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Hero Visual */}
-        <div className="relative order-2 flex justify-center items-center">
-          {imageUrl ? (
+        {/* Hero Visual — only when hero image is configured */}
+        {imageUrl && (
+          <div className="relative order-2 flex justify-center items-center">
             <motion.div
               initial={{ scale: 0.7, opacity: 0, rotate: 8 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -177,149 +323,50 @@ export default function Hero() {
                 ¡Únete! 🏳️‍🌈
               </motion.div>
             </motion.div>
-          ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10 w-full max-w-[520px]">
-              {/* Prism Visual */}
+          </div>
+        )}
+
+        {/* Photos below prism — controlled by admin setting, no X buttons */}
+        {!imageUrl && showPhotos && (
+          <div className="w-full max-w-[600px] mt-8">
+            <div className="relative w-full h-[40vh] md:h-[45vh]">
               <motion.div
-                className="relative flex justify-center mb-4"
-                style={{ opacity: prismGlow }}
+                initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: -5 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="absolute left-0 top-0 w-2/3 h-full z-10"
               >
-                <div className="prism-visual">
-                  <svg viewBox="0 0 300 280" className="prism-svg w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80">
-                    <defs>
-                      <radialGradient id="centerGlow" cx="50%" cy="40%" r="35%">
-                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
-                        <stop offset="40%" stopColor="rgba(200,200,255,0.3)" />
-                        <stop offset="100%" stopColor="transparent" />
-                      </radialGradient>
-                      <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="rgba(139,92,246,0.7)" />
-                        <stop offset="25%" stopColor="rgba(255,255,255,0.85)" />
-                        <stop offset="50%" stopColor="rgba(168,85,247,0.9)" />
-                        <stop offset="75%" stopColor="rgba(255,255,255,0.85)" />
-                        <stop offset="100%" stopColor="rgba(139,92,246,0.7)" />
-                      </linearGradient>
-                    </defs>
-
-                    {/* Outer glow triangle */}
-                    <polygon
-                      points="150,15 285,265 15,265"
-                      fill="none"
-                      stroke="rgba(139,92,246,0.3)"
-                      strokeWidth="8"
-                      strokeLinejoin="round"
-                      style={{ filter: 'blur(4px)' }}
-                    />
-
-                    {/* Outer triangle */}
-                    <polygon
-                      points="150,15 285,265 15,265"
-                      fill="none"
-                      stroke="url(#edgeGrad)"
-                      strokeWidth="2.5"
-                      strokeLinejoin="round"
-                    />
-
-                    {/* Inner triangle */}
-                    <polygon
-                      points="150,65 248,235 52,235"
-                      fill="none"
-                      stroke="rgba(255,255,255,0.2)"
-                      strokeWidth="1.5"
-                      strokeLinejoin="round"
-                    />
-
-                    {/* 3D depth connecting lines */}
-                    <line x1="150" y1="15" x2="150" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    <line x1="15" y1="265" x2="52" y2="235" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    <line x1="285" y1="265" x2="248" y2="235" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-
-                    {/* Center glow */}
-                    <ellipse cx="150" cy="130" rx="55" ry="45" fill="url(#centerGlow)" />
-
-                    {/* Top vertex bright point */}
-                    <circle cx="150" cy="15" r="4" fill="white" opacity="0.9" />
-                    <circle cx="150" cy="15" r="12" fill="white" opacity="0.15">
-                      <animate attributeName="r" values="10;18;10" dur="3s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.1;0.25;0.1" dur="3s" repeatCount="indefinite" />
-                    </circle>
-
-                    {/* Lens flare streaks at top */}
-                    <line x1="115" y1="15" x2="185" y2="15" stroke="white" strokeWidth="0.5" opacity="0.4" />
-                    <line x1="150" y1="-8" x2="150" y2="38" stroke="white" strokeWidth="0.5" opacity="0.3" />
-                  </svg>
-
-                  {/* Rainbow beams emanating from prism base */}
-                  <div className="prism-beams" />
-                </div>
+                <img
+                  src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop"
+                  alt="Party"
+                  className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
+                />
               </motion.div>
 
-              {/* Toggleable images */}
-              <div className="relative w-full h-[50vh] md:h-[55vh]">
-                <AnimatePresence>
-                  {image1Visible && (
-                    <motion.div
-                      key="img1"
-                      initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
-                      animate={{ opacity: 1, scale: 1, rotate: -5 }}
-                      exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                      transition={{ duration: 0.4 }}
-                      className="absolute left-0 top-0 w-2/3 h-full z-10"
-                    >
-                      <button
-                        onClick={() => setImage1Visible(false)}
-                        className="absolute top-3 right-3 z-20 bg-black/50 hover:bg-black/80 text-white/80 hover:text-white rounded-full p-1.5 transition-all duration-200 backdrop-blur-sm border border-white/10"
-                        aria-label="Ocultar imagen de fiesta"
-                      >
-                        <X size={14} />
-                      </button>
-                      <img
-                        src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop"
-                        alt="Party"
-                        className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 5 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="absolute right-0 top-10 w-1/2 h-full z-20"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"
+                  alt="Club"
+                  className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
+                />
+              </motion.div>
 
-                <AnimatePresence>
-                  {image2Visible && (
-                    <motion.div
-                      key="img2"
-                      initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
-                      animate={{ opacity: 1, scale: 1, rotate: 5 }}
-                      exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                      transition={{ duration: 0.4, delay: 0.1 }}
-                      className="absolute right-0 top-10 w-1/2 h-full z-20"
-                    >
-                      <button
-                        onClick={() => setImage2Visible(false)}
-                        className="absolute top-3 right-3 z-30 bg-black/50 hover:bg-black/80 text-white/80 hover:text-white rounded-full p-1.5 transition-all duration-200 backdrop-blur-sm border border-white/10"
-                        aria-label="Ocultar imagen de club"
-                      >
-                        <X size={14} />
-                      </button>
-                      <img
-                        src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"
-                        alt="Club"
-                        className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8, type: "spring" }}
-                  className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-prisma-purple text-white w-28 h-28 rounded-full flex items-center justify-center z-30 shadow-xl shadow-prisma-purple/40 border-2 border-white/20 pulse-ring"
-                >
-                  <span className="font-display text-2xl rotate-[-12deg]">VEN</span>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-        </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8, type: "spring" }}
+                className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-prisma-purple text-white w-28 h-28 rounded-full flex items-center justify-center z-30 shadow-xl shadow-prisma-purple/40 border-2 border-white/20 pulse-ring"
+              >
+                <span className="font-display text-2xl rotate-[-12deg]">VEN</span>
+              </motion.div>
+            </div>
+          </div>
+        )}
       </motion.div>
 
       {/* Scroll indicator */}
