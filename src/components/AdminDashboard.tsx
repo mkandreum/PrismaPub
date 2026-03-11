@@ -365,10 +365,26 @@ function EventsTab() {
 function TicketsTab() {
   const [tickets, setTickets] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const { showToast } = useToast();
 
-  useEffect(() => {
+  const load = useCallback(() => {
     apiFetch("/api/admin/tickets").then(r => r.json()).then(setTickets);
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const remove = async (ticket: any) => {
+    if (!confirm(`¿Eliminar la entrada ${ticket.qr_code}?`)) return;
+    try {
+      await apiFetch(`/api/admin/tickets/${ticket.id}`, { method: "DELETE" });
+      showToast("Entrada eliminada", "success");
+      load();
+    } catch {
+      showToast("No se pudo eliminar la entrada", "error");
+    }
+  };
 
   const filtered = tickets.filter(t =>
     t.user_name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -402,6 +418,7 @@ function TicketsTab() {
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Evento</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Código QR</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Fecha</th>
+                <th className="text-right px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -414,6 +431,15 @@ function TicketsTab() {
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">{t.qr_code}</code>
                   </td>
                   <td className="px-5 py-3 text-gray-400 text-xs">{new Date(t.created_at).toLocaleString()}</td>
+                  <td className="px-5 py-3 text-right">
+                    <button
+                      onClick={() => remove(t)}
+                      className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500 transition-colors"
+                      aria-label={`Eliminar entrada ${t.qr_code}`}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

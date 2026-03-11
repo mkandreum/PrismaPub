@@ -416,6 +416,17 @@ app.get('/api/admin/tickets', authenticate, (_req, res) => {
   res.json(db.prepare('SELECT t.*, e.title as event_title FROM tickets t JOIN events e ON t.event_id = e.id ORDER BY t.created_at DESC').all());
 });
 
+app.delete('/api/admin/tickets/:id', authenticate, (req, res) => {
+  try {
+    const ticket = db.prepare('SELECT user_name, user_email, qr_code FROM tickets WHERE id = ?').get(req.params.id) as any;
+    db.prepare('DELETE FROM tickets WHERE id = ?').run(req.params.id);
+    logActivity('TICKET_DELETE', `Deleted ticket ${ticket?.qr_code || req.params.id} for ${ticket?.user_email || 'unknown user'}`);
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: 'Failed to delete ticket' });
+  }
+});
+
 // Gallery
 app.post('/api/admin/gallery', authenticate, upload.array('photos', 20), async (req, res) => {
   const files = req.files as Express.Multer.File[];
