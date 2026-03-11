@@ -761,6 +761,17 @@ function SettingsTab() {
           </div>
           <FormInput label="Dirección" value={settings.address || ""} onChange={(v) => update("address", v)} />
           <FormInput label="URL de Instagram" value={settings.instagram_url || ""} onChange={(v) => update("instagram_url", v)} />
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Publicaciones de Instagram (1 URL por linea)</label>
+            <textarea
+              value={settings.instagram_posts || ""}
+              onChange={(e) => update("instagram_posts", e.target.value)}
+              rows={5}
+              placeholder={"https://www.instagram.com/p/XXXXXXXXX/\nhttps://www.instagram.com/reel/YYYYYYYYY/"}
+              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors resize-y"
+            />
+            <p className="text-xs text-gray-400 mt-1">Acepta enlaces de tipo post, reel o tv. Se mostraran embebidos en la seccion Galeria.</p>
+          </div>
           <FormInput label="Texto del pie de página" value={settings.footer_text || ""} onChange={(v) => update("footer_text", v)} />
         </div>
 

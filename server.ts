@@ -220,6 +220,7 @@ ensureSettingDefault('smtp_from_email', '');
 ensureSettingDefault('site_font', 'amplitude');
 ensureSettingDefault('hero_photo_left_url', '');
 ensureSettingDefault('hero_photo_right_url', '');
+ensureSettingDefault('instagram_posts', '');
 
 // Seed events
 const eventsCount = db.prepare('SELECT COUNT(*) as count FROM events').get() as { count: number };
@@ -273,7 +274,7 @@ app.get('/api/settings', (_req, res) => {
   const publicKeys = new Set([
     'site_name', 'hero_phrase', 'hero_subtitle', 'address', 'instagram_url',
     'logo_url', 'footer_text', 'marquee_1', 'marquee_2', 'hero_image_url',
-    'show_hero_photos', 'site_font', 'hero_photo_left_url', 'hero_photo_right_url',
+    'show_hero_photos', 'site_font', 'hero_photo_left_url', 'hero_photo_right_url', 'instagram_posts',
   ]);
   const obj = (settings as any[]).reduce((acc, curr) => {
     if (publicKeys.has(curr.key)) acc[curr.key] = curr.value;

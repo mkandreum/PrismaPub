@@ -2,18 +2,46 @@ import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { X, Maximize2 } from "lucide-react";
 
+function toInstagramEmbedUrl(rawUrl: string): string | null {
+  try {
+    const parsed = new URL(rawUrl.trim());
+    if (!parsed.hostname.includes("instagram.com")) return null;
+    const match = parsed.pathname.match(/\/(p|reel|tv)\/([^/?#]+)/i);
+    if (!match) return null;
+    const kind = match[1].toLowerCase();
+    const code = match[2];
+    return `https://www.instagram.com/${kind}/${code}/embed`;
+  } catch {
+    return null;
+  }
+}
+
 export default function Gallery() {
   const [photos, setPhotos] = useState<string[]>([]);
+  const [instagramEmbeds, setInstagramEmbeds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/gallery')
-      .then(res => res.json())
-      .then(data => {
-        if (data && Array.isArray(data)) {
-          setPhotos(data.map((p: any) => p.url));
+    Promise.all([
+      fetch('/api/gallery').then(res => res.json()),
+      fetch('/api/settings').then(res => res.json()),
+    ])
+      .then(([galleryData, settingsData]) => {
+        if (galleryData && Array.isArray(galleryData)) {
+          setPhotos(galleryData.map((p: any) => p.url));
         }
+
+        const rawLinks = String(settingsData?.instagram_posts || "")
+          .split(/\r?\n/)
+          .map((line: string) => line.trim())
+          .filter(Boolean);
+
+        const embeds = rawLinks
+          .map(toInstagramEmbedUrl)
+          .filter((url): url is string => Boolean(url));
+
+        setInstagramEmbeds(Array.from(new Set(embeds)));
       })
       .catch(err => console.error("Error fetching gallery:", err))
       .finally(() => setIsLoading(false));
@@ -37,15 +65,39 @@ export default function Gallery() {
           </p>
         </motion.div>
 
+        {/* Instagram embeds */}
+        {!isLoading && instagramEmbeds.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 mb-10">
+            {instagramEmbeds.map((embedUrl, i) => (
+              <motion.div
+                key={embedUrl}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
+                className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-xl"
+              >
+                <iframe
+                  src={`${embedUrl}?utm_source=ig_embed&utm_campaign=loading`}
+                  title={`Instagram post ${i + 1}`}
+                  className="w-full h-[620px] bg-black"
+                  loading="lazy"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                />
+              </motion.div>
+            ))}
+          </div>
+        )}
+
         {/* Masonry Layout */}
         {isLoading ? (
           <div className="text-center py-12 text-gray-400 uppercase tracking-wider text-sm">Cargando galería...</div>
-        ) : photos.length === 0 ? (
+        ) : photos.length === 0 && instagramEmbeds.length === 0 ? (
           <div className="text-center py-14 rounded-2xl border border-white/10 bg-white/5">
-            <p className="text-white/80 font-display text-2xl uppercase mb-2">Aún no hay fotos</p>
-            <p className="text-gray-400 text-sm uppercase tracking-wider">Sube imágenes desde el panel de administración</p>
+            <p className="text-white/80 font-display text-2xl uppercase mb-2">Aún no hay contenido</p>
+            <p className="text-gray-400 text-sm uppercase tracking-wider">Sube fotos o pega enlaces de Instagram desde el panel de administración</p>
           </div>
-        ) : (
+        ) : photos.length > 0 ? (
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-5 space-y-4 md:space-y-5">
             {photos.map((src, i) => (
               <motion.div
@@ -77,7 +129,7 @@ export default function Gallery() {
               </motion.div>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Lightbox */}
