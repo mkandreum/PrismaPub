@@ -1,4 +1,5 @@
 @import url('https://fonts.cdnfonts.com/css/amplitude-brk');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Audiowide&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Chakra+Petch:wght@300;400;500;600;700&family=Exo+2:wght@400;600;700;800&family=Monoton&family=Orbitron:wght@400..900&family=Press+Start+2P&family=Quantico:wght@400;700&family=Righteous&family=Rubik+Glitch&family=Russo+One&family=Saira+Stencil+One&family=Staatliches&family=Syncopate:wght@400;700&family=Teko:wght@400;500;600;700&family=Unica+One&family=Wallpoet&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -58,7 +59,7 @@ body::after {
 }
 
 h1, h2, h3, .font-display {
-  font-family: 'Amplitude BRK', ui-sans-serif, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: -0.02em;
   text-transform: uppercase;
   font-weight: 800;

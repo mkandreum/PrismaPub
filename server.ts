@@ -217,6 +217,9 @@ ensureSettingDefault('smtp_pass', '');
 ensureSettingDefault('smtp_secure', '0');
 ensureSettingDefault('smtp_from_name', 'PRISMA PUB');
 ensureSettingDefault('smtp_from_email', '');
+ensureSettingDefault('site_font', 'amplitude');
+ensureSettingDefault('hero_photo_left_url', '');
+ensureSettingDefault('hero_photo_right_url', '');
 
 // Seed events
 const eventsCount = db.prepare('SELECT COUNT(*) as count FROM events').get() as { count: number };
@@ -270,7 +273,7 @@ app.get('/api/settings', (_req, res) => {
   const publicKeys = new Set([
     'site_name', 'hero_phrase', 'hero_subtitle', 'address', 'instagram_url',
     'logo_url', 'footer_text', 'marquee_1', 'marquee_2', 'hero_image_url',
-    'show_hero_photos',
+    'show_hero_photos', 'site_font', 'hero_photo_left_url', 'hero_photo_right_url',
   ]);
   const obj = (settings as any[]).reduce((acc, curr) => {
     if (publicKeys.has(curr.key)) acc[curr.key] = curr.value;
@@ -516,6 +519,26 @@ app.post('/api/admin/settings/logo', authenticate, upload.single('image'), async
   const url = `/uploads/${filename}`;
   db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('logo_url', url);
   logActivity('LOGO_UPDATE', 'Logo updated');
+  res.json({ url });
+});
+
+app.post('/api/admin/settings/hero-photo-left', authenticate, upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image' });
+  const filename = `hero-left-${Date.now()}.webp`;
+  await sharp(req.file.buffer).webp({ quality: 86 }).resize({ width: 1200, withoutEnlargement: true }).toFile(path.join(uploadsDir, filename));
+  const url = `/uploads/${filename}`;
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('hero_photo_left_url', url);
+  logActivity('HERO_LEFT_IMAGE', 'Hero left photo updated');
+  res.json({ url });
+});
+
+app.post('/api/admin/settings/hero-photo-right', authenticate, upload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image' });
+  const filename = `hero-right-${Date.now()}.webp`;
+  await sharp(req.file.buffer).webp({ quality: 86 }).resize({ width: 1200, withoutEnlargement: true }).toFile(path.join(uploadsDir, filename));
+  const url = `/uploads/${filename}`;
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('hero_photo_right_url', url);
+  logActivity('HERO_RIGHT_IMAGE', 'Hero right photo updated');
   res.json({ url });
 });
 

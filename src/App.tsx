@@ -11,6 +11,7 @@ import Marquee from './components/Marquee';
 import Banners from './components/Banners';
 import { ToastProvider } from './components/Toast';
 import { MapPin, Instagram } from 'lucide-react';
+import { applySiteFont } from './fonts';
 
 // Lazy-load below-fold and heavy components for better initial load performance
 const EventsSection = lazy(() => import('./components/EventsSection'));
@@ -36,6 +37,10 @@ function MainApp() {
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(setSettings).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    applySiteFont(settings.site_font);
+  }, [settings.site_font]);
 
   // If there's a valid token, allow quick access to admin
   useEffect(() => {
@@ -190,6 +195,13 @@ function Footer({ settings }: { settings: Record<string, string> }) {
 
 // ── TICKET PAGE WRAPPER ──────────────────────────────
 function TicketPage() {
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then((data) => applySiteFont(data.site_font))
+      .catch(() => applySiteFont(undefined));
+  }, []);
+
   return (
     <div className="app-shell noise-bg min-h-screen bg-prisma-dark font-sans selection:bg-prisma-accent selection:text-white">
       <Suspense fallback={<LazyFallback />}>

@@ -23,6 +23,8 @@ export default function Hero() {
   const phrase = settings.hero_phrase || "La experiencia LGBT+ definitiva";
   const subtitle = settings.hero_subtitle || "Música • Baile • Libertad";
   const showPhotos = settings.show_hero_photos !== "0";
+  const leftHeroPhoto = settings.hero_photo_left_url || "https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop";
+  const rightHeroPhoto = settings.hero_photo_right_url || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop";
   const particles = useMemo(
     () => Array.from({ length: 16 }).map(() => ({
       x: `${5 + Math.random() * 90}%`,
@@ -138,11 +140,12 @@ export default function Hero() {
             {/* Rainbow beams — extend beyond viewBox via overflow:visible */}
             {[
               { x2: 14, color: "#ff1737" },
-              { x2: 52, color: "#ff7b00" },
-              { x2: 92, color: "#fff200" },
-              { x2: 130, color: "#48ff3a" },
-              { x2: 170, color: "#33e6ff" },
-              { x2: 212, color: "#3f69ff" },
+              { x2: 54, color: "#ff7b00" },
+              { x2: 94, color: "#fff200" },
+              { x2: 134, color: "#48ff3a" },
+              { x2: 174, color: "#33e6ff" },
+              { x2: 214, color: "#4aa6ff" },
+              { x2: 250, color: "#5d5eff" },
               { x2: 286, color: "#ff2dff" },
             ].map((beam, i) => (
               <g key={beam.color}>
@@ -384,7 +387,7 @@ export default function Hero() {
                 className="absolute left-0 top-0 w-2/3 h-full z-10"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop"
+                  src={leftHeroPhoto}
                   alt="Party"
                   loading="lazy"
                   className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
@@ -398,20 +401,11 @@ export default function Hero() {
                 className="absolute right-0 top-10 w-1/2 h-full z-20"
               >
                 <img
-                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop"
+                  src={rightHeroPhoto}
                   alt="Club"
                   loading="lazy"
                   className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
                 />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8, type: "spring" }}
-                className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-prisma-purple text-white w-28 h-28 rounded-full flex items-center justify-center z-30 shadow-xl shadow-prisma-purple/40 border-2 border-white/20 pulse-ring"
-              >
-                <span className="font-display text-2xl rotate-[-12deg]">VEN</span>
               </motion.div>
             </div>
           </div>

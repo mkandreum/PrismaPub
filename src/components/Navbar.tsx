@@ -153,7 +153,7 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
                   className="flex items-center gap-3 mx-auto text-gray-400 hover:text-prisma-accent transition-colors group"
                 >
                   <Lock size={18} className="group-hover:scale-110 transition-transform" />
-                  <span className="font-display text-xl uppercase tracking-widest">Acceso admin</span>
+                  <span className="font-display text-xl uppercase tracking-widest">Login</span>
                 </button>
               </div>
             </div>

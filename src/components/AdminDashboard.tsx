@@ -6,6 +6,7 @@ import {
   Upload, X, Save, Eye, EyeOff, ArrowLeft, GripVertical, Search
 } from "lucide-react";
 import { useToast } from "./Toast";
+import { applySiteFont, DEFAULT_SITE_FONT, SITE_FONT_OPTIONS } from "../fonts";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -641,11 +642,17 @@ function SettingsTab() {
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
   const heroRef = useRef<HTMLInputElement>(null);
+  const heroLeftRef = useRef<HTMLInputElement>(null);
+  const heroRightRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiFetch("/api/admin/settings").then(r => r.json()).then(setSettings);
   }, []);
+
+  useEffect(() => {
+    applySiteFont(settings.site_font || DEFAULT_SITE_FONT);
+  }, [settings.site_font]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -691,6 +698,24 @@ function SettingsTab() {
     }
   };
 
+  const uploadHeroSidePhoto = async (side: "left" | "right", e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    const fd = new FormData();
+    fd.append("image", e.target.files[0]);
+    try {
+      const res = await apiFetch(`/api/admin/settings/hero-photo-${side}`, { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Error");
+      const key = side === "left" ? "hero_photo_left_url" : "hero_photo_right_url";
+      setSettings((s) => ({ ...s, [key]: data.url }));
+      showToast(`Foto ${side === "left" ? "izquierda" : "derecha"} actualizada`, "success");
+    } catch {
+      showToast("Error al subir foto del hero", "error");
+    } finally {
+      e.target.value = "";
+    }
+  };
+
   const removeLogo = () => {
     setSettings(s => ({ ...s, logo_url: '' }));
   };
@@ -705,6 +730,35 @@ function SettingsTab() {
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
           <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">General</h3>
           <FormInput label="Nombre del sitio" value={settings.site_name || ""} onChange={(v) => update("site_name", v)} />
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Tipografia global</label>
+            {(() => {
+              const selectedFont = SITE_FONT_OPTIONS.find((font) => font.key === (settings.site_font || DEFAULT_SITE_FONT)) || SITE_FONT_OPTIONS[0];
+              return (
+                <>
+                  <select
+                    value={settings.site_font || DEFAULT_SITE_FONT}
+                    onChange={(e) => update("site_font", e.target.value)}
+                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors bg-white"
+                    style={{ fontFamily: selectedFont.stack }}
+                  >
+                    {SITE_FONT_OPTIONS.map((font) => (
+                      <option key={font.key} value={font.key} style={{ fontFamily: font.stack }}>
+                        {font.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p
+                    className="text-sm text-gray-700 mt-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200"
+                    style={{ fontFamily: selectedFont.stack }}
+                  >
+                    Preview: GRAN APERTURA - BINGO - DRAGS - FIESTA
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">{selectedFont.description}</p>
+                </>
+              );
+            })()}
+          </div>
           <FormInput label="Dirección" value={settings.address || ""} onChange={(v) => update("address", v)} />
           <FormInput label="URL de Instagram" value={settings.instagram_url || ""} onChange={(v) => update("instagram_url", v)} />
           <FormInput label="Texto del pie de página" value={settings.footer_text || ""} onChange={(v) => update("footer_text", v)} />
@@ -810,6 +864,30 @@ function SettingsTab() {
               <Upload size={16} /> Cambiar imagen
               <input ref={heroRef} type="file" accept="image/*" onChange={uploadHero} className="hidden" />
             </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Foto inclinada izquierda (inicio)</label>
+              {settings.hero_photo_left_url && (
+                <img src={settings.hero_photo_left_url} alt="Hero izquierda" className="w-full h-28 object-cover rounded-xl mb-3 border" />
+              )}
+              <label className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
+                <Upload size={16} /> Subir foto izquierda
+                <input ref={heroLeftRef} type="file" accept="image/*" onChange={(e) => uploadHeroSidePhoto("left", e)} className="hidden" />
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Foto inclinada derecha (inicio)</label>
+              {settings.hero_photo_right_url && (
+                <img src={settings.hero_photo_right_url} alt="Hero derecha" className="w-full h-28 object-cover rounded-xl mb-3 border" />
+              )}
+              <label className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
+                <Upload size={16} /> Subir foto derecha
+                <input ref={heroRightRef} type="file" accept="image/*" onChange={(e) => uploadHeroSidePhoto("right", e)} className="hidden" />
+              </label>
+            </div>
           </div>
         </div>
 
