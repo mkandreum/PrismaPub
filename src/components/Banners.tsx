@@ -34,17 +34,17 @@ export default function Banners() {
             className="w-full relative overflow-hidden group border-b border-white/10 bg-prisma-purple/88 text-white"
           >
             <div className="flex items-center py-2 px-4 min-h-[36px] relative overflow-hidden">
-              <motion.div
-                animate={{ x: ["0%", "-50%"] }}
-                transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
-                className="flex whitespace-nowrap items-center pr-12"
-              >
-                {[...Array(12)].map((_, i) => (
-                  <span key={i} className="text-sm md:text-base uppercase font-semibold tracking-widest mr-6">
-                    {banner.text} •
-                  </span>
+              <div className="banner-ticker-track pr-12">
+                {[0, 1].map((groupIndex) => (
+                  <div key={groupIndex} className="banner-ticker-group">
+                    {[...Array(8)].map((_, i) => (
+                      <span key={`${groupIndex}-${i}`} className="text-sm md:text-base uppercase font-semibold tracking-widest mr-6 shrink-0">
+                        {banner.text} •
+                      </span>
+                    ))}
+                  </div>
                 ))}
-              </motion.div>
+              </div>
               <div className="absolute right-0 top-0 bottom-0 w-12 flex items-center justify-center bg-gradient-to-l from-prisma-purple via-prisma-purple/80 to-transparent z-20">
                 <button
                   onClick={() => setBanners(prev => prev.filter(b => b.id !== banner.id))}

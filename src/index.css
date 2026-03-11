@@ -88,6 +88,22 @@ h1, h2 {
   to { transform: translateX(-50%); }
 }
 
+.banner-ticker-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  white-space: nowrap;
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.banner-ticker-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 /* ── GLASS ─────────────────────────────────────── */
 .glass {
   background: linear-gradient(180deg, rgba(34, 43, 103, 0.42), rgba(129, 70, 228, 0.12));
