@@ -92,7 +92,13 @@ export default function Gallery() {
 
         {/* Masonry Layout */}
         {isLoading ? (
-          <div className="text-center py-12 text-gray-400 uppercase tracking-wider text-sm">Cargando galería...</div>
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-5 space-y-4 md:space-y-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="break-inside-avoid rounded-2xl border border-white/10 bg-white/5 overflow-hidden animate-pulse">
+                <div className={`w-full ${i % 3 === 0 ? 'h-64' : i % 3 === 1 ? 'h-80' : 'h-72'} bg-white/10`} />
+              </div>
+            ))}
+          </div>
         ) : photos.length === 0 && instagramEmbeds.length === 0 ? (
           <div className="text-center py-14 rounded-2xl border border-white/10 bg-white/5">
             <p className="text-white/80 font-display text-2xl uppercase mb-2">Aún no hay contenido</p>

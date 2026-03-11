@@ -13,7 +13,14 @@ import QRCode from 'qrcode';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const JWT_SECRET = process.env.JWT_SECRET || 'prisma-pub-jwt-secret-change-me';
+const JWT_SECRET_CURRENT = process.env.JWT_SECRET || '';
+const JWT_SECRET_PREVIOUS = process.env.JWT_SECRET_PREVIOUS || '';
+
+if (process.env.NODE_ENV === 'production' && !JWT_SECRET_CURRENT) {
+  throw new Error('JWT_SECRET is required in production');
+}
+
+const getJwtSigningSecret = () => JWT_SECRET_CURRENT || 'prisma-pub-jwt-secret-change-me';
 
 // Ensure directories
 const dataDir = path.join(__dirname, 'data');
@@ -32,6 +39,13 @@ const getSetting = (key: string, fallback = ''): string => {
 const ensureSettingDefault = (key: string, value: string) => {
   const exists = db.prepare('SELECT 1 FROM settings WHERE key = ?').get(key);
   if (!exists) db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run(key, value);
+};
+
+const addColumnIfMissing = (table: string, column: string, definition: string) => {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  if (!columns.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
 };
 
 const escapeHtml = (value: string) => value
@@ -192,6 +206,17 @@ db.exec(`
   );
 `);
 
+addColumnIfMissing('events', 'capacity', 'INTEGER DEFAULT 0');
+addColumnIfMissing('events', 'general_price', 'REAL');
+addColumnIfMissing('events', 'early_price', 'REAL');
+addColumnIfMissing('events', 'vip_price', 'REAL');
+addColumnIfMissing('tickets', 'ticket_type', "TEXT DEFAULT 'general'");
+addColumnIfMissing('tickets', 'price_paid', 'REAL DEFAULT 0');
+addColumnIfMissing('banners', 'start_at', 'TEXT');
+addColumnIfMissing('banners', 'end_at', 'TEXT');
+addColumnIfMissing('banners', 'priority', 'INTEGER DEFAULT 0');
+addColumnIfMissing('banners', 'sort_order', 'INTEGER DEFAULT 0');
+
 // Seed admin + defaults
 const adminRow = db.prepare('SELECT count(*) as count FROM settings WHERE key = ?').get('admin_password') as any;
 if (adminRow.count === 0) {
@@ -243,7 +268,21 @@ const authenticate = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).send('Unauthorized');
   const token = authHeader.split(' ')[1];
-  try { jwt.verify(token, JWT_SECRET); next(); } catch { res.status(401).send('Invalid token'); }
+  try {
+    jwt.verify(token, getJwtSigningSecret());
+    next();
+    return;
+  } catch {}
+
+  if (JWT_SECRET_PREVIOUS) {
+    try {
+      jwt.verify(token, JWT_SECRET_PREVIOUS);
+      next();
+      return;
+    } catch {}
+  }
+
+  res.status(401).send('Invalid token');
 };
 
 const app = express();
@@ -260,7 +299,7 @@ app.post('/api/login', (req, res) => {
   const { password } = req.body;
   const row = db.prepare('SELECT value FROM settings WHERE key = ?').get('admin_password') as { value: string } | undefined;
   if (row && bcrypt.compareSync(password, row.value)) {
-    const token = jwt.sign({ admin: true }, JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ admin: true }, getJwtSigningSecret(), { expiresIn: '24h' });
     logActivity('LOGIN', 'Admin logged in');
     res.json({ token });
   } else {
@@ -294,7 +333,18 @@ app.get('/api/admin/settings', authenticate, (_req, res) => {
 
 app.get('/api/events', (_req, res) => {
   try {
-    const events = db.prepare('SELECT * FROM events WHERE is_active = 1 ORDER BY date ASC').all();
+    const events = db.prepare(`
+      SELECT
+        e.*,
+        COALESCE((SELECT COUNT(*) FROM tickets t WHERE t.event_id = e.id), 0) as sold_count,
+        CASE WHEN COALESCE(e.capacity, 0) > 0
+          THEN MAX(0, e.capacity - COALESCE((SELECT COUNT(*) FROM tickets t WHERE t.event_id = e.id), 0))
+          ELSE NULL
+        END as remaining_count
+      FROM events e
+      WHERE e.is_active = 1
+      ORDER BY e.date ASC
+    `).all();
     res.json(events);
   } catch { res.status(500).json({ error: 'Failed to fetch events' }); }
 });
@@ -308,15 +358,31 @@ app.get('/api/events/:id', (req, res) => {
 });
 
 app.post('/api/tickets', async (req, res) => {
-  const { event_id, user_name, user_email } = req.body;
+  const { event_id, user_name, user_email, ticket_type } = req.body;
   if (!event_id || !user_name || !user_email) return res.status(400).json({ error: 'Missing required fields' });
   try {
-    const event = db.prepare('SELECT id, title, date, time, image FROM events WHERE id = ? AND is_active = 1').get(event_id) as any;
+    const event = db.prepare('SELECT id, title, date, time, image, price, capacity, general_price, early_price, vip_price FROM events WHERE id = ? AND is_active = 1').get(event_id) as any;
     if (!event) return res.status(404).json({ error: 'Event not found' });
 
+    const soldCount = (db.prepare('SELECT COUNT(*) as count FROM tickets WHERE event_id = ?').get(event_id) as any)?.count || 0;
+    if (event.capacity && soldCount >= Number(event.capacity)) {
+      return res.status(400).json({ error: 'Aforo completo para este evento' });
+    }
+
+    const chosenType = ['general', 'early', 'vip'].includes(String(ticket_type || '').toLowerCase())
+      ? String(ticket_type).toLowerCase()
+      : 'general';
+    const priceMap: Record<string, number> = {
+      general: Number(event.general_price ?? event.price ?? 0),
+      early: Number(event.early_price ?? event.general_price ?? event.price ?? 0),
+      vip: Number(event.vip_price ?? event.general_price ?? event.price ?? 0),
+    };
+    const pricePaid = priceMap[chosenType];
+
     const qr_code = `PRISMA-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    const result = db.prepare('INSERT INTO tickets (event_id, user_name, user_email, qr_code) VALUES (?, ?, ?, ?)').run(event_id, user_name, user_email, qr_code);
-    logActivity('TICKET_PURCHASE', `${user_name} bought ticket for event #${event_id}`);
+    const result = db.prepare('INSERT INTO tickets (event_id, user_name, user_email, qr_code, ticket_type, price_paid) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(event_id, user_name, user_email, qr_code, chosenType, pricePaid);
+    logActivity('TICKET_PURCHASE', `${user_name} bought ${chosenType} ticket for event #${event_id}`);
 
     const emailPayload = {
       qr_code,
@@ -334,10 +400,10 @@ app.post('/api/tickets', async (req, res) => {
       } else if (emailResult.skipped) {
         logActivity('TICKET_EMAIL_SKIPPED', `SMTP disabled for ${user_email}`);
       }
-      res.json({ id: result.lastInsertRowid, qr_code, email_sent: emailResult.sent, email_skipped: emailResult.skipped });
+      res.json({ id: result.lastInsertRowid, qr_code, ticket_type: chosenType, price_paid: pricePaid, email_sent: emailResult.sent, email_skipped: emailResult.skipped });
     } catch (mailErr: any) {
       logActivity('TICKET_EMAIL_FAILED', `Ticket ${qr_code} email failed: ${mailErr?.message || 'unknown error'}`);
-      res.json({ id: result.lastInsertRowid, qr_code, email_sent: false, email_error: mailErr?.message || 'Email failed' });
+      res.json({ id: result.lastInsertRowid, qr_code, ticket_type: chosenType, price_paid: pricePaid, email_sent: false, email_error: mailErr?.message || 'Email failed' });
     }
   } catch { res.status(500).json({ error: 'Failed to create ticket' }); }
 });
@@ -358,19 +424,37 @@ app.get('/api/gallery', (_req, res) => {
 });
 
 app.get('/api/banners', (_req, res) => {
-  res.json(db.prepare('SELECT * FROM banners WHERE active = 1').all());
+  res.json(db.prepare(`
+    SELECT *
+    FROM banners
+    WHERE active = 1
+      AND (start_at IS NULL OR start_at = '' OR datetime(start_at) <= datetime('now'))
+      AND (end_at IS NULL OR end_at = '' OR datetime(end_at) >= datetime('now'))
+    ORDER BY priority DESC, sort_order ASC, created_at DESC
+  `).all());
 });
 
 // ── ADMIN API ───────────────────────────────────────────
 // Events
 app.get('/api/admin/events', authenticate, (_req, res) => {
-  res.json(db.prepare('SELECT * FROM events ORDER BY date DESC').all());
+  res.json(db.prepare(`
+    SELECT
+      e.*,
+      COALESCE((SELECT COUNT(*) FROM tickets t WHERE t.event_id = e.id), 0) as sold_count,
+      CASE WHEN COALESCE(e.capacity, 0) > 0
+        THEN MAX(0, e.capacity - COALESCE((SELECT COUNT(*) FROM tickets t WHERE t.event_id = e.id), 0))
+        ELSE NULL
+      END as remaining_count
+    FROM events e
+    ORDER BY e.date DESC
+  `).all());
 });
 
 app.post('/api/admin/events', authenticate, (req, res) => {
-  const { title, date, time, description, price, image } = req.body;
+  const { title, date, time, description, price, image, capacity, general_price, early_price, vip_price } = req.body;
   try {
-    const result = db.prepare('INSERT INTO events (title, date, time, description, price, image) VALUES (?, ?, ?, ?, ?, ?)').run(title, date, time, description, price, image);
+    const result = db.prepare('INSERT INTO events (title, date, time, description, price, image, capacity, general_price, early_price, vip_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .run(title, date, time, description, price, image, capacity || 0, general_price ?? price, early_price ?? null, vip_price ?? null);
     logActivity('EVENT_CREATE', `Created: ${title}`);
     res.json({ id: result.lastInsertRowid });
   } catch { res.status(500).json({ error: 'Failed to create event' }); }
@@ -393,10 +477,10 @@ app.post('/api/admin/events/image', authenticate, upload.single('image'), async 
 });
 
 app.patch('/api/admin/events/:id', authenticate, (req, res) => {
-  const { title, date, time, description, price, image, is_active } = req.body;
+  const { title, date, time, description, price, image, is_active, capacity, general_price, early_price, vip_price } = req.body;
   try {
-    db.prepare('UPDATE events SET title=?, date=?, time=?, description=?, price=?, image=?, is_active=? WHERE id=?')
-      .run(title, date, time, description, price, image, is_active !== undefined ? is_active : 1, req.params.id);
+    db.prepare('UPDATE events SET title=?, date=?, time=?, description=?, price=?, image=?, is_active=?, capacity=?, general_price=?, early_price=?, vip_price=? WHERE id=?')
+      .run(title, date, time, description, price, image, is_active !== undefined ? is_active : 1, capacity || 0, general_price ?? price, early_price ?? null, vip_price ?? null, req.params.id);
     logActivity('EVENT_UPDATE', `Updated: ${title}`);
     res.json({ success: true });
   } catch { res.status(500).json({ error: 'Failed to update event' }); }
@@ -413,7 +497,7 @@ app.delete('/api/admin/events/:id', authenticate, (req, res) => {
 
 // Tickets
 app.get('/api/admin/tickets', authenticate, (_req, res) => {
-  res.json(db.prepare('SELECT t.*, e.title as event_title FROM tickets t JOIN events e ON t.event_id = e.id ORDER BY t.created_at DESC').all());
+  res.json(db.prepare('SELECT t.*, e.title as event_title, e.date as event_date, e.time as event_time FROM tickets t JOIN events e ON t.event_id = e.id ORDER BY t.created_at DESC').all());
 });
 
 app.delete('/api/admin/tickets/:id', authenticate, (req, res) => {
@@ -424,6 +508,36 @@ app.delete('/api/admin/tickets/:id', authenticate, (req, res) => {
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: 'Failed to delete ticket' });
+  }
+});
+
+app.post('/api/admin/tickets/:id/resend', authenticate, async (req, res) => {
+  try {
+    const ticket = db.prepare(`
+      SELECT t.*, e.title as event_title, e.date as event_date, e.time as event_time
+      FROM tickets t
+      JOIN events e ON t.event_id = e.id
+      WHERE t.id = ?
+    `).get(req.params.id) as any;
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+    const result = await sendTicketEmail(req, {
+      qr_code: ticket.qr_code,
+      user_name: ticket.user_name,
+      user_email: ticket.user_email,
+      event_title: ticket.event_title,
+      event_date: ticket.event_date,
+      event_time: ticket.event_time,
+    });
+
+    if (result.sent) {
+      logActivity('TICKET_RESEND', `Resent ticket ${ticket.qr_code} to ${ticket.user_email}`);
+      return res.json({ success: true });
+    }
+
+    return res.status(400).json({ error: result.reason || 'Email skipped' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || 'Failed to resend ticket' });
   }
 });
 
@@ -468,14 +582,18 @@ app.post('/api/admin/gallery/reorder', authenticate, (req, res) => {
 
 // Banners
 app.get('/api/admin/banners', authenticate, (_req, res) => {
-  res.json(db.prepare('SELECT * FROM banners ORDER BY created_at DESC').all());
+  res.json(db.prepare('SELECT * FROM banners ORDER BY priority DESC, sort_order ASC, created_at DESC').all());
 });
 
 app.post('/api/admin/banners', authenticate, (req, res) => {
   const text = String(req.body?.text ?? '').trim();
+  const startAt = String(req.body?.start_at ?? '').trim();
+  const endAt = String(req.body?.end_at ?? '').trim();
+  const priority = Number(req.body?.priority ?? 0) || 0;
   if (!text) return res.status(400).json({ error: 'Banner text is required' });
   try {
-    const info = db.prepare('INSERT INTO banners (text) VALUES (?)').run(text);
+    const info = db.prepare('INSERT INTO banners (text, start_at, end_at, priority) VALUES (?, ?, ?, ?)')
+      .run(text, startAt || null, endAt || null, priority);
     logActivity('BANNER_CREATE', `Banner: ${text}`);
     res.json({ id: info.lastInsertRowid });
   } catch {
@@ -484,12 +602,22 @@ app.post('/api/admin/banners', authenticate, (req, res) => {
 });
 
 app.put('/api/admin/banners/:id', authenticate, (req, res) => {
-  const { active, text } = req.body;
+  const { active, text, start_at, end_at, priority } = req.body;
   if (text !== undefined) {
-    db.prepare('UPDATE banners SET text = ?, active = ? WHERE id = ?').run(text, active ?? 1, req.params.id);
+    db.prepare('UPDATE banners SET text = ?, active = ?, start_at = ?, end_at = ?, priority = ? WHERE id = ?')
+      .run(text, active ?? 1, start_at || null, end_at || null, Number(priority ?? 0) || 0, req.params.id);
   } else {
     db.prepare('UPDATE banners SET active = ? WHERE id = ?').run(active, req.params.id);
   }
+  res.json({ success: true });
+});
+
+app.post('/api/admin/banners/reorder', authenticate, (req, res) => {
+  const { itemIds } = req.body;
+  if (!Array.isArray(itemIds)) return res.status(400).json({ error: 'itemIds array required' });
+  const stmt = db.prepare('UPDATE banners SET sort_order = ? WHERE id = ?');
+  const tx = db.transaction((ids: number[]) => { ids.forEach((id, i) => stmt.run(i, id)); });
+  tx(itemIds);
   res.json({ success: true });
 });
 

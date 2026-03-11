@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, useInView } from "motion/react";
-import { Ticket, X, Calendar, Clock, MapPin, Sparkles } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Ticket, X, Calendar, Clock, MapPin } from "lucide-react";
 import { useToast } from "./Toast";
-import { EASE_OUT_EXPO, OVERLAY_TRANSITION, PANEL_EXIT_TRANSITION, PANEL_TRANSITION } from "../motion";
+import { EASE_OUT_EXPO, OVERLAY_TRANSITION, PANEL_TRANSITION } from "../motion";
 
 interface EventData {
   id: number;
@@ -12,6 +12,12 @@ interface EventData {
   description: string;
   price: number;
   image: string;
+  capacity?: number;
+  sold_count?: number;
+  remaining_count?: number | null;
+  general_price?: number;
+  early_price?: number | null;
+  vip_price?: number | null;
 }
 
 export default function EventsSection() {
@@ -20,6 +26,7 @@ export default function EventsSection() {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [selectedTicketType, setSelectedTicketType] = useState<"general" | "early" | "vip">("general");
   const [buying, setBuying] = useState(false);
   const [purchasedQR, setPurchasedQR] = useState<string | null>(null);
   const [autoRedirecting, setAutoRedirecting] = useState(false);
@@ -44,7 +51,8 @@ export default function EventsSection() {
         body: JSON.stringify({
           event_id: selectedEvent.id,
           user_name: customerName,
-          user_email: customerEmail
+          user_email: customerEmail,
+          ticket_type: selectedTicketType,
         })
       });
       const data = await res.json();
@@ -77,9 +85,26 @@ export default function EventsSection() {
     setSelectedEvent(null);
     setCustomerName("");
     setCustomerEmail("");
+    setSelectedTicketType("general");
     setPurchasedQR(null);
     setAutoRedirecting(false);
   };
+
+  const getTicketOptions = (event: EventData) => {
+    const baseGeneral = Number(event.general_price ?? event.price ?? 0);
+    const baseEarly = Number(event.early_price ?? 0);
+    const baseVip = Number(event.vip_price ?? 0);
+    const options = [
+      { key: "general" as const, label: "General", price: baseGeneral },
+      { key: "early" as const, label: "Early", price: baseEarly },
+      { key: "vip" as const, label: "VIP", price: baseVip },
+    ].filter((opt) => opt.price > 0);
+    return options.length ? options : [{ key: "general" as const, label: "General", price: Number(event.price ?? 0) }];
+  };
+
+  const selectedTicketPrice = selectedEvent
+    ? (getTicketOptions(selectedEvent).find((opt) => opt.key === selectedTicketType)?.price ?? Number(selectedEvent.price ?? 0))
+    : 0;
 
   return (
     <section id="events" className="py-12 md:py-16 px-4 md:px-6 bg-prisma-dark text-white relative overflow-hidden">
@@ -104,8 +129,20 @@ export default function EventsSection() {
         </motion.div>
 
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-prisma-accent" />
+          <div className="grid gap-5 md:gap-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="relative rounded-3xl overflow-hidden border border-white/10 bg-white/[0.04] animate-pulse">
+                <div className="flex flex-col md:flex-row">
+                  <div className="md:w-72 h-52 bg-white/10" />
+                  <div className="flex-1 p-6 md:p-8 space-y-4">
+                    <div className="h-8 w-2/3 bg-white/12 rounded-lg" />
+                    <div className="h-4 w-1/2 bg-white/10 rounded" />
+                    <div className="h-4 w-5/6 bg-white/10 rounded" />
+                    <div className="h-12 w-40 bg-prisma-purple/25 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid gap-5 md:gap-6">
@@ -159,6 +196,21 @@ export default function EventsSection() {
                         </span>
                       </div>
                       <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">{event.description}</p>
+                      {Number(event.capacity || 0) > 0 && (
+                        <div className="mt-4">
+                          <div className="flex justify-between text-xs uppercase tracking-wider text-gray-400 mb-1">
+                            <span>Aforo</span>
+                            <span>{event.sold_count || 0}/{event.capacity}</span>
+                          </div>
+                          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-prisma-purple to-prisma-accent"
+                              style={{ width: `${Math.min(100, ((event.sold_count || 0) / Math.max(1, Number(event.capacity))) * 100)}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">Restantes: {Math.max(0, Number(event.remaining_count ?? (Number(event.capacity) - (event.sold_count || 0))))}</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
@@ -166,7 +218,10 @@ export default function EventsSection() {
                         {event.price.toFixed(2)}€
                       </div>
                       <button
-                        onClick={() => setSelectedEvent(event)}
+                        onClick={() => {
+                          setSelectedEvent(event);
+                          setSelectedTicketType(getTicketOptions(event)[0].key);
+                        }}
                         className="w-full md:w-auto bg-gradient-to-r from-prisma-purple to-prisma-accent text-white px-8 py-3.5 rounded-full font-semibold uppercase tracking-wider text-sm hover:shadow-[0_0_35px_rgba(139,92,246,0.5)] transition-all duration-300 flex items-center justify-center gap-2 group/btn"
                       >
                         <Ticket size={18} className="group-hover/btn:rotate-12 transition-transform duration-300" />
@@ -197,13 +252,13 @@ export default function EventsSection() {
               exit={{ opacity: 0 }}
               transition={OVERLAY_TRANSITION}
               onClick={closeModal}
-              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              className="absolute inset-0 bg-black/80"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.975, y: 24, filter: "blur(10px)" }}
-              animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, scale: 0.985, y: 18, filter: "blur(6px)" }}
-              transition={{ ...PANEL_TRANSITION, opacity: OVERLAY_TRANSITION, filter: PANEL_EXIT_TRANSITION }}
+              initial={{ opacity: 0, scale: 0.975, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.985, y: 18 }}
+              transition={{ ...PANEL_TRANSITION, opacity: OVERLAY_TRANSITION }}
               className="bg-prisma-dark border-2 border-prisma-purple/30 rounded-3xl p-6 md:p-10 max-w-lg w-full max-h-[90vh] overflow-y-auto relative z-[151] shadow-[0_0_80px_rgba(139,92,246,0.25)]"
             >
               <button
@@ -249,10 +304,26 @@ export default function EventsSection() {
                       />
                     </div>
 
+                    <div>
+                      <label className="block text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Tipo de entrada</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {getTicketOptions(selectedEvent).map((opt) => (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => setSelectedTicketType(opt.key)}
+                            className={`px-3 py-2 rounded-xl border text-sm uppercase tracking-wide transition-colors ${selectedTicketType === opt.key ? 'bg-prisma-accent/25 border-prisma-accent text-white' : 'bg-white/5 border-white/15 text-gray-300 hover:border-prisma-accent/50'}`}
+                          >
+                            {opt.label} · {opt.price.toFixed(2)}€
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                       <div className="flex justify-between items-center text-xl font-display uppercase">
                         <span className="text-gray-300">Total</span>
-                        <span className="text-prisma-accent text-2xl">{selectedEvent.price.toFixed(2)}€</span>
+                        <span className="text-prisma-accent text-2xl">{selectedTicketPrice.toFixed(2)}€</span>
                       </div>
                     </div>
 

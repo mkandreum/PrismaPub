@@ -206,6 +206,10 @@ function EventsTab() {
       time: fd.get("time") as string,
       description: fd.get("description") as string,
       price: parseFloat(fd.get("price") as string),
+      capacity: parseInt((fd.get("capacity") as string) || "0", 10) || 0,
+      general_price: parseFloat((fd.get("general_price") as string) || "0") || 0,
+      early_price: parseFloat((fd.get("early_price") as string) || "0") || null,
+      vip_price: parseFloat((fd.get("vip_price") as string) || "0") || null,
       image: eventImageUrl,
       is_active: editing?.is_active ?? 1,
     };
@@ -291,6 +295,12 @@ function EventsTab() {
                   <FormInput name="time" label="Hora" type="time" defaultValue={editing?.time} required />
                 </div>
                 <FormInput name="price" label="Precio (€)" type="number" step="0.01" defaultValue={editing?.price} required />
+                <FormInput name="capacity" label="Aforo total (0 = ilimitado)" type="number" defaultValue={editing?.capacity ?? 0} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormInput name="general_price" label="Precio General (€)" type="number" step="0.01" defaultValue={editing?.general_price ?? editing?.price} />
+                  <FormInput name="early_price" label="Precio Early (€)" type="number" step="0.01" defaultValue={editing?.early_price} />
+                  <FormInput name="vip_price" label="Precio VIP (€)" type="number" step="0.01" defaultValue={editing?.vip_price} />
+                </div>
                 <div>
                   <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen del evento</label>
                   {(eventImageUrl || editing?.image) && (
@@ -336,6 +346,20 @@ function EventsTab() {
                 {!ev.is_active && <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Inactivo</span>}
               </div>
               <p className="text-xs text-gray-400">{ev.date} • {ev.time} • {ev.price}€</p>
+              {Number(ev.capacity || 0) > 0 && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between text-[11px] text-gray-500 uppercase tracking-wide">
+                    <span>Aforo</span>
+                    <span>{ev.sold_count || 0}/{ev.capacity} · Restantes {Math.max(0, Number(ev.remaining_count ?? (ev.capacity - (ev.sold_count || 0))))}</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1">
+                    <div
+                      className="h-full bg-prisma-accent"
+                      style={{ width: `${Math.min(100, ((ev.sold_count || 0) / Math.max(1, Number(ev.capacity))) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <button
@@ -386,6 +410,17 @@ function TicketsTab() {
     }
   };
 
+  const resend = async (ticket: any) => {
+    try {
+      const res = await apiFetch(`/api/admin/tickets/${ticket.id}/resend`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Error");
+      showToast("Entrada reenviada por email", "success");
+    } catch (err: any) {
+      showToast(err?.message || "No se pudo reenviar", "error");
+    }
+  };
+
   const filtered = tickets.filter(t =>
     t.user_name?.toLowerCase().includes(search.toLowerCase()) ||
     t.user_email?.toLowerCase().includes(search.toLowerCase()) ||
@@ -416,6 +451,7 @@ function TicketsTab() {
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Nombre</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Email</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Evento</th>
+                <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Tipo</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Código QR</th>
                 <th className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Fecha</th>
                 <th className="text-right px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">Acciones</th>
@@ -428,10 +464,20 @@ function TicketsTab() {
                   <td className="px-5 py-3 text-gray-500">{t.user_email}</td>
                   <td className="px-5 py-3">{t.event_title}</td>
                   <td className="px-5 py-3">
+                    <span className="text-xs uppercase font-semibold px-2 py-1 rounded bg-gray-100 text-gray-600">{t.ticket_type || "general"}</span>
+                  </td>
+                  <td className="px-5 py-3">
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">{t.qr_code}</code>
                   </td>
                   <td className="px-5 py-3 text-gray-400 text-xs">{new Date(t.created_at).toLocaleString()}</td>
                   <td className="px-5 py-3 text-right">
+                    <button
+                      onClick={() => resend(t)}
+                      className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-200 text-gray-400 hover:border-prisma-accent hover:text-prisma-accent transition-colors mr-2"
+                      aria-label={`Reenviar entrada ${t.qr_code}`}
+                    >
+                      <Save size={16} />
+                    </button>
                     <button
                       onClick={() => remove(t)}
                       className="inline-flex items-center justify-center p-2 rounded-lg border border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500 transition-colors"
@@ -533,6 +579,10 @@ function GalleryTab() {
 function BannersTab() {
   const [banners, setBanners] = useState<any[]>([]);
   const [newText, setNewText] = useState("");
+  const [newPriority, setNewPriority] = useState("0");
+  const [newStartAt, setNewStartAt] = useState("");
+  const [newEndAt, setNewEndAt] = useState("");
+  const [draggingId, setDraggingId] = useState<number | null>(null);
   const { showToast } = useToast();
 
   const load = useCallback(() => {
@@ -549,10 +599,19 @@ function BannersTab() {
       return;
     }
     try {
-      const res = await apiFetch("/api/admin/banners", { method: "POST", body: JSON.stringify({ text }) });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Error");
+      await apiFetch("/api/admin/banners", {
+        method: "POST",
+        body: JSON.stringify({
+          text,
+          priority: parseInt(newPriority || "0", 10) || 0,
+          start_at: newStartAt || null,
+          end_at: newEndAt || null,
+        })
+      });
       setNewText("");
+      setNewPriority("0");
+      setNewStartAt("");
+      setNewEndAt("");
       showToast("Banner añadido", "success");
       load();
     } catch {
@@ -571,34 +630,155 @@ function BannersTab() {
     load();
   };
 
+  const updateBanner = async (banner: any, updates: any) => {
+    await apiFetch(`/api/admin/banners/${banner.id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        text: updates.text ?? banner.text,
+        active: updates.active ?? banner.active,
+        priority: updates.priority ?? banner.priority ?? 0,
+        start_at: updates.start_at ?? banner.start_at ?? null,
+        end_at: updates.end_at ?? banner.end_at ?? null,
+      })
+    });
+    load();
+  };
+
+  const formatDatetimeForInput = (value?: string | null) => {
+    if (!value) return '';
+    return value.replace(' ', 'T').slice(0, 16);
+  };
+
+  const handleDrop = async (targetId: number) => {
+    if (!draggingId || draggingId === targetId) return;
+    const next = [...banners];
+    const from = next.findIndex((b) => b.id === draggingId);
+    const to = next.findIndex((b) => b.id === targetId);
+    if (from === -1 || to === -1) return;
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setBanners(next);
+    try {
+      await apiFetch('/api/admin/banners/reorder', {
+        method: 'POST',
+        body: JSON.stringify({ itemIds: next.map((b) => b.id) })
+      });
+    } catch {
+      showToast('No se pudo reordenar', 'error');
+      load();
+    } finally {
+      setDraggingId(null);
+    }
+  };
+
   return (
     <div>
       <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Banners</h2>
 
       <form onSubmit={add} className="flex gap-3 mb-8">
-        <input
-          value={newText}
-          onChange={(e) => setNewText(e.target.value)}
-          placeholder="Escribe el texto del banner..."
-          className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors"
-        />
-        <button type="submit" className="bg-prisma-accent text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-prisma-accent/90 transition-colors">
+        <div className="flex-1 space-y-3">
+          <input
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
+            placeholder="Escribe el texto del banner..."
+            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input
+              type="number"
+              value={newPriority}
+              onChange={(e) => setNewPriority(e.target.value)}
+              placeholder="Prioridad"
+              className="border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors"
+            />
+            <input
+              type="datetime-local"
+              value={newStartAt}
+              onChange={(e) => setNewStartAt(e.target.value)}
+              className="border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors"
+            />
+            <input
+              type="datetime-local"
+              value={newEndAt}
+              onChange={(e) => setNewEndAt(e.target.value)}
+              className="border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-prisma-accent outline-none transition-colors"
+            />
+          </div>
+        </div>
+        <button type="submit" className="self-start bg-prisma-accent text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-prisma-accent/90 transition-colors">
           <Plus size={18} /> Añadir
         </button>
       </form>
 
+      <div className="mb-8 bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+        <h3 className="font-display text-lg uppercase mb-4 text-gray-900">Previsualización en tiempo real</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="border border-gray-200 rounded-xl p-4">
+            <p className="text-xs uppercase tracking-wider text-gray-400 mb-2">Desktop</p>
+            <div className="h-12 rounded-lg bg-prisma-purple/90 text-white flex items-center px-4 text-sm uppercase tracking-wider overflow-hidden">
+              <span className="whitespace-nowrap">{newText || 'Tu banner aparecerá aquí'} • {newText || 'Tu banner aparecerá aquí'}</span>
+            </div>
+          </div>
+          <div className="border border-gray-200 rounded-xl p-4">
+            <p className="text-xs uppercase tracking-wider text-gray-400 mb-2">Mobile</p>
+            <div className="h-10 rounded-lg bg-prisma-purple/90 text-white flex items-center px-3 text-xs uppercase tracking-wider overflow-hidden">
+              <span className="whitespace-nowrap">{newText || 'Banner móvil'} • {newText || 'Banner móvil'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-3">
         {banners.map((b) => (
-          <div key={b.id} className="bg-white rounded-2xl border border-gray-200 p-5 flex items-center gap-4 shadow-sm">
-            <button onClick={() => toggle(b)} className="flex-shrink-0">
+          <div
+            key={b.id}
+            draggable
+            onDragStart={() => setDraggingId(b.id)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(b.id)}
+            className={`bg-white rounded-2xl border p-5 flex flex-col md:flex-row md:items-center gap-4 shadow-sm ${draggingId === b.id ? 'border-prisma-accent' : 'border-gray-200'}`}
+          >
+            <div className="flex items-center gap-3">
+              <GripVertical size={18} className="text-gray-300 cursor-grab" />
+              <button onClick={() => toggle(b)} className="flex-shrink-0">
               {b.active ? (
                 <ToggleRight size={28} className="text-green-500" />
               ) : (
                 <ToggleLeft size={28} className="text-gray-300" />
               )}
-            </button>
-            <p className={`flex-1 text-sm ${b.active ? "text-gray-800" : "text-gray-400 line-through"}`}>{b.text}</p>
-            <button onClick={() => remove(b.id)} className="p-2 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors text-gray-400">
+              </button>
+            </div>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
+              <input
+                value={b.text}
+                onChange={(e) => setBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, text: e.target.value } : x))}
+                onBlur={(e) => updateBanner(b, { text: e.currentTarget.value })}
+                className={`border-2 border-gray-200 rounded-xl px-3 py-2 text-sm md:col-span-2 ${b.active ? 'text-gray-800' : 'text-gray-400'}`}
+              />
+              <input
+                type="number"
+                value={b.priority ?? 0}
+                onChange={(e) => setBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, priority: e.target.value } : x))}
+                onBlur={(e) => updateBanner(b, { priority: Number(e.currentTarget.value || 0) })}
+                className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm"
+              />
+              <div className="text-xs text-gray-500 flex items-center">Prioridad</div>
+              <input
+                type="datetime-local"
+                value={formatDatetimeForInput(b.start_at)}
+                onChange={(e) => setBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, start_at: e.target.value } : x))}
+                onBlur={(e) => updateBanner(b, { start_at: e.currentTarget.value || null })}
+                className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm"
+              />
+              <input
+                type="datetime-local"
+                value={formatDatetimeForInput(b.end_at)}
+                onChange={(e) => setBanners((prev) => prev.map((x) => x.id === b.id ? { ...x, end_at: e.target.value } : x))}
+                onBlur={(e) => updateBanner(b, { end_at: e.currentTarget.value || null })}
+                className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm"
+              />
+            </div>
+            <button onClick={() => remove(b.id)} className="p-2 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors text-gray-400 self-end md:self-auto">
               <Trash2 size={16} />
             </button>
           </div>
@@ -665,6 +845,8 @@ function ActivityTab() {
 // ═══════════════════════════════════════════════════════
 function SettingsTab() {
   const [settings, setSettings] = useState<Record<string, string>>({});
+  const [initialSettings, setInitialSettings] = useState<Record<string, string>>({});
+  const [dirtyKeys, setDirtyKeys] = useState<Set<string>>(new Set());
   const [newPassword, setNewPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [showSmtpPass, setShowSmtpPass] = useState(false);
@@ -676,27 +858,62 @@ function SettingsTab() {
   const logoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    apiFetch("/api/admin/settings").then(r => r.json()).then(setSettings);
+    apiFetch("/api/admin/settings").then(r => r.json()).then((data) => {
+      setSettings(data);
+      setInitialSettings(data);
+      setDirtyKeys(new Set());
+    });
   }, []);
 
   useEffect(() => {
     applySiteFont(settings.site_font || DEFAULT_SITE_FONT);
   }, [settings.site_font]);
 
-  const save = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const hasUnsavedChanges = dirtyKeys.size > 0 || newPassword.trim().length > 0;
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  const saveSection = async (keys: string[], options?: { includePassword?: boolean }) => {
     setSaving(true);
-    const body: Record<string, string> = { ...settings };
-    if (newPassword.trim()) body.admin_password = newPassword;
+    const body: Record<string, string> = {};
+    keys.forEach((key) => {
+      body[key] = settings[key] || "";
+    });
+    if (options?.includePassword && newPassword.trim()) body.admin_password = newPassword;
     try {
       await apiFetch("/api/admin/settings", { method: "POST", body: JSON.stringify(body) });
-      showToast("Ajustes guardados", "success");
-      setNewPassword("");
+      setInitialSettings((prev) => {
+        const next = { ...prev };
+        keys.forEach((key) => {
+          next[key] = settings[key] || "";
+        });
+        return next;
+      });
+      setDirtyKeys((prev) => {
+        const next = new Set(prev);
+        keys.forEach((key) => next.delete(key));
+        return next;
+      });
+      if (options?.includePassword) setNewPassword("");
+      showToast("Seccion guardada", "success");
     } catch {
       showToast("Error al guardar", "error");
     } finally {
       setSaving(false);
     }
+  };
+
+  const saveAll = async () => {
+    const keys = Array.from(new Set([...Object.keys(settings), ...Array.from(dirtyKeys)]));
+    await saveSection(keys, { includePassword: true });
   };
 
   const uploadHero = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -707,6 +924,7 @@ function SettingsTab() {
       const res = await apiFetch("/api/admin/settings/hero-image", { method: "POST", body: fd });
       const data = await res.json();
       setSettings(s => ({ ...s, hero_image_url: data.url }));
+      setInitialSettings(s => ({ ...s, hero_image_url: data.url }));
       showToast("Imagen principal actualizada", "success");
     } catch {
       showToast("Error al subir imagen", "error");
@@ -721,6 +939,7 @@ function SettingsTab() {
       const res = await apiFetch("/api/admin/settings/logo", { method: "POST", body: fd });
       const data = await res.json();
       setSettings(s => ({ ...s, logo_url: data.url }));
+      setInitialSettings(s => ({ ...s, logo_url: data.url }));
       showToast("Logo actualizado", "success");
     } catch {
       showToast("Error al subir imagen", "error");
@@ -737,6 +956,7 @@ function SettingsTab() {
       if (!res.ok) throw new Error(data?.error || "Error");
       const key = side === "left" ? "hero_photo_left_url" : "hero_photo_right_url";
       setSettings((s) => ({ ...s, [key]: data.url }));
+      setInitialSettings((s) => ({ ...s, [key]: data.url }));
       showToast(`Foto ${side === "left" ? "izquierda" : "derecha"} actualizada`, "success");
     } catch {
       showToast("Error al subir foto del hero", "error");
@@ -745,19 +965,56 @@ function SettingsTab() {
     }
   };
 
-  const removeLogo = () => {
-    setSettings(s => ({ ...s, logo_url: '' }));
+  const markDirty = (key: string, value: string) => {
+    const initialValue = initialSettings[key] || "";
+    setDirtyKeys((prev) => {
+      const next = new Set(prev);
+      if (value === initialValue) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   };
 
-  const update = (key: string, value: string) => setSettings(s => ({ ...s, [key]: value }));
+  const removeLogo = () => {
+    setSettings(s => ({ ...s, logo_url: '' }));
+    markDirty('logo_url', '');
+  };
+
+  const update = (key: string, value: string) => {
+    setSettings(s => ({ ...s, [key]: value }));
+    markDirty(key, value);
+  };
+
+  const GENERAL_KEYS = ["site_name", "site_font", "address", "instagram_url", "instagram_posts", "footer_text"];
+  const LOGO_KEYS = ["logo_url"];
+  const MARQUEE_KEYS = ["marquee_1", "marquee_2"];
+  const SMTP_KEYS = ["smtp_host", "smtp_port", "smtp_user", "smtp_pass", "smtp_from_name", "smtp_from_email", "smtp_enabled", "smtp_secure"];
+  const HERO_KEYS = ["hero_phrase", "hero_subtitle", "show_hero_photos", "hero_image_url", "hero_photo_left_url", "hero_photo_right_url"];
 
   return (
     <div>
       <h2 className="font-display text-3xl uppercase mb-6 text-gray-900">Ajustes</h2>
 
-      <form onSubmit={save} className="max-w-2xl space-y-6">
+      <div className="max-w-2xl space-y-6">
+        {hasUnsavedChanges && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-4 py-3 text-sm flex items-center justify-between gap-4">
+            <span>Tienes cambios sin guardar.</span>
+            <button
+              type="button"
+              onClick={saveAll}
+              disabled={saving}
+              className="bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider hover:bg-amber-700 transition-colors disabled:opacity-60"
+            >
+              Guardar todo
+            </button>
+          </div>
+        )}
+
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">General</h3>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 className="font-display text-lg uppercase text-gray-800">General</h3>
+            <button type="button" onClick={() => saveSection(GENERAL_KEYS)} className="text-xs font-semibold uppercase tracking-wider text-prisma-accent hover:text-prisma-accent/80">Guardar seccion</button>
+          </div>
           <FormInput label="Nombre del sitio" value={settings.site_name || ""} onChange={(v) => update("site_name", v)} />
           <div>
             <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Tipografia global</label>
@@ -805,7 +1062,10 @@ function SettingsTab() {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Logo (Navbar y pie de página)</h3>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 className="font-display text-lg uppercase text-gray-800">Logo (Navbar y pie de pagina)</h3>
+            <button type="button" onClick={() => saveSection(LOGO_KEYS)} className="text-xs font-semibold uppercase tracking-wider text-prisma-accent hover:text-prisma-accent/80">Guardar seccion</button>
+          </div>
           <div>
             <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen del logo</label>
             <p className="text-xs text-gray-400 mb-3">Si se configura, reemplaza el logo de texto en la barra y el pie de página. Déjalo vacío para mostrar texto + bandera pride.</p>
@@ -823,13 +1083,19 @@ function SettingsTab() {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Textos desplazables</h3>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 className="font-display text-lg uppercase text-gray-800">Textos desplazables</h3>
+            <button type="button" onClick={() => saveSection(MARQUEE_KEYS)} className="text-xs font-semibold uppercase tracking-wider text-prisma-accent hover:text-prisma-accent/80">Guardar seccion</button>
+          </div>
           <FormInput label="Texto 1 (después del hero)" value={settings.marquee_1 || ""} onChange={(v) => update("marquee_1", v)} />
           <FormInput label="Texto 2 (después de eventos)" value={settings.marquee_2 || ""} onChange={(v) => update("marquee_2", v)} />
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">SMTP (envío automático de entradas)</h3>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 className="font-display text-lg uppercase text-gray-800">SMTP (envio automatico de entradas)</h3>
+            <button type="button" onClick={() => saveSection(SMTP_KEYS)} className="text-xs font-semibold uppercase tracking-wider text-prisma-accent hover:text-prisma-accent/80">Guardar seccion</button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput label="Servidor SMTP" value={settings.smtp_host || ""} onChange={(v) => update("smtp_host", v)} />
             <FormInput label="Puerto SMTP" type="number" value={settings.smtp_port || "587"} onChange={(v) => update("smtp_port", v)} />
@@ -880,7 +1146,10 @@ function SettingsTab() {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Sección principal (Hero)</h3>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 className="font-display text-lg uppercase text-gray-800">Seccion principal (Hero)</h3>
+            <button type="button" onClick={() => saveSection(HERO_KEYS)} className="text-xs font-semibold uppercase tracking-wider text-prisma-accent hover:text-prisma-accent/80">Guardar seccion</button>
+          </div>
           <FormInput label="Título principal (THE ULTIMATE...)" value={settings.hero_phrase || ""} onChange={(v) => update("hero_phrase", v)} />
           <FormInput label="Subtítulo principal" value={settings.hero_subtitle || ""} onChange={(v) => update("hero_subtitle", v)} />
           <div>
@@ -932,7 +1201,10 @@ function SettingsTab() {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
-          <h3 className="font-display text-lg uppercase text-gray-800 border-b border-gray-100 pb-3">Seguridad</h3>
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+            <h3 className="font-display text-lg uppercase text-gray-800">Seguridad</h3>
+            <button type="button" onClick={() => saveSection([], { includePassword: true })} className="text-xs font-semibold uppercase tracking-wider text-prisma-accent hover:text-prisma-accent/80">Guardar seccion</button>
+          </div>
           <div>
             <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Nueva contraseña de admin</label>
             <div className="relative">
@@ -951,13 +1223,14 @@ function SettingsTab() {
         </div>
 
         <button
-          type="submit"
+          type="button"
+          onClick={saveAll}
           disabled={saving}
           className="bg-prisma-accent text-white px-8 py-3 rounded-xl font-semibold uppercase tracking-wider hover:bg-prisma-accent/90 transition-colors disabled:opacity-50 flex items-center gap-2"
         >
           <Save size={18} /> {saving ? "Guardando..." : "Guardar todos los ajustes"}
         </button>
-      </form>
+      </div>
     </div>
   );
 }
