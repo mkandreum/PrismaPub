@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeft } from 'lucide-react';
+import { OVERLAY_TRANSITION, SURFACE_ENTER_TRANSITION } from '../motion';
 
 interface TicketData {
   id: number;
@@ -61,8 +62,9 @@ export default function Ticket() {
       </div>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        initial={{ opacity: 0, scale: 0.98, y: 22 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ ...SURFACE_ENTER_TRANSITION, opacity: OVERLAY_TRANSITION }}
         className="w-full max-w-md bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-gray-100 relative"
       >
         {/* Top Image Section */}

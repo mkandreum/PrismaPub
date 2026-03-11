@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
+import { OVERLAY_TRANSITION, SHEET_TRANSITION, SURFACE_ENTER_TRANSITION } from '../motion';
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -56,8 +57,8 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
       <motion.nav
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed left-1/2 -translate-x-1/2 bottom-[max(1.2rem,env(safe-area-inset-bottom))] md:bottom-10 w-[98vw] md:w-[min(1000px,96vw)] z-50 border border-white/10 md:border-2 rounded-full backdrop-blur-lg flex justify-center items-center px-3 py-2.5 md:px-6 md:py-2.5 shadow-[0_0_50px_rgba(139,92,246,0.25)] gap-2 md:gap-12 whitespace-nowrap transition-all duration-300 ${scrolled ? 'bg-prisma-dark/80 scale-[0.98]' : 'bg-prisma-dark/60'}`}
+        transition={SURFACE_ENTER_TRANSITION}
+        className={`fixed left-1/2 -translate-x-1/2 bottom-[max(1.2rem,env(safe-area-inset-bottom))] md:bottom-10 w-[98vw] md:w-[min(1000px,96vw)] z-50 border border-white/10 md:border-2 rounded-full flex justify-center items-center px-3 py-2.5 md:px-6 md:py-2.5 shadow-[0_0_36px_rgba(139,92,246,0.18)] gap-2 md:gap-12 whitespace-nowrap transition-all duration-300 ${scrolled ? 'bg-prisma-dark/88 scale-[0.98]' : 'bg-prisma-dark/72'}`}
       >
         <button
           onClick={() => scrollTo('events')}
@@ -112,10 +113,10 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", bounce: 0, duration: 0.6 }}
+            initial={{ opacity: 0, y: "8%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "6%" }}
+            transition={{ ...SHEET_TRANSITION, opacity: OVERLAY_TRANSITION }}
             className="fixed inset-0 bg-prisma-dark z-40 flex flex-col items-center justify-center"
           >
             {/* Ambient glow */}

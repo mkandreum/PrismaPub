@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useToast } from "./Toast";
 import { applySiteFont, DEFAULT_SITE_FONT, SITE_FONT_OPTIONS } from "../fonts";
+import { OVERLAY_TRANSITION, PANEL_TRANSITION, SHEET_TRANSITION } from "../motion";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -106,10 +107,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           <AnimatePresence mode="wait">
             <motion.div
               key={tab}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ ...PANEL_TRANSITION, opacity: OVERLAY_TRANSITION }}
             >
               {tab === "stats" && <StatsTab />}
               {tab === "events" && <EventsTab />}
@@ -267,12 +268,14 @@ function EventsTab() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={OVERLAY_TRANSITION}
             className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 18, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.99 }}
+              transition={{ ...SHEET_TRANSITION, opacity: OVERLAY_TRANSITION }}
               className="bg-white rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl"
             >
               <div className="flex justify-between items-center mb-6">

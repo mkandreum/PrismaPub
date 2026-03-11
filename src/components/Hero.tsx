@@ -39,9 +39,9 @@ export default function Hero() {
       {/* Animated gradient bg */}
       <div className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-[#050510]" />
-        <div className="glow-orb left-[-10%] top-[-5%] h-[500px] w-[500px] bg-[#3a1a7a]/40 blur-[120px] animate-[glow-drift-1_15s_ease-in-out_infinite]" />
-        <div className="glow-orb right-[-10%] top-[10%] h-[600px] w-[600px] bg-[#4c0577]/35 blur-[130px] animate-[glow-drift-2_12s_ease-in-out_infinite]" />
-        <div className="glow-orb bottom-[-10%] left-[20%] h-[450px] w-[450px] bg-[#1e0b4a]/50 blur-[100px] animate-[glow-drift-3_18s_ease-in-out_infinite]" />
+        <div className="glow-orb left-[-8%] top-[-4%] h-[360px] w-[360px] bg-[#3a1a7a]/32 blur-[72px] animate-[glow-drift-1_18s_ease-in-out_infinite] transform-gpu" />
+        <div className="glow-orb right-[-8%] top-[10%] h-[420px] w-[420px] bg-[#4c0577]/28 blur-[78px] animate-[glow-drift-2_16s_ease-in-out_infinite] transform-gpu" />
+        <div className="glow-orb bottom-[-8%] left-[20%] h-[320px] w-[320px] bg-[#1e0b4a]/36 blur-[68px] animate-[glow-drift-3_22s_ease-in-out_infinite] transform-gpu" />
       </div>
 
       {/* Floating particles */}
@@ -118,23 +118,19 @@ export default function Hero() {
             </defs>
 
             {/* Entry beam — white light entering the prism from above */}
-            <motion.line
+            <line
               x1="150" y1="-60" x2="150" y2="48"
               stroke="white"
               strokeWidth="3"
               strokeLinecap="round"
               filter="url(#soft-glow)"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.4, 0.7, 0.4] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              opacity="0.58"
             />
-            <motion.line
+            <line
               x1="150" y1="-60" x2="150" y2="48"
               stroke="white"
               strokeWidth="1.2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              opacity="0.9"
             />
 
             {/* Rainbow beams — extend beyond viewBox via overflow:visible */}
@@ -149,7 +145,7 @@ export default function Hero() {
               { x2: 286, color: "#ff2dff" },
             ].map((beam, i) => (
               <g key={beam.color}>
-                <motion.line
+                <line
                   x1="150"
                   y1="48"
                   x2={beam.x2}
@@ -158,11 +154,9 @@ export default function Hero() {
                   strokeWidth="12"
                   strokeLinecap="round"
                   filter="url(#beam-glow)"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0.55, 0.92, 0.65] }}
-                  transition={{ duration: 2.8, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+                  opacity="0.74"
                 />
-                <motion.line
+                <line
                   x1="150"
                   y1="48"
                   x2={beam.x2}
@@ -170,9 +164,7 @@ export default function Hero() {
                   stroke={beam.color}
                   strokeWidth="5"
                   strokeLinecap="round"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0.72, 1, 0.8] }}
-                  transition={{ duration: 2.1, delay: i * 0.08, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+                  opacity="0.96"
                 />
               </g>
             ))}
@@ -196,37 +188,31 @@ export default function Hero() {
 
             {/* Glowing edge overlays for radiant edges */}
             {/* Left edge glow */}
-            <motion.line
+            <line
               x1="150" y1="48" x2="30" y2="260"
               stroke="url(#prism-edge-left)"
               strokeWidth="4"
               strokeLinecap="round"
               filter="url(#edge-radiance)"
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: [0.4, 0.8, 0.4] }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+              opacity="0.68"
             />
             {/* Right edge glow */}
-            <motion.line
+            <line
               x1="150" y1="48" x2="270" y2="260"
               stroke="url(#prism-edge-right)"
               strokeWidth="4"
               strokeLinecap="round"
               filter="url(#edge-radiance)"
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: [0.4, 0.8, 0.4] }}
-              transition={{ duration: 3.5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
+              opacity="0.68"
             />
             {/* Bottom edge glow */}
-            <motion.line
+            <line
               x1="30" y1="260" x2="270" y2="260"
               stroke="url(#prism-edge-bottom)"
               strokeWidth="3.5"
               strokeLinecap="round"
               filter="url(#edge-radiance)"
-              initial={{ opacity: 0.3 }}
-              animate={{ opacity: [0.3, 0.7, 0.3] }}
-              transition={{ duration: 4, delay: 1, repeat: Infinity, ease: "easeInOut" }}
+              opacity="0.54"
             />
 
             <line x1="150" y1="48" x2="150" y2="260" stroke="rgba(255,255,255,0.45)" strokeWidth="1.1" />
@@ -239,47 +225,37 @@ export default function Hero() {
               {/* Soft radial glow */}
               <circle cx="150" cy="48" r="18" fill="url(#apex-flare)" />
               {/* Bright core */}
-              <motion.circle
+              <circle
                 cx="150" cy="48" r="4"
                 fill="white"
-                initial={{ opacity: 0.8 }}
-                animate={{ opacity: [0.8, 1, 0.8], r: [4, 5, 4] as any }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                opacity="0.96"
               />
               {/* Main cross — long vertical spike */}
-              <motion.line
+              <line
                 x1="150" y1="20" x2="150" y2="76"
                 stroke="white" strokeWidth="1"
                 filter="url(#flare-glow)"
-                initial={{ opacity: 0.6 }}
-                animate={{ opacity: [0.6, 0.9, 0.6] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                opacity="0.82"
               />
               {/* Main cross — long horizontal spike */}
-              <motion.line
+              <line
                 x1="122" y1="48" x2="178" y2="48"
                 stroke="white" strokeWidth="1"
                 filter="url(#flare-glow)"
-                initial={{ opacity: 0.6 }}
-                animate={{ opacity: [0.6, 0.9, 0.6] }}
-                transition={{ duration: 3, delay: 0.2, repeat: Infinity, ease: "easeInOut" }}
+                opacity="0.82"
               />
               {/* Shorter diagonal spikes */}
-              <motion.line
+              <line
                 x1="136" y1="34" x2="164" y2="62"
                 stroke="rgba(220,200,255,0.7)" strokeWidth="0.6"
                 filter="url(#flare-glow)"
-                initial={{ opacity: 0.4 }}
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 2.4, delay: 0.1, repeat: Infinity, ease: "easeInOut" }}
+                opacity="0.48"
               />
-              <motion.line
+              <line
                 x1="164" y1="34" x2="136" y2="62"
                 stroke="rgba(220,200,255,0.7)" strokeWidth="0.6"
                 filter="url(#flare-glow)"
-                initial={{ opacity: 0.4 }}
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 2.4, delay: 0.3, repeat: Infinity, ease: "easeInOut" }}
+                opacity="0.48"
               />
             </g>
           </svg>
@@ -356,7 +332,7 @@ export default function Hero() {
               href="#gallery"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="group inline-flex items-center justify-center gap-2 sm:gap-3 bg-white/5 backdrop-blur-sm border border-prisma-purple/30 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold uppercase tracking-widest text-xs sm:text-sm hover:bg-prisma-purple/20 hover:border-prisma-purple/60 transition-all duration-300"
+              className="group inline-flex items-center justify-center gap-2 sm:gap-3 bg-white/8 border border-prisma-purple/30 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold uppercase tracking-widest text-xs sm:text-sm hover:bg-prisma-purple/20 hover:border-prisma-purple/60 transition-all duration-300"
             >
               Ver galería
             </motion.a>

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { X, Maximize2 } from "lucide-react";
+import { EASE_OUT_EXPO, OVERLAY_TRANSITION, PANEL_TRANSITION } from "../motion";
 
 function toInstagramEmbedUrl(rawUrl: string): string | null {
   try {
@@ -74,7 +75,7 @@ export default function Gallery() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
+                transition={{ duration: 0.58, delay: (i % 3) * 0.08, ease: EASE_OUT_EXPO }}
                 className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-xl"
               >
                 <iframe
@@ -105,12 +106,12 @@ export default function Gallery() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
-                whileHover={{ scale: 1.03, zIndex: 20, transition: { duration: 0.3 } }}
+                transition={{ duration: 0.62, delay: (i % 3) * 0.1, ease: EASE_OUT_EXPO }}
+                whileHover={{ scale: 1.02, zIndex: 20, transition: { duration: 0.34, ease: EASE_OUT_EXPO } }}
                 className="relative group break-inside-avoid cursor-pointer"
                 onClick={() => setSelectedImage(src)}
               >
-                <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl group-hover:shadow-prisma-purple/30 group-hover:border-prisma-purple/30 transition-all duration-500">
+                <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-xl group-hover:shadow-prisma-purple/20 group-hover:border-prisma-purple/30 transition-all duration-500">
                   <div className="relative overflow-hidden">
                     <img
                       src={src}
@@ -139,11 +140,12 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12 bg-black/95 backdrop-blur-md"
+            transition={OVERLAY_TRANSITION}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12 bg-black/94"
             onClick={() => setSelectedImage(null)}
           >
             <motion.button
-              className="absolute top-6 right-6 md:top-10 md:right-10 text-white hover:text-prisma-accent transition-colors z-[210] bg-white/10 p-2 border border-white/20 rounded-full backdrop-blur-sm"
+              className="absolute top-6 right-6 md:top-10 md:right-10 text-white hover:text-prisma-accent transition-colors z-[210] bg-white/10 p-2 border border-white/20 rounded-full"
               whileHover={{ rotate: 90, scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setSelectedImage(null)}
@@ -152,10 +154,10 @@ export default function Gallery() {
             </motion.button>
 
             <motion.div
-              initial={{ scale: 0.8, rotate: -2 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0.8, rotate: 2 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.985, y: 14 }}
+              transition={{ ...PANEL_TRANSITION, opacity: OVERLAY_TRANSITION }}
               className="relative max-w-full max-h-full rounded-2xl overflow-hidden border-2 border-prisma-purple/40 shadow-[0_0_80px_rgba(139,92,246,0.3)]"
               onClick={(e) => e.stopPropagation()}
             >

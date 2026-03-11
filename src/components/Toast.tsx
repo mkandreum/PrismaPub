@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { TOAST_TRANSITION } from "../motion";
 
 export type ToastType = 'loading' | 'success' | 'error';
 
@@ -44,10 +45,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           {toasts.map((toast) => (
             <motion.div
               key={toast.id}
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 100, opacity: 0 }}
-              className="bg-black/90 backdrop-blur-xl border-2 border-prisma-purple/30 p-4 shadow-[0_0_30px_rgba(139,92,246,0.3)] flex items-center gap-3 pointer-events-auto rounded-xl"
+              initial={{ x: 48, opacity: 0, scale: 0.96 }}
+              animate={{ x: 0, opacity: 1, scale: 1 }}
+              exit={{ x: 32, opacity: 0, scale: 0.98 }}
+              transition={TOAST_TRANSITION}
+              className="bg-black/92 border-2 border-prisma-purple/30 p-4 shadow-[0_0_24px_rgba(139,92,246,0.22)] flex items-center gap-3 pointer-events-auto rounded-xl"
             >
               {toast.type === 'loading' && <Loader2 className="animate-spin text-prisma-accent" size={22} />}
               {toast.type === 'success' && <CheckCircle2 className="text-green-400" size={22} />}

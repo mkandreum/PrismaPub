@@ -206,12 +206,17 @@ h1, h2 {
 /* ── NOISE BG ──────────────────────────────────── */
 .noise-bg::before {
   content: '';
-  position: fixed; inset: 0;
+  position: absolute; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-  mix-blend-mode: overlay;
+  z-index: 0;
+  opacity: 0.12;
+}
+
+main > section:not(:first-child),
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
 }
 
 .glow-orb {
@@ -280,7 +285,8 @@ h1, h2 {
 }
 
 .prism-triangle-edge {
-  animation: prism-edge-glow 4s ease-in-out infinite;
+  stroke-width: 2.9;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.72)) drop-shadow(0 0 26px rgba(205, 166, 255, 0.42));
 }
 
 @keyframes prism-shimmer {

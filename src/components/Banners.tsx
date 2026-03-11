@@ -31,7 +31,7 @@ export default function Banners() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="w-full relative overflow-hidden group border-b border-white/10 bg-prisma-purple/80 backdrop-blur-md text-white"
+            className="w-full relative overflow-hidden group border-b border-white/10 bg-prisma-purple/88 text-white"
           >
             <div className="flex items-center py-2 px-4 min-h-[36px] relative overflow-hidden">
               <motion.div

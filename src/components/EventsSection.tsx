@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "motion/react";
 import { Ticket, X, Calendar, Clock, MapPin, Sparkles } from "lucide-react";
 import { useToast } from "./Toast";
+import { EASE_OUT_EXPO, OVERLAY_TRANSITION, PANEL_EXIT_TRANSITION, PANEL_TRANSITION } from "../motion";
 
 interface EventData {
   id: number;
@@ -83,9 +84,9 @@ export default function EventsSection() {
   return (
     <section id="events" className="py-12 md:py-16 px-4 md:px-6 bg-prisma-dark text-white relative overflow-hidden">
       {/* Animated background accents */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-prisma-accent/8 rounded-full blur-[160px] -z-1 animate-[glow-drift-1_12s_ease-in-out_infinite]" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-prisma-purple/15 rounded-full blur-[160px] -z-1 animate-[glow-drift-2_14s_ease-in-out_infinite]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-prisma-deep/5 rounded-full blur-[200px] -z-1 animate-[glow-drift-3_10s_ease-in-out_infinite]" />
+      <div className="absolute top-0 right-0 w-72 h-72 bg-prisma-accent/7 rounded-full blur-[80px] -z-1 animate-[glow-drift-1_16s_ease-in-out_infinite] transform-gpu" />
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-prisma-purple/12 rounded-full blur-[80px] -z-1 animate-[glow-drift-2_18s_ease-in-out_infinite] transform-gpu" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] bg-prisma-deep/5 rounded-full blur-[110px] -z-1 animate-[glow-drift-3_20s_ease-in-out_infinite] transform-gpu" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
@@ -114,9 +115,9 @@ export default function EventsSection() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ delay: i * 0.08, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                whileHover={{ y: -4, transition: { duration: 0.3 } }}
-                className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-md border border-white/[0.12] rounded-3xl overflow-hidden hover:border-prisma-purple/50 hover:shadow-[0_0_50px_rgba(139,92,246,0.2),0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-500 group"
+                transition={{ delay: i * 0.08, duration: 0.72, ease: EASE_OUT_EXPO }}
+                whileHover={{ y: -4, transition: { duration: 0.34, ease: EASE_OUT_EXPO } }}
+                className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] border border-white/[0.12] rounded-3xl overflow-hidden hover:border-prisma-purple/50 hover:shadow-[0_0_32px_rgba(139,92,246,0.16),0_8px_24px_rgba(0,0,0,0.32)] transition-all duration-500 group"
               >
                 {/* Subtle gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-prisma-purple/0 via-prisma-purple/[0.04] to-prisma-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -132,7 +133,7 @@ export default function EventsSection() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-prisma-dark/90 via-prisma-dark/20 to-transparent md:bg-gradient-to-r md:from-transparent md:to-prisma-dark/90" />
                     {/* Price badge on image */}
-                    <div className="absolute top-4 right-4 bg-prisma-dark/70 backdrop-blur-sm border border-prisma-accent/30 rounded-full px-4 py-1.5 md:hidden">
+                    <div className="absolute top-4 right-4 bg-prisma-dark/82 border border-prisma-accent/30 rounded-full px-4 py-1.5 md:hidden">
                       <span className="text-prisma-accent font-display text-lg">{event.price.toFixed(2)}€</span>
                     </div>
                   </div>
@@ -194,13 +195,15 @@ export default function EventsSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={OVERLAY_TRANSITION}
               onClick={closeModal}
               className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
             <motion.div
-              initial={{ scale: 0.9, y: 30 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 30 }}
+              initial={{ opacity: 0, scale: 0.975, y: 24, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.985, y: 18, filter: "blur(6px)" }}
+              transition={{ ...PANEL_TRANSITION, opacity: OVERLAY_TRANSITION, filter: PANEL_EXIT_TRANSITION }}
               className="bg-prisma-dark border-2 border-prisma-purple/30 rounded-3xl p-6 md:p-10 max-w-lg w-full max-h-[90vh] overflow-y-auto relative z-[151] shadow-[0_0_80px_rgba(139,92,246,0.25)]"
             >
               <button

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Lock, Eye, EyeOff } from "lucide-react";
+import { OVERLAY_TRANSITION, SURFACE_ENTER_TRANSITION } from "../motion";
 
 interface LoginProps {
   onLogin: (token: string) => void;
@@ -44,9 +45,9 @@ export default function Login({ onLogin, onBack }: LoginProps) {
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-prisma-deep/15 rounded-full blur-[150px]" />
 
       <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ ...SURFACE_ENTER_TRANSITION, opacity: OVERLAY_TRANSITION }}
         className="w-full max-w-md relative z-10"
       >
         <button
@@ -94,6 +95,7 @@ export default function Login({ onLogin, onBack }: LoginProps) {
             <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={OVERLAY_TRANSITION}
               className="text-prisma-accent text-sm font-semibold uppercase tracking-wider bg-prisma-accent/10 border border-prisma-accent/20 rounded-xl px-4 py-3"
             >
               {error}
