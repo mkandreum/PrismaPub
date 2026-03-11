@@ -58,7 +58,7 @@ export default function Navbar({ onLoginClick, onLogoClick, settings }: NavbarPr
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={SURFACE_ENTER_TRANSITION}
-        className={`fixed left-1/2 -translate-x-1/2 bottom-[max(1.2rem,env(safe-area-inset-bottom))] md:bottom-10 w-[98vw] md:w-[min(1000px,96vw)] z-50 border border-white/10 md:border-2 rounded-full flex justify-center items-center px-3 py-2.5 md:px-6 md:py-2.5 shadow-[0_0_36px_rgba(139,92,246,0.18)] gap-2 md:gap-12 whitespace-nowrap transition-all duration-300 ${scrolled ? 'bg-prisma-dark/88 scale-[0.98]' : 'bg-prisma-dark/72'}`}
+        className={`fixed left-1/2 -translate-x-1/2 bottom-[max(1.2rem,env(safe-area-inset-bottom))] md:bottom-10 w-[98vw] md:w-[min(1000px,96vw)] z-50 border border-white/10 md:border-2 rounded-full backdrop-blur-lg flex justify-center items-center px-3 py-2.5 md:px-6 md:py-2.5 shadow-[0_0_36px_rgba(139,92,246,0.18)] gap-2 md:gap-12 whitespace-nowrap transition-all duration-300 ${scrolled ? 'bg-prisma-dark/88 scale-[0.98]' : 'bg-prisma-dark/72'}`}
       >
         <button
           onClick={() => scrollTo('events')}
