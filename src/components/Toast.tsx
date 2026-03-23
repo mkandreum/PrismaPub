@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { TOAST_TRANSITION } from "../motion";
@@ -20,22 +20,41 @@ const ToastContext = React.createContext<ToastContextType | undefined>(undefined
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  const showToast = (message: string, type: ToastType) => {
+  // Clean up all pending timers on unmount
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
+
+  const hideToast = useCallback((id: string) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  const showToast = useCallback((message: string, type: ToastType) => {
     if (type !== 'loading') {
       setToasts(prev => prev.filter(t => t.type !== 'loading'));
     }
     const id = Math.random().toString(36).substring(2, 9);
     setToasts(prev => [...prev, { id, message, type }]);
     if (type !== 'loading') {
-      setTimeout(() => hideToast(id), 3000);
+      const timer = setTimeout(() => {
+        timersRef.current.delete(id);
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, 3000);
+      timersRef.current.set(id, timer);
     }
     return id;
-  };
-
-  const hideToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
+  }, []);
 
   return (
     <ToastContext.Provider value={{ showToast, hideToast }}>

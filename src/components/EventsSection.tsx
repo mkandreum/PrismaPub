@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Ticket, X, Calendar, Clock, MapPin } from "lucide-react";
 import { useToast } from "./Toast";
@@ -31,6 +31,15 @@ export default function EventsSection() {
   const [purchasedQR, setPurchasedQR] = useState<string | null>(null);
   const [autoRedirecting, setAutoRedirecting] = useState(false);
   const { showToast } = useToast();
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     fetch('/api/events')
@@ -68,7 +77,7 @@ export default function EventsSection() {
           showToast("¡Entrada comprada!", "success");
         }
         setAutoRedirecting(true);
-        setTimeout(() => {
+        redirectTimerRef.current = setTimeout(() => {
           window.location.href = `/ticket/${data.qr_code}`;
         }, 1200);
       } else {
@@ -82,6 +91,10 @@ export default function EventsSection() {
   };
 
   const closeModal = () => {
+    if (redirectTimerRef.current) {
+      clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
     setSelectedEvent(null);
     setCustomerName("");
     setCustomerEmail("");

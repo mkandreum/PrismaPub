@@ -93,8 +93,7 @@ h1, h2 {
   align-items: center;
   width: max-content;
   white-space: nowrap;
-  animation: marquee 28s linear infinite;
-  will-change: transform;
+  animation: marquee 50s linear infinite;
   transform: translateZ(0);
 }
 
