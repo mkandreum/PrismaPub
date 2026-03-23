@@ -343,7 +343,7 @@ app.get('/api/events', (_req, res) => {
         END as remaining_count
       FROM events e
       WHERE e.is_active = 1
-      ORDER BY e.date ASC
+      ORDER BY e.date DESC
     `).all();
     res.json(events);
   } catch { res.status(500).json({ error: 'Failed to fetch events' }); }
@@ -489,8 +489,10 @@ app.patch('/api/admin/events/:id', authenticate, (req, res) => {
 app.delete('/api/admin/events/:id', authenticate, (req, res) => {
   try {
     const ev = db.prepare('SELECT title FROM events WHERE id = ?').get(req.params.id) as any;
+    if (!ev) return res.status(404).json({ error: 'Event not found' });
+    db.prepare('DELETE FROM tickets WHERE event_id = ?').run(req.params.id);
     db.prepare('DELETE FROM events WHERE id = ?').run(req.params.id);
-    logActivity('EVENT_DELETE', `Deleted: ${ev?.title}`);
+    logActivity('EVENT_DELETE', `Deleted: ${ev.title}`);
     res.json({ success: true });
   } catch { res.status(500).json({ error: 'Failed to delete event' }); }
 });

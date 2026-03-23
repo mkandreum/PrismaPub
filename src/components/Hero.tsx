@@ -366,7 +366,7 @@ export default function Hero() {
                   src={leftHeroPhoto}
                   alt="Party"
                   loading="lazy"
-                  className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 grayscale hover:grayscale-0 transition-all duration-500"
+                  className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 transition-all duration-500"
                 />
               </motion.div>
 
