@@ -1,32 +1,15 @@
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import { ArrowRight, Instagram, Sparkles } from "lucide-react";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useMemo } from "react";
 
-export default function Hero() {
-  const [settings, setSettings] = useState<any>({});
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 70]);
-  const parallaxOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-
-  useEffect(() => {
-    fetch('/api/settings')
-      .then(res => res.json())
-      .then(setSettings)
-      .catch(err => console.error("Error fetching settings:", err));
-  }, []);
-
+export default function Hero({ settings }: { settings: Record<string, string> }) {
   const phrase = settings.hero_phrase || "La experiencia LGBT+ definitiva";
   const subtitle = settings.hero_subtitle || "Música • Baile • Libertad";
   const showPhotos = settings.show_hero_photos !== "0";
   const leftHeroPhoto = settings.hero_photo_left_url || "https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop";
   const rightHeroPhoto = settings.hero_photo_right_url || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop";
   const particles = useMemo(
-    () => Array.from({ length: 16 }).map(() => ({
+    () => Array.from({ length: 8 }).map(() => ({
       x: `${5 + Math.random() * 90}%`,
       delay: `${Math.random() * 12}s`,
       duration: `${10 + Math.random() * 14}s`,
@@ -35,7 +18,7 @@ export default function Hero() {
   );
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center overflow-hidden px-4">
+    <section className="relative min-h-screen flex flex-col items-center overflow-hidden px-4">
       {/* Animated gradient bg */}
       <div className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-[#050510]" />
@@ -262,7 +245,7 @@ export default function Hero() {
         </div>
       </motion.div>
 
-      <motion.div style={{ y: parallaxY, opacity: parallaxOpacity }} className="max-w-6xl w-full relative z-10 will-change-transform flex flex-col items-center text-center pt-4 md:pt-6 pb-12 md:pb-14">
+      <div className="max-w-6xl w-full relative z-10 flex flex-col items-center text-center pt-4 md:pt-6 pb-12 md:pb-14">
         {/* Text Content */}
         <div className="flex flex-col items-center text-center">
           {/* Small badge */}
@@ -386,7 +369,7 @@ export default function Hero() {
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </section>
   );
 }
