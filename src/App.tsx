@@ -74,7 +74,7 @@ function MainApp() {
               settings={settings}
             />
             <main>
-              <Hero />
+              <Hero settings={settings} />
               <Marquee text={settings.marquee_1 || 'PRISMA PUB • SAFE SPACE • GOOD VIBES • '} />
               <Suspense fallback={<LazyFallback />}>
                 <EventsSection />
