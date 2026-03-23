@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Ticket, X, Calendar, Clock, MapPin } from "lucide-react";
 import { useToast } from "./Toast";
@@ -120,6 +121,7 @@ export default function EventsSection() {
     : 0;
 
   return (
+    <>
     <section id="events" className="py-12 md:py-16 px-4 md:px-6 bg-prisma-dark text-white relative overflow-hidden">
       {/* Animated background accents */}
       <div className="absolute top-0 right-0 w-72 h-72 bg-prisma-accent/7 rounded-full blur-[80px] -z-1 animate-[glow-drift-1_16s_ease-in-out_infinite] transform-gpu" />
@@ -255,7 +257,11 @@ export default function EventsSection() {
         )}
       </div>
 
-      {/* Ticket Purchase Modal */}
+    </section>
+
+    {/* Ticket Purchase Modal – rendered via portal so iOS Safari's overflow:hidden on the
+        section element does not break position:fixed behaviour. */}
+    {createPortal(
       <AnimatePresence>
         {selectedEvent && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
@@ -365,7 +371,9 @@ export default function EventsSection() {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
-    </section>
+      </AnimatePresence>,
+      document.body
+    )}
+    </>
   );
 }
