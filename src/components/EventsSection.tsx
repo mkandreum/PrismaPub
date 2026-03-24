@@ -211,21 +211,7 @@ export default function EventsSection() {
                         </span>
                       </div>
                       <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">{event.description}</p>
-                      {Number(event.capacity || 0) > 0 && (
-                        <div className="mt-4">
-                          <div className="flex justify-between text-xs uppercase tracking-wider text-gray-400 mb-1">
-                            <span>Aforo</span>
-                            <span>{event.sold_count || 0}/{event.capacity}</span>
-                          </div>
-                          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-prisma-purple to-prisma-accent"
-                              style={{ width: `${Math.min(100, ((event.sold_count || 0) / Math.max(1, Number(event.capacity))) * 100)}%` }}
-                            />
-                          </div>
-                          <p className="text-xs text-gray-400 mt-1">Restantes: {Math.max(0, Number(event.remaining_count ?? (Number(event.capacity) - (event.sold_count || 0))))}</p>
-                        </div>
-                      )}
+
                     </div>
 
                     <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
