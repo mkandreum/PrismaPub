@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { QRCodeSVG } from 'qrcode.react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { OVERLAY_TRANSITION, SURFACE_ENTER_TRANSITION } from '../motion';
 
 interface TicketData {
@@ -20,6 +20,7 @@ export default function Ticket() {
   const { qr_code } = useParams();
   const [ticket, setTicket] = useState<TicketData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     fetch(`/api/tickets/${qr_code}`)
@@ -33,6 +34,28 @@ export default function Ticket() {
         setLoading(false);
       });
   }, [qr_code]);
+
+  const handleDownload = async () => {
+    if (!ticket) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(`/api/tickets/${ticket.qr_code}/image`);
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `entrada-${ticket.qr_code}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -52,13 +75,21 @@ export default function Ticket() {
 
   return (
     <div className="pt-24 min-h-screen bg-prisma-dark text-white px-4 sm:px-6 lg:px-8 pb-20 flex flex-col items-center">
-      <div className="w-full max-w-md mb-8">
+      <div className="w-full max-w-md mb-8 flex items-center justify-between">
         <Link
           to="/"
           className="flex items-center gap-2 text-gray-400 hover:text-prisma-accent transition-colors font-semibold uppercase tracking-widest text-sm"
         >
           <ArrowLeft size={20} /> Back to Home
         </Link>
+        <button
+          onClick={handleDownload}
+          disabled={downloading}
+          className="flex items-center gap-2 bg-prisma-accent hover:bg-prisma-purple text-white px-5 py-2.5 rounded-full font-semibold uppercase tracking-widest text-sm transition-colors disabled:opacity-50"
+        >
+          <Download size={18} />
+          {downloading ? 'Downloading...' : 'Download Ticket'}
+        </button>
       </div>
 
       <motion.div

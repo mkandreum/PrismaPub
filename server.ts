@@ -64,6 +64,30 @@ const getBaseUrl = (req: express.Request) => {
 
 const normalizeBool = (value: string) => ['1', 'true', 'yes', 'on'].includes(String(value || '').toLowerCase());
 
+async function loadEventImageAsBase64(imagePath: string): Promise<string | null> {
+  try {
+    if (!imagePath) return null;
+
+    let buffer: Buffer;
+    if (imagePath.startsWith('/uploads/')) {
+      const filePath = path.join(uploadsDir, imagePath.replace('/uploads/', ''));
+      if (!fs.existsSync(filePath)) return null;
+      buffer = fs.readFileSync(filePath);
+    } else if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      const response = await fetch(imagePath);
+      if (!response.ok) return null;
+      buffer = Buffer.from(await response.arrayBuffer());
+    } else {
+      return null;
+    }
+
+    const resized = await sharp(buffer).resize(1000, 580, { fit: 'cover' }).png().toBuffer();
+    return `data:image/png;base64,${resized.toString('base64')}`;
+  } catch {
+    return null;
+  }
+}
+
 async function buildTicketImageBuffer(ticket: {
   qr_code: string;
   user_name: string;
@@ -71,67 +95,95 @@ async function buildTicketImageBuffer(ticket: {
   event_date: string;
   event_time: string;
   ticket_type?: string;
+  event_image?: string;
 }) {
-  const qrDataUrl = await QRCode.toDataURL(ticket.qr_code, { margin: 1, width: 300 });
+  const qrDataUrl = await QRCode.toDataURL(ticket.qr_code, { margin: 1, width: 400 });
   const ref = ticket.qr_code.split('-')[1] || ticket.qr_code;
-  const dateStr = new Date(ticket.event_date).toLocaleDateString('es-ES');
+  const dateStr = new Date(ticket.event_date).toLocaleDateString('en-GB');
   const titleLine = escapeHtml(ticket.event_title).slice(0, 34);
   const nameLine = escapeHtml(ticket.user_name).slice(0, 34);
-  const typeKey = ticket.ticket_type || 'general';
-  const typeLabel = typeKey.toUpperCase();
-  const typeColors: Record<string, string> = { vip: '#f59e0b', early: '#10b981', general: '#8B5CF6' };
-  const typeColor = typeColors[typeKey] ?? '#8B5CF6';
 
-  // Uses Liberation fonts (installed via fonts-liberation apt package in Dockerfile)
-  // to ensure text renders correctly in the server/container environment.
   const sans = 'Liberation Sans, DejaVu Sans, Arial, sans-serif';
   const mono = 'Liberation Mono, DejaVu Sans Mono, Courier New, monospace';
 
+  const imageDataUrl = await loadEventImageAsBase64(ticket.event_image || '');
+  const imageTag = imageDataUrl && imageDataUrl.startsWith('data:image/')
+    ? `<image href="${imageDataUrl}" x="40" y="40" width="1000" height="580" opacity="0.7" clip-path="url(#headerClip)"/>`
+    : '';
+
   const rainbowColors = ['#E40303', '#FF8C00', '#FFED00', '#008026', '#24408E', '#732982'];
-  const rainbowStripes = rainbowColors
-    .map((color, i) => `<rect x="60" y="${60 + i * 16}" width="960" height="16" fill="${color}" clip-path="url(#headerClip)"/>`)
+  const flagStripes = rainbowColors
+    .map((color, i) => `<rect x="910" y="${90 + i * 12}" width="80" height="12" fill="${color}"/>`)
     .join('\n  ');
 
-  const svg = `<svg width="1080" height="1560" viewBox="0 0 1080 1560" xmlns="http://www.w3.org/2000/svg">
+  const svg = `<svg width="1080" height="1760" viewBox="0 0 1080 1760" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1e1b4b"/>
-      <stop offset="100%" stop-color="#7c3aed"/>
-    </linearGradient>
     <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0b0f26"/>
-      <stop offset="55%" stop-color="#15123b"/>
-      <stop offset="100%" stop-color="#26135b"/>
+      <stop offset="0%" stop-color="#0a0a14"/>
+      <stop offset="55%" stop-color="#12102e"/>
+      <stop offset="100%" stop-color="#1a0f3c"/>
     </linearGradient>
     <clipPath id="headerClip">
-      <rect x="60" y="60" rx="48" ry="48" width="960" height="360"/>
+      <rect x="40" y="40" rx="96" ry="96" width="1000" height="580"/>
     </clipPath>
+    <clipPath id="cardClip">
+      <rect x="40" y="40" rx="96" ry="96" width="1000" height="1680"/>
+    </clipPath>
+    <filter id="qrShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#00000022"/>
+    </filter>
   </defs>
-  <rect width="1080" height="1560" fill="url(#bgGrad)"/>
-  <rect x="60" y="60" rx="48" ry="48" width="960" height="1440" fill="#ffffff"/>
-  <rect x="60" y="60" width="960" height="360" fill="url(#headerGrad)" clip-path="url(#headerClip)"/>
-  ${rainbowStripes}
-  <text x="120" y="295" font-size="96" font-family="${sans}" font-weight="700" fill="#ffffff" letter-spacing="6">PRISMA</text>
-  <text x="120" y="375" font-size="40" font-family="${sans}" font-weight="400" fill="#c4b5fd" letter-spacing="10">PUB</text>
-  <rect x="820" y="308" rx="20" ry="20" width="164" height="48" fill="${typeColor}"/>
-  <text x="902" y="341" text-anchor="middle" font-size="26" font-family="${sans}" font-weight="700" fill="#ffffff">${typeLabel}</text>
-  <text x="120" y="494" font-size="52" font-family="${sans}" font-weight="700" fill="#1b133e">${titleLine}</text>
-  <rect x="120" y="514" width="840" height="2" fill="#f3f4f6"/>
-  <text x="120" y="576" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">FECHA</text>
-  <text x="120" y="624" font-size="36" font-family="${mono}" font-weight="600" fill="#111827">${dateStr}</text>
-  <text x="560" y="576" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">HORA</text>
-  <text x="560" y="624" font-size="36" font-family="${mono}" font-weight="600" fill="#111827">${escapeHtml(ticket.event_time)}</text>
-  <text x="120" y="696" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">NOMBRE</text>
-  <text x="120" y="744" font-size="36" font-family="${mono}" font-weight="600" fill="#111827">${nameLine}</text>
-  <text x="560" y="696" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">REFERENCIA</text>
-  <text x="560" y="744" font-size="34" font-family="${mono}" font-weight="600" fill="#111827">${escapeHtml(ref)}</text>
-  <circle cx="60"   cy="808" r="44" fill="url(#bgGrad)"/>
-  <circle cx="1020" cy="808" r="44" fill="url(#bgGrad)"/>
-  <line x1="110" y1="808" x2="970" y2="808" stroke="#d1d5db" stroke-width="3" stroke-dasharray="20,14"/>
-  <text x="540" y="878" text-anchor="middle" font-size="24" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="4">CÓDIGO QR</text>
-  <rect x="230" y="898" rx="28" ry="28" width="620" height="550" fill="#f5f3ff"/>
-  <image href="${qrDataUrl}" x="300" y="938" width="480" height="480"/>
-  <text x="540" y="1470" text-anchor="middle" font-size="24" font-family="${mono}" fill="#6b7280">${escapeHtml(ticket.qr_code)}</text>
+
+  <!-- Background -->
+  <rect width="1080" height="1760" fill="url(#bgGrad)"/>
+
+  <!-- White card -->
+  <rect x="40" y="40" rx="96" ry="96" width="1000" height="1680" fill="#ffffff"/>
+
+  <!-- Header: purple background -->
+  <rect x="40" y="40" width="1000" height="580" fill="#8B5CF6" clip-path="url(#headerClip)"/>
+
+  <!-- Header: event image overlay -->
+  ${imageTag}
+
+  <!-- PRISMA branding -->
+  <text x="106" y="140" font-size="56" font-family="${sans}" font-weight="800" fill="#ffffff" letter-spacing="4">PRISMA</text>
+
+  <!-- Pride flag -->
+  ${flagStripes}
+
+  <!-- Cutout circles at image/details boundary -->
+  <circle cx="40" cy="620" r="36" fill="url(#bgGrad)"/>
+  <circle cx="1040" cy="620" r="36" fill="url(#bgGrad)"/>
+
+  <!-- Decorative curve -->
+  <path d="M40,670 C290,770 790,570 1040,670" fill="none" stroke="rgba(168,85,247,0.15)" stroke-width="3"/>
+
+  <!-- Event title -->
+  <text x="106" y="754" font-size="64" font-family="${sans}" font-weight="800" fill="#0a0a14" letter-spacing="-1">${titleLine}</text>
+
+  <!-- Details grid -->
+  <text x="106" y="842" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="4">DATE</text>
+  <text x="106" y="878" font-size="32" font-family="${mono}" font-weight="600" fill="#111827">${dateStr}</text>
+
+  <text x="560" y="842" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="4">TIME</text>
+  <text x="560" y="878" font-size="32" font-family="${mono}" font-weight="600" fill="#111827">${escapeHtml(ticket.event_time)}</text>
+
+  <text x="106" y="954" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="4">NAME</text>
+  <text x="106" y="990" font-size="32" font-family="${mono}" font-weight="600" fill="#111827">${nameLine}</text>
+
+  <text x="560" y="954" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="4">REFERENCE</text>
+  <text x="560" y="990" font-size="32" font-family="${mono}" font-weight="600" fill="#111827">${escapeHtml(ref)}</text>
+
+  <!-- Dashed separator -->
+  <line x1="80" y1="1080" x2="1000" y2="1080" stroke="#e5e7eb" stroke-width="3" stroke-dasharray="16,12"/>
+
+  <!-- QR section -->
+  <rect x="310" y="1130" rx="32" ry="32" width="460" height="460" fill="#ffffff" filter="url(#qrShadow)"/>
+  <image href="${qrDataUrl}" x="340" y="1160" width="400" height="400"/>
+
+  <!-- QR code text -->
+  <text x="540" y="1640" text-anchor="middle" font-size="22" font-family="${mono}" fill="#9ca3af" letter-spacing="3">${escapeHtml(ticket.qr_code)}</text>
 </svg>`;
 
   return sharp(Buffer.from(svg)).png().toBuffer();
@@ -145,6 +197,7 @@ async function sendTicketEmail(req: express.Request, payload: {
   event_date: string;
   event_time: string;
   ticket_type?: string;
+  event_image?: string;
 }) {
   const smtpEnabled = normalizeBool(getSetting('smtp_enabled', '0'));
   if (!smtpEnabled) {
@@ -171,7 +224,6 @@ async function sendTicketEmail(req: express.Request, payload: {
   });
 
   const ticketImage = await buildTicketImageBuffer(payload);
-  const qrPng = await QRCode.toBuffer(payload.qr_code, { margin: 1, width: 420 });
   const ticketUrl = `${getBaseUrl(req)}/ticket/${encodeURIComponent(payload.qr_code)}`;
 
   await transporter.sendMail({
@@ -182,15 +234,14 @@ async function sendTicketEmail(req: express.Request, payload: {
       <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
         <h2 style="margin-bottom: 8px;">¡Tu entrada está lista! 🎉</h2>
         <p style="margin-top: 0; color: #4b5563;">Evento: <strong>${escapeHtml(payload.event_title)}</strong></p>
-        <p style="color: #4b5563;">Fecha: ${escapeHtml(new Date(payload.event_date).toLocaleDateString('es-ES'))} · Hora: ${escapeHtml(payload.event_time)}</p>
-        <p style="color: #4b5563;">Adjuntamos tu entrada en imagen y tu QR.</p>
+        <p style="color: #4b5563;">Fecha: ${escapeHtml(new Date(payload.event_date).toLocaleDateString('en-GB'))} · Hora: ${escapeHtml(payload.event_time)}</p>
+        <p style="color: #4b5563;">Adjuntamos tu entrada en imagen. También puedes verla online:</p>
         <p><a href="${ticketUrl}" style="display:inline-block;background:#8B5CF6;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700;">Ver entrada online</a></p>
         <img src="cid:ticket-image" alt="Entrada" style="width:100%;max-width:520px;border-radius:16px;border:1px solid #e5e7eb;margin-top:12px;"/>
       </div>
     `,
     attachments: [
       { filename: `entrada-${payload.qr_code}.png`, content: ticketImage, cid: 'ticket-image' },
-      { filename: `qr-${payload.qr_code}.png`, content: qrPng },
     ],
   });
 
@@ -430,6 +481,7 @@ app.post('/api/tickets', async (req, res) => {
       event_date: event.date,
       event_time: event.time,
       ticket_type: chosenType,
+      event_image: event.image,
     };
 
     try {
@@ -456,6 +508,36 @@ app.get('/api/tickets/:qr_code', (req, res) => {
     if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
     res.json(ticket);
   } catch { res.status(500).json({ error: 'Failed to fetch ticket' }); }
+});
+
+app.get('/api/tickets/:qr_code/image', async (req, res) => {
+  try {
+    const ticket = db.prepare(`
+      SELECT t.*, e.title as event_title, e.date as event_date, e.time as event_time, e.image as event_image
+      FROM tickets t JOIN events e ON t.event_id = e.id WHERE t.qr_code = ?
+    `).get(req.params.qr_code) as any;
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+
+    const imageBuffer = await buildTicketImageBuffer({
+      qr_code: ticket.qr_code,
+      user_name: ticket.user_name,
+      event_title: ticket.event_title,
+      event_date: ticket.event_date,
+      event_time: ticket.event_time,
+      ticket_type: ticket.ticket_type,
+      event_image: ticket.event_image,
+    });
+
+    res.set({
+      'Content-Type': 'image/png',
+      'Content-Disposition': `attachment; filename="entrada-${ticket.qr_code}.png"`,
+      'Cache-Control': 'public, max-age=86400',
+    });
+    res.send(imageBuffer);
+  } catch (err) {
+    console.error('Ticket image generation error:', err);
+    res.status(500).json({ error: 'Failed to generate ticket image' });
+  }
 });
 
 app.get('/api/gallery', (_req, res) => {
@@ -555,7 +637,7 @@ app.delete('/api/admin/tickets/:id', authenticate, (req, res) => {
 app.post('/api/admin/tickets/:id/resend', authenticate, async (req, res) => {
   try {
     const ticket = db.prepare(`
-      SELECT t.*, e.title as event_title, e.date as event_date, e.time as event_time
+      SELECT t.*, e.title as event_title, e.date as event_date, e.time as event_time, e.image as event_image
       FROM tickets t
       JOIN events e ON t.event_id = e.id
       WHERE t.id = ?
@@ -570,6 +652,7 @@ app.post('/api/admin/tickets/:id/resend', authenticate, async (req, res) => {
       event_date: ticket.event_date,
       event_time: ticket.event_time,
       ticket_type: ticket.ticket_type,
+      event_image: ticket.event_image,
     });
 
     if (result.sent) {
