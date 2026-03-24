@@ -107,7 +107,7 @@ async function buildTicketImageBuffer(ticket: {
   const mono = 'Liberation Mono, DejaVu Sans Mono, Courier New, monospace';
 
   const imageDataUrl = await loadEventImageAsBase64(ticket.event_image || '');
-  const imageTag = imageDataUrl
+  const imageTag = imageDataUrl && imageDataUrl.startsWith('data:image/')
     ? `<image href="${imageDataUrl}" x="40" y="40" width="1000" height="580" opacity="0.7" clip-path="url(#headerClip)"/>`
     : '';
 
@@ -234,7 +234,7 @@ async function sendTicketEmail(req: express.Request, payload: {
       <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; color: #111827;">
         <h2 style="margin-bottom: 8px;">¡Tu entrada está lista! 🎉</h2>
         <p style="margin-top: 0; color: #4b5563;">Evento: <strong>${escapeHtml(payload.event_title)}</strong></p>
-        <p style="color: #4b5563;">Fecha: ${escapeHtml(new Date(payload.event_date).toLocaleDateString('es-ES'))} · Hora: ${escapeHtml(payload.event_time)}</p>
+        <p style="color: #4b5563;">Fecha: ${escapeHtml(new Date(payload.event_date).toLocaleDateString('en-GB'))} · Hora: ${escapeHtml(payload.event_time)}</p>
         <p style="color: #4b5563;">Adjuntamos tu entrada en imagen. También puedes verla online:</p>
         <p><a href="${ticketUrl}" style="display:inline-block;background:#8B5CF6;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none;font-weight:700;">Ver entrada online</a></p>
         <img src="cid:ticket-image" alt="Entrada" style="width:100%;max-width:520px;border-radius:16px;border:1px solid #e5e7eb;margin-top:12px;"/>
@@ -534,7 +534,10 @@ app.get('/api/tickets/:qr_code/image', async (req, res) => {
       'Cache-Control': 'public, max-age=86400',
     });
     res.send(imageBuffer);
-  } catch { res.status(500).json({ error: 'Failed to generate ticket image' }); }
+  } catch (err) {
+    console.error('Ticket image generation error:', err);
+    res.status(500).json({ error: 'Failed to generate ticket image' });
+  }
 });
 
 app.get('/api/gallery', (_req, res) => {
