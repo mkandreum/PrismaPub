@@ -100,11 +100,11 @@ async function buildTicketImageBuffer(ticket: {
   const qrDataUrl = await QRCode.toDataURL(ticket.qr_code, { margin: 1, width: 400 });
   const ref = ticket.qr_code.split('-')[1] || ticket.qr_code;
   const dateStr = new Date(ticket.event_date).toLocaleDateString('en-GB');
-  const titleLine = escapeHtml(ticket.event_title).slice(0, 34);
-  const nameLine = escapeHtml(ticket.user_name).slice(0, 34);
+  const titleLine = escapeHtml([...ticket.event_title].slice(0, 34).join(''));
+  const nameLine = escapeHtml([...ticket.user_name].slice(0, 34).join(''));
 
-  const sans = 'Liberation Sans, DejaVu Sans, Arial, sans-serif';
-  const mono = 'Liberation Mono, DejaVu Sans Mono, Courier New, monospace';
+  const sans = 'Liberation Sans, DejaVu Sans, Arial, Noto Color Emoji, sans-serif';
+  const mono = 'Liberation Mono, DejaVu Sans Mono, Courier New, Noto Color Emoji, monospace';
 
   const imageDataUrl = await loadEventImageAsBase64(ticket.event_image || '');
   const imageTag = imageDataUrl && imageDataUrl.startsWith('data:image/')

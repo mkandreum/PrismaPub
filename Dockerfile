@@ -15,7 +15,7 @@ FROM node:20-slim
 WORKDIR /app
 
 # Install fonts required for SVG/ticket image rendering with Sharp/librsvg
-RUN apt-get update && apt-get install -y --no-install-recommends fonts-liberation && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends fonts-liberation fonts-noto-color-emoji && rm -rf /var/lib/apt/lists/*
 
 # Install production dependencies only
 COPY package*.json ./
