@@ -70,32 +70,69 @@ async function buildTicketImageBuffer(ticket: {
   event_title: string;
   event_date: string;
   event_time: string;
+  ticket_type?: string;
 }) {
-  const qrDataUrl = await QRCode.toDataURL(ticket.qr_code, { margin: 1, width: 260 });
+  const qrDataUrl = await QRCode.toDataURL(ticket.qr_code, { margin: 1, width: 300 });
   const ref = ticket.qr_code.split('-')[1] || ticket.qr_code;
+  const dateStr = new Date(ticket.event_date).toLocaleDateString('es-ES');
+  const titleLine = escapeHtml(ticket.event_title).slice(0, 34);
+  const nameLine = escapeHtml(ticket.user_name).slice(0, 34);
+  const typeKey = ticket.ticket_type || 'general';
+  const typeLabel = typeKey.toUpperCase();
+  const typeColors: Record<string, string> = { vip: '#f59e0b', early: '#10b981', general: '#8B5CF6' };
+  const typeColor = typeColors[typeKey] ?? '#8B5CF6';
 
-  const svg = `
-    <svg width="1080" height="1350" viewBox="0 0 1080 1350" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#0b0f26"/>
-          <stop offset="55%" stop-color="#15123b"/>
-          <stop offset="100%" stop-color="#26135b"/>
-        </linearGradient>
-      </defs>
-      <rect width="1080" height="1350" fill="url(#bg)"/>
-      <rect x="60" y="70" rx="40" ry="40" width="960" height="1210" fill="#ffffff"/>
-      <text x="120" y="180" font-size="88" font-family="Arial Black, Arial, sans-serif" fill="#1b133e">PRISMA</text>
-      <text x="120" y="260" font-size="62" font-family="Arial, sans-serif" font-weight="700" fill="#8B5CF6">${escapeHtml(ticket.event_title).slice(0, 34)}</text>
-      <text x="120" y="330" font-size="34" font-family="Arial, sans-serif" fill="#4b5563">Fecha: ${escapeHtml(new Date(ticket.event_date).toLocaleDateString('es-ES'))}</text>
-      <text x="120" y="378" font-size="34" font-family="Arial, sans-serif" fill="#4b5563">Hora: ${escapeHtml(ticket.event_time)}</text>
-      <text x="120" y="426" font-size="34" font-family="Arial, sans-serif" fill="#4b5563">Nombre: ${escapeHtml(ticket.user_name).slice(0, 36)}</text>
-      <text x="120" y="474" font-size="30" font-family="Courier New, monospace" fill="#6b7280">Referencia: ${escapeHtml(ref)}</text>
-      <rect x="240" y="560" rx="24" ry="24" width="600" height="600" fill="#f5f3ff"/>
-      <image href="${qrDataUrl}" x="310" y="630" width="460" height="460"/>
-      <text x="540" y="1188" text-anchor="middle" font-size="24" font-family="Courier New, monospace" fill="#6b7280">${escapeHtml(ticket.qr_code)}</text>
-    </svg>
-  `;
+  // Uses Liberation fonts (installed via fonts-liberation apt package in Dockerfile)
+  // to ensure text renders correctly in the server/container environment.
+  const sans = 'Liberation Sans, DejaVu Sans, Arial, sans-serif';
+  const mono = 'Liberation Mono, DejaVu Sans Mono, Courier New, monospace';
+
+  const rainbowColors = ['#E40303', '#FF8C00', '#FFED00', '#008026', '#24408E', '#732982'];
+  const rainbowStripes = rainbowColors
+    .map((color, i) => `<rect x="60" y="${60 + i * 16}" width="960" height="16" fill="${color}" clip-path="url(#headerClip)"/>`)
+    .join('\n  ');
+
+  const svg = `<svg width="1080" height="1560" viewBox="0 0 1080 1560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0f26"/>
+      <stop offset="55%" stop-color="#15123b"/>
+      <stop offset="100%" stop-color="#26135b"/>
+    </linearGradient>
+    <clipPath id="headerClip">
+      <rect x="60" y="60" rx="48" ry="48" width="960" height="360"/>
+    </clipPath>
+  </defs>
+  <rect width="1080" height="1560" fill="url(#bgGrad)"/>
+  <rect x="60" y="60" rx="48" ry="48" width="960" height="1440" fill="#ffffff"/>
+  <rect x="60" y="60" width="960" height="360" fill="url(#headerGrad)" clip-path="url(#headerClip)"/>
+  ${rainbowStripes}
+  <text x="120" y="295" font-size="96" font-family="${sans}" font-weight="700" fill="#ffffff" letter-spacing="6">PRISMA</text>
+  <text x="120" y="375" font-size="40" font-family="${sans}" font-weight="400" fill="#c4b5fd" letter-spacing="10">PUB</text>
+  <rect x="820" y="308" rx="20" ry="20" width="164" height="48" fill="${typeColor}"/>
+  <text x="902" y="341" text-anchor="middle" font-size="26" font-family="${sans}" font-weight="700" fill="#ffffff">${typeLabel}</text>
+  <text x="120" y="494" font-size="52" font-family="${sans}" font-weight="700" fill="#1b133e">${titleLine}</text>
+  <rect x="120" y="514" width="840" height="2" fill="#f3f4f6"/>
+  <text x="120" y="576" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">FECHA</text>
+  <text x="120" y="624" font-size="36" font-family="${mono}" font-weight="600" fill="#111827">${dateStr}</text>
+  <text x="560" y="576" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">HORA</text>
+  <text x="560" y="624" font-size="36" font-family="${mono}" font-weight="600" fill="#111827">${escapeHtml(ticket.event_time)}</text>
+  <text x="120" y="696" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">NOMBRE</text>
+  <text x="120" y="744" font-size="36" font-family="${mono}" font-weight="600" fill="#111827">${nameLine}</text>
+  <text x="560" y="696" font-size="22" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="3">REFERENCIA</text>
+  <text x="560" y="744" font-size="34" font-family="${mono}" font-weight="600" fill="#111827">${escapeHtml(ref)}</text>
+  <circle cx="60"   cy="808" r="44" fill="url(#bgGrad)"/>
+  <circle cx="1020" cy="808" r="44" fill="url(#bgGrad)"/>
+  <line x1="110" y1="808" x2="970" y2="808" stroke="#d1d5db" stroke-width="3" stroke-dasharray="20,14"/>
+  <text x="540" y="878" text-anchor="middle" font-size="24" font-family="${sans}" font-weight="700" fill="#9ca3af" letter-spacing="4">CÓDIGO QR</text>
+  <rect x="230" y="898" rx="28" ry="28" width="620" height="550" fill="#f5f3ff"/>
+  <image href="${qrDataUrl}" x="300" y="938" width="480" height="480"/>
+  <text x="540" y="1470" text-anchor="middle" font-size="24" font-family="${mono}" fill="#6b7280">${escapeHtml(ticket.qr_code)}</text>
+</svg>`;
 
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
@@ -107,6 +144,7 @@ async function sendTicketEmail(req: express.Request, payload: {
   event_title: string;
   event_date: string;
   event_time: string;
+  ticket_type?: string;
 }) {
   const smtpEnabled = normalizeBool(getSetting('smtp_enabled', '0'));
   if (!smtpEnabled) {
@@ -391,6 +429,7 @@ app.post('/api/tickets', async (req, res) => {
       event_title: event.title,
       event_date: event.date,
       event_time: event.time,
+      ticket_type: chosenType,
     };
 
     try {
@@ -530,6 +569,7 @@ app.post('/api/admin/tickets/:id/resend', authenticate, async (req, res) => {
       event_title: ticket.event_title,
       event_date: ticket.event_date,
       event_time: ticket.event_time,
+      ticket_type: ticket.ticket_type,
     });
 
     if (result.sent) {
