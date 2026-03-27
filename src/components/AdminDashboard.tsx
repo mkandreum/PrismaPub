@@ -343,6 +343,7 @@ function EventsTab() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h4 className="font-display text-lg uppercase truncate">{ev.title}</h4>
+                {ev.is_expired ? <span className="text-xs bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">Caducado</span> : null}
                 {!ev.is_active && <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Inactivo</span>}
               </div>
               <p className="text-xs text-gray-400">{ev.date} • {ev.time} • {ev.price}€</p>
