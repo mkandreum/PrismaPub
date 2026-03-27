@@ -432,7 +432,8 @@ app.get('/api/events', (_req, res) => {
         END as remaining_count
       FROM events e
       WHERE e.is_active = 1
-      ORDER BY e.date DESC
+        AND e.date >= date('now', 'localtime')
+      ORDER BY e.date ASC
     `).all();
     res.json(events);
   } catch { res.status(500).json({ error: 'Failed to fetch events' }); }
@@ -565,7 +566,8 @@ app.get('/api/admin/events', authenticate, (_req, res) => {
       CASE WHEN COALESCE(e.capacity, 0) > 0
         THEN MAX(0, e.capacity - COALESCE((SELECT COUNT(*) FROM tickets t WHERE t.event_id = e.id), 0))
         ELSE NULL
-      END as remaining_count
+      END as remaining_count,
+      CASE WHEN e.date < date('now', 'localtime') THEN 1 ELSE 0 END as is_expired
     FROM events e
     ORDER BY e.date DESC
   `).all());
