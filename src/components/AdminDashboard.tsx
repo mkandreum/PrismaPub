@@ -1176,7 +1176,7 @@ function SettingsTab() {
             <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen del título</label>
             {settings.hero_image_url && (
               <div className="flex items-center gap-4 mb-3">
-                <img src={settings.hero_image_url} alt="Hero" className="max-w-xs h-32 object-contain rounded-xl border bg-gray-900 p-2" />
+                <img src={settings.hero_image_url} alt="Imagen del título principal" className="max-w-xs h-32 object-contain rounded-xl border bg-gray-900 p-2" />
                 <button onClick={removeHeroImage} type="button" className="text-xs text-red-500 hover:text-red-700 underline">Quitar imagen</button>
               </div>
             )}
