@@ -337,33 +337,33 @@ export default function Hero({ settings }: { settings: Record<string, string> })
 
         {/* Photos below prism — controlled by admin setting */}
         {showPhotos && (
-          <div className="w-full max-w-[600px] mt-8">
-            <div className="relative w-full h-[40vh] md:h-[45vh]">
+          <div className="w-full max-w-[700px] mt-8">
+            <div className="flex items-start justify-center gap-4">
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
-                animate={{ opacity: 1, scale: 1, rotate: -5 }}
+                initial={{ opacity: 0, scale: 0.9, rotate: -3 }}
+                animate={{ opacity: 1, scale: 1, rotate: -3 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="absolute left-0 top-0 w-2/3 h-full z-10"
+                className="w-1/2 flex-shrink-0"
               >
                 <img
                   src={leftHeroPhoto}
                   alt="Party"
                   loading="lazy"
-                  className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 transition-all duration-500"
+                  className="w-full h-auto object-contain rounded-2xl shadow-2xl shadow-prisma-purple/20 border-2 border-prisma-purple/20 transition-all duration-500"
                 />
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
-                animate={{ opacity: 1, scale: 1, rotate: 5 }}
+                initial={{ opacity: 0, scale: 0.9, rotate: 3 }}
+                animate={{ opacity: 1, scale: 1, rotate: 3 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
-                className="absolute right-0 top-10 w-1/2 h-full z-20"
+                className="w-1/2 flex-shrink-0 mt-6"
               >
                 <img
                   src={rightHeroPhoto}
                   alt="Club"
                   loading="lazy"
-                  className="w-full h-full object-cover rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
+                  className="w-full h-auto object-contain rounded-2xl shadow-2xl shadow-prisma-purple/30 border-2 border-prisma-purple/30"
                 />
               </motion.div>
             </div>
