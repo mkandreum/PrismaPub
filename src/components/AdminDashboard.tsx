@@ -981,6 +981,12 @@ function SettingsTab() {
     markDirty('logo_url', '');
   };
 
+  const removeHeroImage = () => {
+    setSettings(s => ({ ...s, hero_image_url: '', use_hero_title_image: '0' }));
+    markDirty('hero_image_url', '');
+    markDirty('use_hero_title_image', '0');
+  };
+
   const update = (key: string, value: string) => {
     setSettings(s => ({ ...s, [key]: value }));
     markDirty(key, value);
@@ -990,7 +996,7 @@ function SettingsTab() {
   const LOGO_KEYS = ["logo_url"];
   const MARQUEE_KEYS = ["marquee_1", "marquee_2"];
   const SMTP_KEYS = ["smtp_host", "smtp_port", "smtp_user", "smtp_pass", "smtp_from_name", "smtp_from_email", "smtp_enabled", "smtp_secure"];
-  const HERO_KEYS = ["hero_phrase", "hero_subtitle", "show_hero_photos", "hero_image_url", "hero_photo_left_url", "hero_photo_right_url"];
+  const HERO_KEYS = ["hero_phrase", "hero_subtitle", "show_hero_photos", "hero_image_url", "hero_photo_left_url", "hero_photo_right_url", "use_hero_title_image"];
 
   return (
     <div>
@@ -1157,6 +1163,32 @@ function SettingsTab() {
             <label className="inline-flex items-center gap-2 text-sm text-gray-700">
               <input
                 type="checkbox"
+                checked={(settings.use_hero_title_image || "0") === "1"}
+                onChange={(e) => update("use_hero_title_image", e.target.checked ? "1" : "0")}
+                className="accent-prisma-accent"
+                disabled={!settings.hero_image_url}
+              />
+              Usar imagen en lugar del título
+            </label>
+            <p className="text-xs text-gray-400 mt-1">Si se activa, se mostrará la imagen subida en lugar del texto del título principal. Sube una imagen primero para activar esta opción.</p>
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen del título</label>
+            {settings.hero_image_url && (
+              <div className="flex items-center gap-4 mb-3">
+                <img src={settings.hero_image_url} alt="Hero" className="max-w-xs h-32 object-contain rounded-xl border bg-gray-900 p-2" />
+                <button onClick={removeHeroImage} type="button" className="text-xs text-red-500 hover:text-red-700 underline">Quitar imagen</button>
+              </div>
+            )}
+            <label className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
+              <Upload size={16} /> {settings.hero_image_url ? 'Cambiar imagen' : 'Subir imagen'}
+              <input ref={heroRef} type="file" accept="image/*" onChange={uploadHero} className="hidden" />
+            </label>
+          </div>
+          <div>
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
                 checked={(settings.show_hero_photos || "1") === "1"}
                 onChange={(e) => update("show_hero_photos", e.target.checked ? "1" : "0")}
                 className="accent-prisma-accent"
@@ -1164,16 +1196,6 @@ function SettingsTab() {
               Mostrar fotos de inicio (fiesta y club)
             </label>
             <p className="text-xs text-gray-400 mt-1">Si se desactiva, solo se mostrará el prisma y el texto en la sección principal.</p>
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Imagen principal</label>
-            {settings.hero_image_url && (
-              <img src={settings.hero_image_url} alt="Hero" className="w-full max-w-xs h-32 object-cover rounded-xl mb-3 border" />
-            )}
-            <label className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
-              <Upload size={16} /> Cambiar imagen
-              <input ref={heroRef} type="file" accept="image/*" onChange={uploadHero} className="hidden" />
-            </label>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

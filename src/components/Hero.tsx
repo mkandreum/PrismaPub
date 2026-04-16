@@ -6,6 +6,7 @@ export default function Hero({ settings }: { settings: Record<string, string> })
   const phrase = settings.hero_phrase || "La experiencia LGBT+ definitiva";
   const subtitle = settings.hero_subtitle || "Música • Baile • Libertad";
   const showPhotos = settings.show_hero_photos !== "0";
+  const useHeroTitleImage = settings.use_hero_title_image === "1" && !!settings.hero_image_url;
   const leftHeroPhoto = settings.hero_photo_left_url || "https://images.unsplash.com/photo-1545128485-c400e7702796?q=80&w=2070&auto=format&fit=crop";
   const rightHeroPhoto = settings.hero_photo_right_url || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop";
   const particles = useMemo(
@@ -259,27 +260,35 @@ export default function Hero({ settings }: { settings: Record<string, string> })
             Espacio seguro
           </motion.div>
 
-          {/* Main heading */}
+          {/* Main heading — image or text */}
           <motion.div
             initial={{ x: -80, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ type: "spring", duration: 1 }}
             className="max-w-[760px]"
           >
-            <h1 className="headline-glow text-6xl md:text-8xl xl:text-[8.4rem] font-display uppercase text-white mb-5 tracking-[-0.08em]">
-              {phrase.split(' ').map((word: string, i: number) => (
-                <motion.span
-                  key={i}
-                  initial={{ y: 60, opacity: 0, rotateX: 90 }}
-                  animate={{ y: 0, opacity: 1, rotateX: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1, type: "spring", damping: 12 }}
-                  className="inline-block mr-3 last:mr-0 hover:text-white transition-colors duration-300"
-                  style={{ textShadow: '0 0 70px rgba(110,92,255,0.24)' }}
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </h1>
+            {useHeroTitleImage ? (
+              <img
+                src={settings.hero_image_url}
+                alt={phrase}
+                className="mx-auto max-h-[220px] md:max-h-[320px] w-auto object-contain mb-5 drop-shadow-[0_0_40px_rgba(110,92,255,0.3)]"
+              />
+            ) : (
+              <h1 className="headline-glow text-6xl md:text-8xl xl:text-[8.4rem] font-display uppercase text-white mb-5 tracking-[-0.08em]">
+                {phrase.split(' ').map((word: string, i: number) => (
+                  <motion.span
+                    key={i}
+                    initial={{ y: 60, opacity: 0, rotateX: 90 }}
+                    animate={{ y: 0, opacity: 1, rotateX: 0 }}
+                    transition={{ delay: 0.3 + i * 0.1, type: "spring", damping: 12 }}
+                    className="inline-block mr-3 last:mr-0 hover:text-white transition-colors duration-300"
+                    style={{ textShadow: '0 0 70px rgba(110,92,255,0.24)' }}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </h1>
+            )}
           </motion.div>
 
           <motion.p
