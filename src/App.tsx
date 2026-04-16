@@ -113,7 +113,7 @@ function Footer({ settings }: { settings: Record<string, string> }) {
   return (
     <footer id="contact" className="bg-prisma-dark border-t border-prisma-purple/20 pt-10 md:pt-12 pb-24 md:pb-28 px-4 md:px-6 relative overflow-hidden">
       {/* Subtle footer glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-prisma-purple/5 rounded-full blur-[150px] -z-0" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] rounded-full -z-0" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)' }} />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="grid md:grid-cols-3 gap-8 md:gap-10 mb-10">
           {/* Brand */}

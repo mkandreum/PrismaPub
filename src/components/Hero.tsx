@@ -23,9 +23,9 @@ export default function Hero({ settings }: { settings: Record<string, string> })
       {/* Animated gradient bg */}
       <div className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-[#050510]" />
-        <div className="glow-orb left-[-8%] top-[-4%] h-[360px] w-[360px] bg-[#3a1a7a]/32 blur-[72px] animate-[glow-drift-1_18s_ease-in-out_infinite] transform-gpu" />
-        <div className="glow-orb right-[-8%] top-[10%] h-[420px] w-[420px] bg-[#4c0577]/28 blur-[78px] animate-[glow-drift-2_16s_ease-in-out_infinite] transform-gpu" />
-        <div className="glow-orb bottom-[-8%] left-[20%] h-[320px] w-[320px] bg-[#1e0b4a]/36 blur-[68px] animate-[glow-drift-3_22s_ease-in-out_infinite] transform-gpu" />
+        <div className="glow-orb left-[-12%] top-[-8%] h-[540px] w-[540px] animate-[glow-drift-1_18s_ease-in-out_infinite] transform-gpu" style={{ background: 'radial-gradient(circle, rgba(58,26,122,0.32) 0%, transparent 70%)' }} />
+        <div className="glow-orb right-[-12%] top-[6%] h-[600px] w-[600px] animate-[glow-drift-2_16s_ease-in-out_infinite] transform-gpu" style={{ background: 'radial-gradient(circle, rgba(76,5,119,0.28) 0%, transparent 70%)' }} />
+        <div className="glow-orb bottom-[-12%] left-[16%] h-[500px] w-[500px] animate-[glow-drift-3_22s_ease-in-out_infinite] transform-gpu" style={{ background: 'radial-gradient(circle, rgba(30,11,74,0.36) 0%, transparent 70%)' }} />
       </div>
 
       {/* Floating particles */}
