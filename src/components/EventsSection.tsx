@@ -124,9 +124,9 @@ export default function EventsSection() {
     <>
     <section id="events" className="py-12 md:py-16 px-4 md:px-6 bg-prisma-dark text-white relative overflow-hidden">
       {/* Animated background accents */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-prisma-accent/7 rounded-full blur-[80px] -z-1 animate-[glow-drift-1_16s_ease-in-out_infinite] transform-gpu" />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-prisma-purple/12 rounded-full blur-[80px] -z-1 animate-[glow-drift-2_18s_ease-in-out_infinite] transform-gpu" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] bg-prisma-deep/5 rounded-full blur-[110px] -z-1 animate-[glow-drift-3_20s_ease-in-out_infinite] transform-gpu" />
+      <div className="absolute top-[-40px] right-[-40px] w-[448px] h-[448px] rounded-full -z-1 animate-[glow-drift-1_16s_ease-in-out_infinite] transform-gpu" style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%)' }} />
+      <div className="absolute bottom-[-40px] left-[-40px] w-[448px] h-[448px] rounded-full -z-1 animate-[glow-drift-2_18s_ease-in-out_infinite] transform-gpu" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] rounded-full -z-1 animate-[glow-drift-3_20s_ease-in-out_infinite] transform-gpu" style={{ background: 'radial-gradient(circle, rgba(91,33,182,0.05) 0%, transparent 70%)' }} />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div

@@ -37,15 +37,13 @@ body {
 body::before {
   content: "";
   position: fixed;
-  inset: -10%;
+  inset: 0;
   background:
-    radial-gradient(circle at 82% 22%, rgba(255, 96, 204, 0.22) 0, transparent 22%),
-    radial-gradient(circle at 20% 10%, rgba(114, 83, 255, 0.22) 0, transparent 25%),
-    radial-gradient(circle at 70% 72%, rgba(69, 131, 255, 0.14) 0, transparent 26%);
-  filter: blur(70px);
+    radial-gradient(circle at 82% 22%, rgba(255, 96, 204, 0.18) 0, transparent 38%),
+    radial-gradient(circle at 20% 10%, rgba(114, 83, 255, 0.18) 0, transparent 40%),
+    radial-gradient(circle at 70% 72%, rgba(69, 131, 255, 0.12) 0, transparent 42%);
   pointer-events: none;
   z-index: -2;
-  will-change: auto;
   contain: strict;
 }
 
@@ -221,11 +219,12 @@ h1, h2 {
 /* ── NOISE BG ──────────────────────────────────── */
 .noise-bg::before {
   content: '';
-  position: absolute; inset: 0;
+  position: fixed; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
   opacity: 0.12;
+  contain: strict;
 }
 
 main > section:not(:first-child),
@@ -237,10 +236,10 @@ footer {
 .glow-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(90px);
   pointer-events: none;
   will-change: transform;
   contain: layout style;
+  backface-visibility: hidden;
 }
 
 /* GPU-accelerated glow-orb drift animations (replaces JS-driven motion) */
