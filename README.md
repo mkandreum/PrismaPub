@@ -1,36 +1,56 @@
+<div align="center">
 
+# 🍺 PrismaPub
 
-# PrismaPub
+**Sistema de gestión para bares y pubs**
 
-Web app + admin panel for events, ticket sales, gallery, and promotional banners.
+*Un producto de [Xyon Platforms](https://github.com/mkandreum)*
 
-## Local Development
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 
-Prerequisites: Node.js 18+
+</div>
 
-1. Install dependencies: `npm install`
-2. Configure environment variables (see section below)
-3. Run the app: `npm run dev`
+---
 
-## Environment Variables
+## ¿Qué es PrismaPub?
 
-The backend reads environment variables directly from the process environment (Docker Compose/Coolify recommended in production).
+PrismaPub es una plataforma web de gestión para bares y pubs desarrollada por Xyon Platforms. Facilita la administración de pedidos, carta digital y operativa del negocio desde una interfaz web moderna.
 
-- `ADMIN_PASSWORD`: Initial admin password used only when the DB is first initialized.
-- `JWT_SECRET`: Active JWT signing secret. Required in production.
-- `JWT_SECRET_PREVIOUS`: Previous JWT secret accepted for token verification during key rotation.
+## ✨ Funcionalidades
 
-### JWT Rotation
+- **Carta digital** interactiva para clientes
+- **Gestión de pedidos** y comandas
+- **Panel de administración** del negocio
+- **Despliegue self-hosted** vía Docker y Coolify
 
-To rotate JWT secrets without instantly logging out active admin sessions:
+## 🛠️ Stack técnico
 
-1. Set current secret in `JWT_SECRET`.
-2. Move old secret to `JWT_SECRET_PREVIOUS`.
-3. Deploy.
-4. After old tokens expire, remove `JWT_SECRET_PREVIOUS`.
+| Capa | Tecnología |
+|------|----------|
+| Frontend | React + TypeScript + Vite |
+| Backend | Node.js + TypeScript |
+| Despliegue | Docker + Coolify |
 
-Security note: Always use long random values for JWT secrets in production.
+## 🚀 Instalación
 
-## Deployment
+```bash
+git clone https://github.com/mkandreum/PrismaPub.git
+cd PrismaPub
+cp .env.example .env
+docker-compose up -d
+```
 
-This project includes `Dockerfile` and `docker-compose.yaml` for container deployment (for example, Coolify).
+### Desarrollo local
+
+```bash
+npm install
+npm run dev
+```
+
+## 🏢 Xyon Platforms
+
+PrismaPub es un producto desarrollado y mantenido por **Xyon Platforms**, empresa especializada en soluciones digitales para negocios locales y pymes.
+
+> © Xyon Platforms — Todos los derechos reservados
